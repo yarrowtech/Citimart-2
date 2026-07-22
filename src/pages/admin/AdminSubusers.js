@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./AdminSubusers.module.css";
+import { FaUserPlus, FaUsersCog, FaShieldAlt, FaEdit, FaTrash, FaKey, FaSave, FaTimes } from "react-icons/fa";
 
 const rolePermissions = {
   Viewer: ["content", "reports", "faq"],
@@ -233,180 +234,59 @@ const AdminSubusers = () => {
     }
   };
 
+  const activePermissionCount = (permissions = {}) => Object.values(permissions).filter(Boolean).length;
+
   return (
-    <div className={styles.container}>
-      <h2>Manage Subusers</h2>
+    <section className={styles.page}>
+      <header className={styles.hero}>
+        <div><span>Access management</span><h1>Admin Subusers</h1><p>Create staff accounts and control exactly what each person can access.</p></div>
+        <div className={styles.heroIcon}><FaUsersCog /></div>
+      </header>
 
-      {/* Add Subuser Form */}
-      <form className={styles.form} onSubmit={handleAddSubuser}>
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleFormChange}
-          required
-        />
+      <div className={styles.statsGrid}>
+        <article><span><FaUsersCog /></span><div><strong>{subusers.length}</strong><small>Total subusers</small></div></article>
+        <article><span><FaShieldAlt /></span><div><strong>{new Set(subusers.map((item) => item.role)).size}</strong><small>Roles assigned</small></div></article>
+        <article><span><FaUsersCog /></span><div><strong>{subusers.filter((item) => item.parentId).length}</strong><small>Linked accounts</small></div></article>
+      </div>
 
-        <label>Assign To</label>
-        <select name="parentType" value={form.parentType} onChange={handleFormChange}>
-          <option value="Customer">Customer</option>
-          <option value="Vendor">Vendor</option>
-          <option value="Admin">Admin</option>
-          <option value="Merchandise">Merchandise</option>
-          <option value="Marketing">Marketing</option>
-          <option value="HeadOffice">Head Office</option>
-        </select>
+      <div className={styles.workspace}>
+        <form className={styles.formCard} onSubmit={handleAddSubuser}>
+          <div className={styles.sectionHeading}><span><FaUserPlus /></span><div><h2>Add a subuser</h2><p>An invitation will be emailed for password setup.</p></div></div>
+          <div className={styles.formGrid}>
+            <label className={styles.field}><span>Email address</span><input type="email" name="email" value={form.email} onChange={handleFormChange} placeholder="staff@citimart.com" required /></label>
+            <label className={styles.field}><span>Assign to</span><select name="parentType" value={form.parentType} onChange={handleFormChange}><option>Customer</option><option>Vendor</option><option>Admin</option><option>Merchandise</option><option>Marketing</option><option value="HeadOffice">Head Office</option></select></label>
+            <label className={styles.field}><span>Parent account</span>{["Admin","Merchandise","Marketing","HeadOffice"].includes(form.parentType) ? <div className={styles.notRequired}>No parent account required</div> : <select name="parentId" value={form.parentId} onChange={handleFormChange} required><option value="">Select parent</option>{parentAccounts.map((account) => <option key={account._id} value={account._id}>{account.email}</option>)}</select>}</label>
+            <label className={styles.field}><span>Staff role</span><select name="role" value={form.role} onChange={handleFormChange}>{Object.keys(rolePermissions).map((role) => <option key={role}>{role}</option>)}</select></label>
+          </div>
+          <div className={styles.permissionBlock}>
+            <div className={styles.permissionTitle}><span>Permissions</span><small>{activePermissionCount(form.permissions)} selected</small></div>
+            <div className={styles.checkboxGrid}>{Object.keys(form.permissions).map((permission) => <label key={permission} className={form.permissions[permission] ? styles.permissionChecked : ""}><input type="checkbox" name={permission} checked={form.permissions[permission]} onChange={handlePermissionChange}/><span>{permission[0].toUpperCase()+permission.slice(1)}</span></label>)}</div>
+          </div>
+          <button className={styles.primaryBtn} type="submit"><FaUserPlus /> Add Subuser</button>
+        </form>
 
-        <label>Parent Account</label>
-        {["Admin", "Merchandise", "Marketing", "HeadOffice"].includes(form.parentType) ? (
-          <p>No parent account required</p>
-        ) : (
-          <select
-            name="parentId"
-            value={form.parentId}
-            onChange={handleFormChange}
-            required
-          >
-            <option value="">-- Select Parent --</option>
-            {parentAccounts.map((acc) => (
-              <option key={acc._id} value={acc._id}>
-                {acc.email}
-              </option>
-            ))}
-          </select>
-        )}
+        <aside className={styles.roleGuide}>
+          <div className={styles.sectionHeading}><span><FaShieldAlt /></span><div><h2>Role guide</h2><p>Recommended access presets</p></div></div>
+          <div className={styles.roleList}>{Object.entries(rolePermissions).map(([role, permissions], index) => <div className={styles.roleItem} key={role}><span className={`${styles.roleColor} ${styles[`roleColor${index%4}`]}`}/><div><strong>{role}</strong><small>{permissions.length} permissions</small></div></div>)}</div>
+        </aside>
+      </div>
 
-        <label>Role</label>
-        <select name="role" value={form.role} onChange={handleFormChange}>
-          {Object.keys(rolePermissions).map((role) => (
-            <option key={role}>{role}</option>
-          ))}
-        </select>
-
-        <label>Permissions</label>
-        <div className={styles.checkboxGroup}>
-          {Object.keys(form.permissions).map((perm) => (
-            <label key={perm}>
-              <input
-                type="checkbox"
-                name={perm}
-                checked={form.permissions[perm]}
-                onChange={handlePermissionChange}
-              />
-              {perm.charAt(0).toUpperCase() + perm.slice(1)}
-            </label>
-          ))}
-        </div>
-
-        <button type="submit">Add Subuser</button>
-      </form>
-
-      {/* List of Subusers */}
-      <h3>Existing Subusers</h3>
-      {subusers.length === 0 ? (
-        <p>No subusers found.</p>
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Type</th>
-              <th>Parent</th>
-              <th>Role</th>
-              <th>Permissions</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subusers.map((su) => (
-              <tr key={su._id}>
-                <td>
-                  {editingId === su._id ? (
-                    <input
-                      name="email"
-                      value={editForm?.email || ""}
-                      onChange={handleEditFormChange}
-                    />
-                  ) : (
-                    su.email
-                  )}
-                </td>
-                <td>
-                  {editingId === su._id ? (
-                    <select
-                      name="parentType"
-                      value={editForm.parentType}
-                      onChange={handleEditFormChange}
-                    >
-                      <option value="Customer">Customer</option>
-                      <option value="Vendor">Vendor</option>
-                      <option value="Admin">Admin</option>
-                      <option value="Merchandise">Merchandise</option>
-                    </select>
-                  ) : (
-                    su.parentType
-                  )}
-                </td>
-                <td>{su.parentId || "N/A"}</td>
-                <td>
-                  {editingId === su._id ? (
-                    <select
-                      name="role"
-                      value={editForm.role}
-                      onChange={handleEditFormChange}
-                    >
-                      {Object.keys(rolePermissions).map((role) => (
-                        <option key={role}>{role}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    su.role
-                  )}
-                </td>
-                <td>
-                  {editingId === su._id ? (
-                    <div className={styles.checkboxGroup}>
-                      {Object.keys(editForm.permissions).map((perm) => (
-                        <label key={perm}>
-                          <input
-                            type="checkbox"
-                            name={perm}
-                            checked={editForm.permissions[perm]}
-                            onChange={handleEditPermissionChange}
-                          />
-                          {perm.charAt(0).toUpperCase() + perm.slice(1)}
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    Object.keys(su.permissions)
-                      .filter((p) => su.permissions[p])
-                      .join(", ") || "None"
-                  )}
-                </td>
-                <td>
-                  {editingId === su._id ? (
-                    <>
-                      <button onClick={() => handleSaveEdit(su._id)}>Save</button>
-                      <button onClick={handleCancelEdit}>Cancel</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => handleEdit(su)}>Edit</button>
-                      <button onClick={() => handleDelete(su._id)}>Delete</button>
-                      <button onClick={() => handleResetPassword(su._id)}>
-                        Reset Password
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+      <div className={styles.listCard}>
+        <div className={styles.listHeader}><div><span>Team directory</span><h2>Existing Subusers</h2></div><strong>{subusers.length} accounts</strong></div>
+        {!subusers.length ? <div className={styles.emptyState}><FaUsersCog/><h3>No subusers found</h3><p>Add your first staff account above.</p></div> : <div className={styles.tableWrap}>
+          <table className={styles.table}><thead><tr><th>Email</th><th>Account type</th><th>Parent</th><th>Role</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>
+            {subusers.map((subuser,index) => <tr key={subuser._id}>
+              <td data-label="Email">{editingId===subuser._id ? <input name="email" value={editForm?.email||""} onChange={handleEditFormChange}/> : <div className={styles.userCell}><span>{subuser.email?.[0]?.toUpperCase()}</span><div><strong>{subuser.email}</strong><small>Staff account</small></div></div>}</td>
+              <td data-label="Account type">{editingId===subuser._id ? <select name="parentType" value={editForm.parentType} onChange={handleEditFormChange}><option>Customer</option><option>Vendor</option><option>Admin</option><option>Merchandise</option><option>Marketing</option><option value="HeadOffice">Head Office</option></select> : <span className={styles.typeBadge}>{subuser.parentType||"Admin"}</span>}</td>
+              <td data-label="Parent"><span className={styles.parentText}>{subuser.parentId||"Not required"}</span></td>
+              <td data-label="Role">{editingId===subuser._id ? <select name="role" value={editForm.role} onChange={handleEditFormChange}>{Object.keys(rolePermissions).map((role)=><option key={role}>{role}</option>)}</select> : <span className={`${styles.roleBadge} ${styles[`roleBadge${index%4}`]}`}>{subuser.role}</span>}</td>
+              <td data-label="Permissions">{editingId===subuser._id ? <div className={styles.editPermissions}>{Object.keys(editForm.permissions||{}).map((permission)=><label key={permission}><input type="checkbox" name={permission} checked={editForm.permissions[permission]} onChange={handleEditPermissionChange}/>{permission}</label>)}</div> : <div className={styles.permissionChips}>{Object.keys(subuser.permissions||{}).filter((permission)=>subuser.permissions[permission]).map((permission)=><span key={permission}>{permission}</span>)}{!activePermissionCount(subuser.permissions)&&<small>None</small>}</div>}</td>
+              <td data-label="Actions"><div className={styles.actions}>{editingId===subuser._id ? <><button className={styles.saveBtn} type="button" onClick={()=>handleSaveEdit(subuser._id)}><FaSave/><span>Save</span></button><button className={styles.cancelBtn} type="button" onClick={handleCancelEdit}><FaTimes/><span>Cancel</span></button></> : <><button className={styles.editBtn} type="button" onClick={()=>handleEdit(subuser)}><FaEdit/><span>Edit</span></button><button className={styles.keyBtn} type="button" onClick={()=>handleResetPassword(subuser._id)}><FaKey/><span>Reset</span></button><button className={styles.deleteBtn} type="button" onClick={()=>handleDelete(subuser._id)}><FaTrash/><span>Delete</span></button></>}</div></td>
+            </tr>)}
+          </tbody></table>
+        </div>}
+      </div>
+    </section>
   );
 };
 

@@ -654,3 +654,53 @@
 }
 
 
+
+/* Keep gift controls isolated from broad form styles used by admin pages. */
+.giftSection {
+  width: 100%;
+  margin-top: 0.85rem;
+}
+
+.giftSection .giftLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 24px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.giftSection .giftCheckbox {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  flex: 0 0 18px;
+  width: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  max-height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  vertical-align: middle;
+  accent-color: #ff4081;
+}
+
+.giftSection .giftInput {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76px;
+  margin-top: 0.65rem;
+  padding: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .giftSection .giftLabel { align-items: flex-start; font-size: 0.9rem; }
+  .giftSection .giftCheckbox { margin-top: 1px; }
+  .giftSection .giftInput { min-height: 68px; }
+}

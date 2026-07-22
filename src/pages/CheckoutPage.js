@@ -7,7 +7,8 @@ const CheckoutPage = () => {
   const { 
     cartItems: cartFromState = [], 
     isGift = false, 
-    giftMessage = ""
+    giftMessage = "",
+    checkoutMode = "cart"
   } = location.state || {};
 
   const [cartItems, setCartItems] = useState(cartFromState);
@@ -23,6 +24,12 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [customerInfo, setCustomerInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [offerMessage, setOfferMessage] = useState('');
+  const [appliedOffers, setAppliedOffers] = useState([]);
+  const [eligibleOffers, setEligibleOffers] = useState([]);
   const [phone, setPhone] = useState('');
   const navigate = useNavigate();
 
@@ -30,10 +37,74 @@ const CheckoutPage = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetchCart();
-    fetchCustomerInfo();
-  }, []);
+    if (!customerId || !token) {
+      navigate('/login', { replace: true });
+      return;
+    }
 
+    const loadCheckout = async () => {
+      try {
+        if (checkoutMode === 'buyNow' && cartFromState.length) {
+          setCartItems(cartFromState);
+          calculateTotals(cartFromState);
+        } else {
+          await fetchCart();
+        }
+        await fetchCustomerInfo();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCheckout();
+  }, [customerId, token, checkoutMode, navigate]);
+
+  const normalizedItems = (items) => items.map(item => ({
+    product_id: item.product?._id || item.product_id,
+    quantity: Number(item.quantity || 1),
+    size: item.size || "N/A",
+    color: item.color || "",
+    isGift: Boolean(item.isGift || item.gift_option),
+    giftMessage: item.giftMessage || item.gift_message || ""
+  }));
+
+  const calculateTotals = async (items, code = couponCode) => {
+    if (!items.length) return;
+    try {
+      const res = await fetch('http://localhost:5000/customer/checkout-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          customer_id: customerId,
+          checkout_mode: checkoutMode,
+          items: normalizedItems(items),
+          coupon_code: code.trim(),
+          isGift
+        })
+      });
+      const quote = await res.json();
+      if (!res.ok) throw new Error(quote.error || 'Unable to calculate total');
+      setTotals({
+        subtotal: quote.subtotal,
+        discount: quote.discount,
+        deliveryFee: quote.delivery_fee,
+        giftWrapFee: quote.gift_wrap_fee,
+        finalTotal: quote.final_total
+      });
+      setAppliedOffers(quote.applied_offers || []);
+      setEligibleOffers(quote.eligible_offers || []);
+      if (code.trim()) {
+        const used = (quote.applied_offers || []).some(offer =>
+          (quote.eligible_offers || []).some(candidate => candidate.code?.toUpperCase() === code.trim().toUpperCase() && candidate.id === offer.id)
+        );
+        setOfferMessage(used ? 'Offer applied.' : 'This code is invalid, ineligible, or another offer saves you more.');
+      } else {
+        setOfferMessage('');
+      }
+    } catch (error) {
+      setOfferMessage(error.message);
+    }
+  };
   // Fetch cart and calculate totals
   const fetchCart = async () => {
   try {
@@ -41,7 +112,7 @@ const CheckoutPage = () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-
+    if (!res.ok) throw new Error(data.error || data.message || "Unable to load cart");
     // Merge gift info from cart state
     const mergedItems = (data.items || []).map(item => {
       const buyNowItem = cartFromState.find(ci => ci.product?._id === item.product?._id);
@@ -54,26 +125,7 @@ const CheckoutPage = () => {
 
     setCartItems(mergedItems);
 
-    // ---------- TOTALS LOGIC ----------
-    const subtotal = mergedItems.reduce(
-      (sum, i) => sum + (i.product?.price || 0) * i.quantity,
-      0
-    );
-
-    const discount = subtotal > 2000 ? 100 : 0; // same as Cart.js ₹100 off for big orders
-
-    const discountedTotal = subtotal - discount;
-
-    const deliveryFee = discountedTotal > 500 ? 0 : 50; // FREE delivery logic
-
-    const giftWrapFee = mergedItems.reduce(
-      (sum, i) => sum + (i.isGift ? 50 : 0),
-      0
-    );
-
-    const finalTotal = discountedTotal + deliveryFee + giftWrapFee;
-
-    setTotals({ subtotal, discount, deliveryFee, giftWrapFee, finalTotal });
+    calculateTotals(mergedItems);
 
   } catch (err) {
     console.error('Error fetching cart:', err);
@@ -120,10 +172,13 @@ const CheckoutPage = () => {
 
   // Handle order placement
   const handlePlaceOrder = async () => {
+    if (placingOrder) return;
     if (!address.trim()) return alert("Please enter delivery address");
     if (!phone.trim()) return alert("Please enter your phone number");
     if (!cartItems.length) return alert("Your cart is empty");
     if (!customerInfo) return alert("Customer info not loaded yet");
+
+    setPlacingOrder(true);
 
     // COD flow
     if (paymentMethod === "cod") {
@@ -145,9 +200,14 @@ const CheckoutPage = () => {
   giftMessage: item.giftMessage || ""
 })),
 
-            gift_option: isGift,
-            gift_message: giftMessage,
-            amount: totals.finalTotal
+            checkout_mode: checkoutMode,
+            isGift,
+            giftMessage,
+            coupon_code: couponCode.trim(),
+            discount: totals.discount,
+            deliveryFee: totals.deliveryFee,
+            giftWrapFee: totals.giftWrapFee,
+            amount: totals.subtotal - totals.discount
           }),
         });
 
@@ -169,11 +229,13 @@ navigate('/order-success', {
   },
 });
       } else {
-        alert(data.message || "Checkout failed");
+        alert(data.error || data.message || "Checkout failed");
       }
     } catch (err) {
       console.error("Checkout error:", err);
       alert("Something went wrong during COD checkout.");
+    } finally {
+      setPlacingOrder(false);
     }
     return;
   }
@@ -186,14 +248,17 @@ navigate('/order-success', {
       const orderRes = await fetch('http://localhost:5000/customer/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ amount: totals.finalTotal })
+        body: JSON.stringify({
+          customer_id: customerId, checkout_mode: checkoutMode,
+          items: normalizedItems(cartItems), coupon_code: couponCode.trim(), isGift
+        })
       });
 
       const orderData = await orderRes.json();
       if (!orderRes.ok || !orderData.id) return alert(orderData.message || "Order creation failed");
 
       const options = {
-        key: 'rzp_test_RAjRxvEgV7RPjm',
+        key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Citimart',
@@ -211,14 +276,21 @@ navigate('/order-success', {
                 address,
                 phone,
                 items: cartItems.map(item => ({
-                  ...item,
+                  product_id: item.product?._id,
                   quantity: Number(item.quantity),
-                  gift_option: item.isGift || false,
-                  gift_message: item.giftMessage || ""
+                  size: item.size || "N/A",
+                  color: item.color || "N/A",
+                  isGift: item.isGift || false,
+                  giftMessage: item.giftMessage || ""
                 })),
                 customer_id: customerId,
-                gift_option: isGift,
-                gift_message: giftMessage
+                checkout_mode: checkoutMode,
+                isGift,
+                giftMessage,
+                coupon_code: couponCode.trim(),
+                discount: totals.discount,
+                deliveryFee: totals.deliveryFee,
+                giftWrapFee: totals.giftWrapFee
               }),
             });
 
@@ -253,6 +325,8 @@ navigate('/order-success', {
     } catch (err) {
       console.error("Razorpay error:", err);
       alert("Payment failed. Please try again.");
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
@@ -261,6 +335,8 @@ navigate('/order-success', {
     const subcategory = product.subcategory?.toLowerCase();
     return category === 'clothing' || (category === 'handmade' && subcategory === 'jewelry');
   };
+
+  if (loading) return <div className={styles.checkoutPage}>Loading checkout...</div>;
 
   return (
     <div className={styles.checkoutPage}>
@@ -306,8 +382,8 @@ navigate('/order-success', {
             <option value="card">Credit/Debit Card</option>
           </select>
 
-          <button className={styles.placeOrderBtn} onClick={handlePlaceOrder}>
-            Place Order
+          <button className={styles.placeOrderBtn} onClick={handlePlaceOrder} disabled={placingOrder}>
+            {placingOrder ? "Placing Order..." : "Place Order"}
           </button>
         </div>
 
@@ -329,7 +405,7 @@ navigate('/order-success', {
                 </Link>
 
                 <div className={styles.itemDetails}>
-                  <Link to={`/product/${item.product?._id}`} className={styles.itemNameLink}>
+                  <Link to={`/products/${item.product?._id}`} className={styles.itemNameLink}>
                     <p>{item.product?.name}</p>
                   </Link>
                   <small>
@@ -365,6 +441,22 @@ navigate('/order-success', {
               </li>
             ))}
           </ul>
+          <div className={styles.offerBox}>
+            <label htmlFor="checkout-coupon"><strong>Offer code</strong></label>
+            <div className={styles.couponRow}>
+              <input id="checkout-coupon" className={styles.couponInput} value={couponCode}
+                onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                placeholder="Enter coupon code" />
+              <button type="button" onClick={() => calculateTotals(cartItems, couponCode)}>Apply</button>
+            </div>
+            {offerMessage && <small>{offerMessage}</small>}
+            {eligibleOffers.filter(offer => offer.code).length > 0 && (
+              <small className={styles.availableOffers}>
+                Available: {eligibleOffers.filter(offer => offer.code).map(offer => offer.code).join(', ')}
+              </small>
+            )}
+            {appliedOffers.map(offer => <div key={offer.id} className={styles.appliedOffer}>✓ {offer.title}</div>)}
+          </div>
 
           <hr />
           <div className={styles.totalRow}><span>Subtotal:</span><strong>₹{totals.subtotal}</strong></div>

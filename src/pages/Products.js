@@ -635,6 +635,7 @@ const Products = () => {
       });
       const d = await res.json();
       showToast(d.message === "Added to cart" ? "✅ Added to Cart!" : `❌ ${d.error || "Failed"}`);
+      if (d.message === "Added to cart") window.dispatchEvent(new Event("citimart:counts-changed"));
     } catch { showToast("❌ Error"); }
     setPopup(null);
   };
@@ -649,6 +650,7 @@ const Products = () => {
       });
       const d = await res.json();
       showToast(d.message === "Added to wishlist" ? "❤️ Added to Wishlist!" : `❌ ${d.error || "Failed"}`);
+      if (d.message === "Added to wishlist") window.dispatchEvent(new Event("citimart:counts-changed"));
     } catch { showToast("❌ Error"); }
     setPopup(null);
   };

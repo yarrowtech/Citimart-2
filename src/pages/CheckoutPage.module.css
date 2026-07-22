@@ -63,3 +63,82 @@
   font-size: 14px;
   color: #333;
 }
+
+.phoneInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.addressInput,
+.paymentSelect {
+  box-sizing: border-box;
+}
+
+.placeOrderBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.itemDetails,
+.itemNameLink {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .checkoutPage {
+    padding: 1rem;
+  }
+
+  .checkoutContainer {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .left,
+  .right {
+    width: 100%;
+  }
+
+  .placeOrderBtn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .totalRow {
+    gap: 1rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkoutPage {
+    padding: 0.75rem;
+  }
+
+  .summaryItem {
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .summaryItem img {
+    width: 52px;
+    height: 52px;
+  }
+}
+.offerBox {
+  margin: 1rem 0;
+  padding: 0.9rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff8fb;
+}
+.couponRow { display: flex; gap: 0.5rem; align-items: center; }
+.couponRow .couponInput { margin: 0.5rem 0; min-width: 0; }
+.couponRow button { padding: 0.65rem 1rem; border: 0; border-radius: 7px; background: #ec407a; color: white; cursor: pointer; }
+.availableOffers { display: block; margin-top: 0.35rem; color: #555; }
+.appliedOffer { margin-top: 0.4rem; color: #167447; font-weight: 600; }

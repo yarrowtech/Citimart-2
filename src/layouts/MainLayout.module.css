@@ -464,7 +464,7 @@
 /*   RESPONSIVE TOP CONTAINER    */
 /* ============================= */
 
-/* Tablet screens (≤1024px) */
+/* Tablet screens (up to 1024px) */
 @media (max-width: 1024px) {
   .topContainer {
     max-width: 95%;
@@ -488,7 +488,7 @@
   }
 }
 
-/* Mobile screens (≤768px) */
+/* Mobile screens (up to 768px) */
 @media (max-width: 768px) {
   .topContainer {
     flex-direction: column;
@@ -527,7 +527,7 @@
   }
 }
 
-/* Very small screens (≤480px) */
+/* Very small screens (up to 480px) */
 @media (max-width: 480px) {
   .topContainer {
     padding: 0.4rem;
@@ -549,3 +549,255 @@
 }
 
 
+
+/* Unified responsive header actions */
+.topContainer {
+  min-height: 44px;
+  gap: 1rem;
+}
+
+.sellerLink,
+.topContainer .sellerLink {
+  margin: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: #fff;
+  font-weight: 700;
+}
+
+.right {
+  min-width: 0;
+  margin-left: auto;
+  gap: 0.65rem;
+  overflow: visible;
+}
+
+.topContainer .iconLink,
+.topContainer .settingsIcon,
+.logoutBtn,
+.greeting {
+  min-height: 34px;
+  box-sizing: border-box;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.topContainer .iconLink,
+.topContainer .settingsIcon,
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+.topContainer .settingsIcon {
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.topContainer .settingsIcon svg {
+  flex: 0 0 auto;
+  font-size: 1rem;
+}
+
+.greeting {
+  display: inline-flex;
+  align-items: center;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1024px) {
+  .topContainer {
+    max-width: 100%;
+  }
+
+  .right {
+    gap: 0.4rem;
+  }
+
+  .topContainer .iconLink,
+  .topContainer .settingsIcon,
+  .logoutBtn {
+    padding: 6px 9px;
+  }
+
+  .greeting {
+    max-width: 135px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topBar {
+    padding: 0.45rem 0;
+  }
+
+  .topContainer {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .right {
+    width: auto;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .topContainer .iconLink,
+  .topContainer .settingsIcon,
+  .logoutBtn {
+    flex: 0 0 auto;
+  }
+
+  .greeting {
+    max-width: 120px;
+  }
+
+  .navContainer {
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+
+  .logo {
+    flex: 0 0 auto;
+  }
+
+  .logoText {
+    display: none;
+  }
+
+  .navLinks {
+    order: 2;
+    gap: 1rem;
+  }
+
+  .search {
+    order: 3;
+    flex: 1 0 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .topContainer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 0.65rem;
+  }
+
+  .topContainer .sellerLink {
+    align-self: flex-start;
+  }
+
+  .right {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .right > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .right > .settingsIcon {
+    width: 34px;
+    min-width: 34px;
+    justify-self: center;
+  }
+
+  .greeting {
+    grid-column: 1 / -1;
+    max-width: none;
+    justify-content: center;
+  }
+
+  .topContainer .iconLink,
+  .topContainer .settingsIcon,
+  .logoutBtn {
+    font-size: 0.78rem;
+    padding: 6px 7px;
+  }
+
+  .mainNav {
+    padding: 0.65rem 0;
+  }
+
+  .navContainer {
+    padding: 0 0.65rem;
+  }
+
+  .navLinks {
+    margin-left: auto;
+  }
+
+  .menuTitle {
+    font-size: 0.85rem;
+  }
+
+  .dropdownMenu {
+    position: fixed;
+    top: auto;
+    left: 0.65rem;
+    right: 0.65rem;
+    min-width: 0;
+    max-width: calc(100vw - 1.3rem);
+    max-height: 60vh;
+    padding: 12px;
+  }
+
+  .categoryList {
+    min-width: 120px;
+  }
+
+  .subcategoryList {
+    min-width: 0;
+    flex: 1;
+  }
+}
+.actionIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topContainer .iconLink {
+  position: relative;
+  overflow: visible;
+}
+
+.countBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 10;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #004080;
+  border-radius: 999px;
+  background: #ffd400;
+  color: #172554;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+}

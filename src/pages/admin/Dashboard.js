@@ -1,441 +1,210 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  PieChart, Pie, Cell, ResponsiveContainer
+  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend,
+  Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from "recharts";
 import { CSVLink } from "react-csv";
+import {
+  FaArrowDown, FaArrowUp, FaBoxOpen, FaChartLine, FaClipboardList,
+  FaExclamationTriangle, FaGift, FaPercent, FaRedoAlt, FaRupeeSign,
+  FaShoppingBag, FaShoppingCart, FaStore, FaTags, FaTicketAlt,
+  FaUndoAlt, FaUsers
+} from "react-icons/fa";
 import styles from "./Dashboard.module.css";
 
-const COLORS = ["#4f46e5", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b"];
+const API = "http://localhost:5000/api";
+const PIE_COLORS = ["#6d28d9", "#8b5cf6", "#a78bfa", "#ec4899", "#f59e0b", "#14b8a6"];
+const EMPTY = { kpis: {}, revenue_trend: [], order_status: [], payment_methods: [], top_products: [], low_stock: [], recent_orders: [], alerts: [] };
+
+const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+const compact = (value) => Number(value || 0).toLocaleString("en-IN");
 
 const Dashboard = () => {
-  const [filter, setFilter] = useState("Yearly");
+  const navigate = useNavigate();
+  const [period, setPeriod] = useState("monthly");
+  const [data, setData] = useState(EMPTY);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [updatedAt, setUpdatedAt] = useState(null);
 
-  // Dynamic state from backend
-  const [newUsers, setNewUsers] = useState([]);
-  const [vendors, setVendors] = useState([]);
-  const [bestItems, setBestItems] = useState([]);
-  const [latestOrders, setLatestOrders] = useState([]);
-  const [userRolesData, setUserRolesData] = useState([]);
-  const [vendorStatusData, setVendorStatusData] = useState([]);
-  const [totalSales, setTotalSales] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [subusers, setSubusers] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
-
-
-  // Static placeholder data for now (replace with backend revenue/vendor stats later if needed)
- 
-
-  
-  // UI toggles
-  const [showNewUsers, setShowNewUsers] = useState(false);
-  const [showVendors, setShowVendors] = useState(false);
-  const [showSubusers, setShowSubusers] = useState(false);
-
-  // Stock analysis placeholder data
-  const [stockItems, setStockItems] = useState([]);
-
-
-  const [visibleStatus, setVisibleStatus] = useState(null);
-  const toggleVisibility = (status) => {
-    setVisibleStatus((prev) => (prev === status ? null : status));
-  };
-  const filteredItems = (status) => stockItems.filter((item) => item.status === status);
-
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-
-  // Fetch data from backend
-  useEffect(() => {
-    const fetchNewUsers = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/users/new?limit=10");
-        const data = await res.json();
-        setNewUsers(data.data || []);
-      } catch (err) {
-        console.error("Error fetching new users:", err);
-      }
-    };
-
-    const fetchVendors = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/vendors/active?limit=10");
-        const data = await res.json();
-        setVendors(data.data || []);
-      } catch (err) {
-        console.error("Error fetching vendors:", err);
-      }
-    };
-
-    const fetchBestItems = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/dashboard/best-items?limit=5");
-        const data = await res.json();
-        setBestItems(data.data || []);
-      } catch (err) {
-        console.error("Error fetching best items:", err);
-      }
-    };
-    const fetchUserRoles = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/users/roles");
-    const data = await res.json();
-    // Backend returns: { data: [ { name: "admin", count: 5 }, ... ] }
-    const formatted = data.data.map(role => ({
-      name: role.name,
-      value: role.count
-    }));
-    setUserRolesData(formatted);
-  } catch (err) {
-    console.error("Error fetching user roles:", err);
-  }
-};
-
-const fetchVendorStatus = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/vendors/status");
-    const data = await res.json();
-    const formatted = data.data.map(status => ({
-      name: status.name,
-      value: status.count
-    }));
-    setVendorStatusData(formatted);
-  } catch (err) {
-    console.error("Error fetching vendor status:", err);
-  }
-};
- 
-const fetchStockAnalysis = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/dashboard/stock-analysis");
-    const data = await res.json();
-    if (data && data.data) {
-      setStockItems(data.data);
-    } else {
-      setStockItems([]);
+  const loadDashboard = useCallback(async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      navigate("/admin/login", { replace: true });
+      return;
     }
-  } catch (err) {
-    console.error("Error fetching stock analysis:", err);
-  }
-};
-
-
-fetchUserRoles();
-fetchVendorStatus();
-fetchStockAnalysis(); 
-
-    const fetchLatestOrders = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/admin/latest-orders?limit=10");
-    const data = await res.json();
-    setLatestOrders(data); // ✅ backend already returns a list
-  } catch (err) {
-    console.error("Error fetching latest orders:", err);
-  }
-};
-
-     
-    fetchNewUsers();
-    fetchVendors();
-    fetchBestItems();
-    fetchLatestOrders();
-  }, []);
-     
-useEffect(() => {
- const fetchDashboardData = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/dashboard/summary?period=${filter.toLowerCase()}`);
-      const data = await res.json();
-
-      if (!data.error) {
-        setTotalSales(data.total_sales || 0);
-        setTotalRevenue(data.total_revenue || 0);
-        setRevenueData(data.monthly_revenue || []);
-        setSubusers(data.subusers || []);
-        setStockItems(data.stock_analysis || []);
+      const response = await fetch(`${API}/dashboard/overview?period=${period}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const payload = await response.json();
+      if (response.status === 401 || response.status === 403) {
+        navigate("/admin/login", { replace: true });
+        return;
       }
-    } catch (err) {
-      console.error("Error fetching filtered dashboard data:", err);
+      if (!response.ok) throw new Error(payload.error || "Unable to load dashboard");
+      setData({ ...EMPTY, ...payload });
+      setUpdatedAt(new Date());
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [navigate, period]);
 
-  fetchDashboardData();
-}, [filter]); 
+  useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
+  const k = data.kpis || {};
+  const statCards = [
+    { label: "Gross sales", value: money(k.gross_sales), note: `${k.sales_growth >= 0 ? "+" : ""}${k.sales_growth || 0}% vs previous`, trend: k.sales_growth, icon: <FaRupeeSign /> },
+    { label: "Realized revenue", value: money(k.realized_revenue), note: "Paid, completed and delivered", icon: <FaChartLine /> },
+    { label: "Orders", value: compact(k.orders), note: `${k.orders_growth >= 0 ? "+" : ""}${k.orders_growth || 0}% vs previous`, trend: k.orders_growth, icon: <FaShoppingBag /> },
+    { label: "Average order value", value: money(k.average_order_value), note: "Revenue per order", icon: <FaClipboardList /> },
+    { label: "Customers", value: compact(k.customers), note: `${compact(k.active_carts)} active carts`, icon: <FaUsers />, path: "/admin/users" },
+    { label: "Active vendors", value: compact(k.active_vendors), note: `${compact(k.products)} products listed`, icon: <FaStore />, path: "/admin/vendors" },
+  ];
 
+  const operationCards = [
+    { label: "Active carts", value: k.active_carts, icon: <FaShoppingCart />, path: "/admin/orders" },
+    { label: "Customer wishlists", value: k.wishlists, icon: <FaGift />, path: "/admin/users" },
+    { label: "Active offers", value: k.active_offers, icon: <FaTags />, path: "/admin/offers" },
+    { label: "Gift orders", value: k.gift_orders, icon: <FaGift />, path: "/admin/orders" },
+    { label: "Open complaints", value: k.open_complaints, icon: <FaTicketAlt />, path: "/admin/complaints", attention: k.open_complaints > 0 },
+    { label: "Pending returns", value: k.pending_returns, icon: <FaUndoAlt />, path: "/admin/orders", attention: k.pending_returns > 0 },
+    { label: "Out of stock", value: k.out_of_stock, icon: <FaExclamationTriangle />, path: "/admin/inventory", attention: k.out_of_stock > 0 },
+    { label: "Discounts given", value: money(k.discounts), icon: <FaPercent />, path: "/admin/offers" },
+  ];
+
+  const csvRows = useMemo(() => data.recent_orders.map(order => ({
+    order_id: order.order_id, customer: order.customer_name, status: order.status,
+    payment: order.payment_method, amount: order.final_amount, created_at: order.created_at
+  })), [data.recent_orders]);
+
+  const chartTrend = data.revenue_trend.length ? data.revenue_trend : [{ name: "No sales", revenue: 0, orders: 0 }];
+
+  const currentPeriodLabel = { daily: "Last 24 hours", weekly: "Last 7 days", monthly: "Last 30 days", yearly: "Last 12 months" }[period];
 
   return (
-    <div className={styles.dashboardContainer}>
-      {/* Header */}
-      <div className={styles.dashboardHeader}>
-        <h2>Admin Dashboard</h2>
-        <div className={styles.filterDropdown}>
-          <label>Filter: </label>
-          <select value={filter} onChange={handleFilterChange}>
-            <option value="Yearly">Yearly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Daily">Daily</option>
-          </select>
+    <section className={styles.dashboard}>
+      <header className={styles.hero}>
+        <div>
+          <span className={styles.eyebrow}>Commerce overview</span>
+          <h1>Admin Dashboard</h1>
+          <p>Monitor sales, customers, fulfilment and inventory from one workspace.</p>
         </div>
+        <div className={styles.headerActions}>
+          <label className={styles.periodSelect}>
+            <span>Reporting period</span>
+            <select value={period} onChange={(event) => setPeriod(event.target.value)}>
+              <option value="daily">Today</option><option value="weekly">7 days</option>
+              <option value="monthly">30 days</option><option value="yearly">12 months</option>
+            </select>
+          </label>
+          <button className={styles.refreshBtn} onClick={loadDashboard} disabled={loading}><FaRedoAlt /> Refresh</button>
+        </div>
+      </header>
+
+      <div className={styles.dataMeta}>
+        <span>{currentPeriodLabel}</span>
+        <span>{updatedAt ? `Updated ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Loading live data"}</span>
       </div>
 
-      {/* Stats Cards */}
-      <div className={styles.statsCards}>
-       <div className={`${styles.card} ${styles.totalSales}`}>
-  <h4>Total Sales</h4>
-  <h2>₹{totalSales.toLocaleString()}</h2>
-  <p>This year</p>
-</div>
-
-
-        <div className={`${styles.card} ${styles.totalRevenue}`}>
-  <h4>Total Revenue</h4>
-  <h2>₹{totalRevenue.toLocaleString()}</h2>
-  <p>Available for payout</p>
-</div>
-
-
-        <div className={`${styles.card} ${styles.newUsers}`}>
-          <h4 onClick={() => setShowNewUsers(!showNewUsers)} style={{ cursor: "pointer" }}>
-            New Users ⌄
-          </h4>
-          <h2>{newUsers.length}</h2>
-          <p>Customers & Vendors</p>
-          {showNewUsers && (
-            <ul className={styles.dropdownList}>
-              {newUsers.map((user, idx) => (
-                <li key={idx}>{user}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className={`${styles.card} ${styles.activeVendors}`}>
-          <h4 onClick={() => setShowVendors(!showVendors)} style={{ cursor: "pointer" }}>
-            Active Vendors ⌄
-          </h4>
-           {vendors.length > 0 ? vendors[0] : "No vendors"}
-          <p>+5 today</p>
-          {showVendors && (
-            <ul className={styles.dropdownList}>
-              {vendors.map((vendor, idx) => (
-                <li key={idx}>{vendor}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-       <div className={`${styles.card} ${styles.subUsers}`}>
-  <h4 onClick={() => setShowSubusers(!showSubusers)} style={{ cursor: "pointer" }}>
-    Subusers ⌄
-  </h4>
-  <h2>{subusers.length}</h2>
-  <p>With restricted access</p>
-  {showSubusers && (
-    <ul className={styles.dropdownList}>
-      {subusers.map((sub, idx) => (
-        <li key={idx}>{sub}</li>
-      ))}
-    </ul>
-  )}
-</div>
-
-
-        <div className={`${styles.card} ${styles.reports}`}>
-          <h4>Reports</h4>
-          <CSVLink data={latestOrders} filename="orders.csv">
-            <button className={styles.exportBtn}>Export CSV</button>
-          </CSVLink>
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className={styles.chartSection}>
-        <div className={styles.chartCard}>
-          <h3>Monthly Revenue</h3>
-         <ResponsiveContainer width="100%" height={250}>
-  <BarChart data={revenueData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="name" stroke="#ccc" />
-    <YAxis />
-    <Tooltip />
-    <Legend />
-    <Bar dataKey="revenue" fill="#6366f1" />
-  </BarChart>
-</ResponsiveContainer>
-
-        </div>
-
-        <div className={styles.chartCard}>
-          <h3>Best Seller Items</h3>
-         <PieChart width={400} height={250}>
-          <Pie
-           data={bestItems}
-           cx={200}
-           cy={125}
-           innerRadius={50}
-           outerRadius={100}
-           fill="#8884d8"
-           paddingAngle={5}
-           dataKey="sold"   
-           nameKey="name"  
-           label
-          >
-            {bestItems.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+      {error && <div className={styles.errorBanner}><span>{error}</span><button onClick={loadDashboard}>Try again</button></div>}
+      {loading && !updatedAt ? <div className={styles.loading}>Loading your commerce analytics…</div> : (
+        <>
+          <div className={styles.kpiGrid}>
+            {statCards.map(card => (
+              <article key={card.label} className={styles.kpiCard} onClick={() => card.path && navigate(card.path)} role={card.path ? "link" : undefined}>
+                <div className={styles.cardTop}><span className={styles.cardIcon}>{card.icon}</span><span className={styles.cardLabel}>{card.label}</span></div>
+                <strong>{card.value}</strong>
+                <small className={card.trend < 0 ? styles.negative : card.trend > 0 ? styles.positive : ""}>
+                  {card.trend !== undefined && (card.trend >= 0 ? <FaArrowUp /> : <FaArrowDown />)} {card.note}
+                </small>
+              </article>
             ))}
-           </Pie>
-           <Tooltip />
-         </PieChart>
+          </div>
 
-        </div>
+          <div className={styles.operationsGrid}>
+            {operationCards.map(card => (
+              <Link to={card.path} key={card.label} className={`${styles.operationCard} ${card.attention ? styles.attention : ""}`}>
+                <span>{card.icon}</span><div><strong>{compact(card.value)}</strong><small>{card.label}</small></div>
+              </Link>
+            ))}
+          </div>
 
-        <div className={styles.chartCard}>
-          <h3>User Roles</h3>
-          <PieChart width={400} height={250}>
-            <Pie
-              data={userRolesData}
-              cx={200}
-              cy={125}
-              outerRadius={100}
-              fill="#8884d8"
-              dataKey="value"
-              label
-            >
-              {userRolesData.map((entry, index) => (
-                <Cell key={`role-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </div>
+          <div className={styles.analyticsGrid}>
+            <article className={`${styles.panel} ${styles.revenuePanel}`}>
+              <div className={styles.panelHeader}><div><span>Performance</span><h2>Revenue and orders</h2></div><strong>{money(k.gross_sales)}</strong></div>
+              <ResponsiveContainer width="100%" height={260}>
+                <AreaChart data={chartTrend} margin={{ left: -18, right: 8, top: 10 }}>
+                  <defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#7c3aed" stopOpacity={0.35}/><stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/></linearGradient></defs>
+                  <CartesianGrid stroke="#ede9f6" vertical={false}/><XAxis dataKey="name" tick={{ fill: "#716882", fontSize: 12 }} axisLine={false}/><YAxis tick={{ fill: "#716882", fontSize: 12 }} axisLine={false}/>
+                  <Tooltip formatter={(value, name) => name === "revenue" ? money(value) : value}/><Legend />
+                  <Area type="monotone" dataKey="revenue" stroke="#6d28d9" fill="url(#revenueFill)" strokeWidth={3}/>
+                  <Area type="monotone" dataKey="orders" stroke="#ec4899" fill="transparent" strokeWidth={2}/>
+                </AreaChart>
+              </ResponsiveContainer>
+              {!data.revenue_trend.length && <small className={styles.chartNote}>No sales recorded in this period yet.</small>}
+            </article>
 
-        <div className={styles.chartCard}>
-          <h3>Vendor Status</h3>
-          <PieChart width={400} height={250}>
-            <Pie
-              data={vendorStatusData}
-              cx={200}
-              cy={125}
-              outerRadius={100}
-              fill="#8884d8"
-              dataKey="value"
-              label
-            >
-              {vendorStatusData.map((entry, index) => (
-                <Cell key={`vendor-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </div>
-      </div>
+            <ChartPanel title="Order status" data={data.order_status} />
+            <ChartPanel title="Payment mix" data={data.payment_methods} />
+          </div>
 
-       {/* Latest Orders */}
-<div className={styles.ordersSection}>
-  <h3>Latest Orders</h3>
-  <table className={styles.ordersTable}>
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Status</th>
-        <th>Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      {latestOrders.map((order, idx) => (
-        <tr key={idx}>
-          {/* Product images + names */}
-<td style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-  {order.order_items && order.order_items.length > 0 ? (
-    order.order_items.map((item, i) => (
-      <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-        <img
-          src={item.image}
-          alt={item.name}
-          style={{
-            width: "40px",
-            height: "40px",
-            objectFit: "cover",
-            borderRadius: "4px"
-          }}
-        />
-        <span>{item.name}</span>
-      </div>
-    ))
-  ) : (
-    <span>No items</span>
-  )}
-</td>
+          <div className={styles.detailGrid}>
+            <article className={styles.panel}>
+              <div className={styles.panelHeader}><div><span>Merchandising</span><h2>Top-selling products</h2></div><Link to="/admin/products">View products</Link></div>
+              {data.top_products.length ? (
+                <ResponsiveContainer width="100%" height={285}>
+                  <BarChart data={data.top_products} layout="vertical" margin={{ left: 10, right: 16 }}>
+                    <CartesianGrid stroke="#ede9f6" horizontal={false}/><XAxis type="number" axisLine={false}/><YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} axisLine={false}/>
+                    <Tooltip formatter={(value, name) => name === "revenue" ? money(value) : value}/><Bar dataKey="quantity" fill="#7c3aed" radius={[0, 6, 6, 0]}/>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : <Empty text="Product sales will appear here" />}
+            </article>
 
-
-          {/* Order ID */}
-          <td>{order.order_id}</td>
-
-          {/* Customer */}
-          <td>{order.customer_name || "Unknown"}</td>
-
-          {/* Status */}
-          <td className={`${styles.status} ${styles[order.status?.toLowerCase()]}`}>
-            {order.status}
-          </td>
-
-          {/* Amount */}
-          <td>₹{order.final_amount}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-
-      {/* Stock Analysis */}
-      <div className={styles.stockSection}>
-        <h3>📈 Stock Analysis</h3>
-        <div className={styles.stockCategories}>
-          {["Low Stock", "Out of Stock", "High Stock"].map((status) => (
-            <div key={status} className={styles.stockCard}>
-              <div className={styles.stockHeader}>
-                <span>{status}</span>
-                <button onClick={() => toggleVisibility(status)}>
-                  {visibleStatus === status ? "Hide" : "Show"}
-                </button>
+            <article className={styles.panel}>
+              <div className={styles.panelHeader}><div><span>Action centre</span><h2>Needs attention</h2></div><Link to="/admin/inventory">Inventory</Link></div>
+              <div className={styles.alertList}>
+                {data.alerts.length ? data.alerts.map((alert, index) => <Link key={`${alert.text}-${index}`} to={alert.path} className={`${styles.alert} ${styles[alert.type]}`}><FaExclamationTriangle /><span>{alert.text}</span><b>→</b></Link>) : <div className={styles.allClear}>✓ Everything looks under control.</div>}
               </div>
-              {visibleStatus === status && (
-                <div className={styles.stockList}>
-                  {filteredItems(status).map((item, idx) => (
-                    <div key={idx} className={styles.stockItem}>
-                      <img src={item.image} alt={item.name} className={styles.stockImage} />
-                      <div>
-                        <strong>{item.name}</strong>
-                        <p>Product ID: {item.productId}</p>
-                        <p>Qty: {item.quantity}</p>
-                        <p>Size: {item.size}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+              <h3 className={styles.subheading}>Low-stock variants</h3>
+              <div className={styles.stockList}>
+                {data.low_stock.slice(0, 5).map((item, index) => <div className={styles.stockRow} key={`${item.id}-${index}`}><div><strong>{item.name}</strong><small>{[item.size, item.color].filter(Boolean).join(" · ")}</small></div><span className={item.stock === 0 ? styles.stockZero : ""}>{item.stock} left</span></div>)}
+                {!data.low_stock.length && <Empty text="No low-stock products" />}
+              </div>
+            </article>
+          </div>
 
-      {/* Notifications */}
-      <div className={styles.notifications}>
-        <h3>🔔 Live Notifications</h3>
-        <ul>
-          <li>Order ORD1235 is pending delivery.</li>
-          <li>New vendor "TechWear" signed up.</li>
-          <li>Subuser "Raj" updated inventory.</li>
-        </ul>
-      </div>
-    </div>
+          <article className={styles.panel}>
+            <div className={styles.panelHeader}><div><span>Fulfilment</span><h2>Recent orders</h2></div><div className={styles.tableActions}><CSVLink data={csvRows} filename="citimart-orders.csv" className={styles.exportBtn}>Export CSV</CSVLink><Link to="/admin/orders">All orders</Link></div></div>
+            <div className={styles.tableWrap}>
+              <table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Payment</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+                <tbody>{data.recent_orders.map(order => <tr key={order.order_id}><td><b>#{order.order_id.slice(-8).toUpperCase()}</b></td><td>{order.customer_name || "Unknown"}</td><td>{order.order_items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0}</td><td>{String(order.payment_method || "—").toUpperCase()}</td><td><span className={styles.statusPill}>{order.status || "Unknown"}</span></td><td><b>{money(order.final_amount)}</b></td><td>{order.created_at ? new Date(order.created_at).toLocaleDateString("en-IN") : "—"}</td></tr>)}</tbody>
+              </table>
+              {!data.recent_orders.length && <Empty text="No recent orders in this period" />}
+            </div>
+          </article>
+        </>
+      )}
+    </section>
   );
 };
 
+const ChartPanel = ({ title, data }) => {
+  const chartData = data.length ? data : [{ name: "No data", value: 1 }];
+  return (
+    <article className={styles.panel}>
+      <div className={styles.panelHeader}><div><span>Distribution</span><h2>{title}</h2></div></div>
+      <ResponsiveContainer width="100%" height={220}><PieChart><Pie data={chartData} dataKey="value" nameKey="name" innerRadius={52} outerRadius={78} paddingAngle={data.length ? 3 : 0}>{chartData.map((entry, index) => <Cell key={entry.name} fill={data.length ? PIE_COLORS[index % PIE_COLORS.length] : "#ddd6e8"}/>)}</Pie>{data.length && <Tooltip/>}<Legend iconType="circle"/></PieChart></ResponsiveContainer>
+      {!data.length && <small className={styles.chartNote}>No records in this period yet.</small>}
+    </article>
+  );
+};
+
+const Empty = ({ text }) => <div className={styles.empty}><FaBoxOpen /><span>{text}</span></div>;
 export default Dashboard;

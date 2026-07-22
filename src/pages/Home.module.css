@@ -1,4 +1,4 @@
-/* â”€â”€ Base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 .home {
   font-family: "Inter", "Poppins", sans-serif;
   background: #f7f7f8;
@@ -7,7 +7,7 @@
   overflow-x: hidden;
 }
 
-/* â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Toast ─────────────────────────────────────────────────────────────────── */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -28,7 +28,7 @@
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* â”€â”€ Variant Popup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Variant Popup ────────────────────────────────────────────────────────── */
 .popupOverlayDark {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.6);
@@ -103,7 +103,7 @@
 .modalConfirm:disabled { opacity: 0.4; cursor: not-allowed; }
 .modalConfirm:not(:disabled):hover { opacity: 0.9; }
 
-/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
   height: 520px;
@@ -192,7 +192,7 @@
 }
 .heroDotActive { width: 24px; border-radius: 4px; background: #fff; }
 
-/* â”€â”€ Trust strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Trust strip ─────────────────────────────────────────────────────────── */
 .trustStrip {
   background: #fff;
   display: flex; flex-wrap: wrap;
@@ -209,7 +209,7 @@
 .trustItem strong { font-size: 13px; font-weight: 700; color: #111; display: block; }
 .trustItem p { font-size: 11px; color: #6b7280; margin: 2px 0 0; }
 
-/* â”€â”€ Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sections ─────────────────────────────────────────────────────────────── */
 .section {
   padding: 48px 5%;
   max-width: 1400px;
@@ -242,7 +242,7 @@
 .seeAllLight { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); text-decoration: none; }
 .seeAllLight:hover { color: #fff; }
 
-/* â”€â”€ Product card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Product card ─────────────────────────────────────────────────────────── */
 .productRow {
   display: flex; overflow-x: auto; gap: 20px;
   padding-bottom: 12px; scroll-behavior: smooth;
@@ -289,7 +289,7 @@
 .cardPrice { font-size: 16px; font-weight: 800; color: #ff3f6c; }
 .cardMrp   { font-size: 12px; color: #9ca3af; text-decoration: line-through; }
 
-/* â”€â”€ Card action buttons â€” always visible â”€â”€ */
+/* ── Card action buttons — always visible ── */
 .cardActions {
   display: flex; gap: 8px; padding: 10px 14px 14px;
   margin-top: auto;
@@ -316,7 +316,7 @@
 .heartIcon { color: #ff3f6c; font-size: 20px; }
 .wishlistActionBtn:hover .heartIcon { color: #fff; }
 
-/* â”€â”€ Offer strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Offer strip ─────────────────────────────────────────────────────────── */
 .offerStrip {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -342,7 +342,7 @@
 .offerOverlay p  { margin: 4px 0 6px; color: rgba(255,255,255,0.8); font-size: 12px; }
 .offerOverlay span { color: #ff3f6c; font-size: 12px; font-weight: 700; }
 
-/* â”€â”€ Category circles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Category circles ────────────────────────────────────────────────────── */
 .categoryRow {
   display: flex; flex-wrap: wrap; gap: 24px;
   justify-content: flex-start;
@@ -370,7 +370,7 @@
   text-align: center; line-height: 1.3;
 }
 
-/* â”€â”€ Brands â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Brands ──────────────────────────────────────────────────────────────── */
 .brandRow {
   display: flex; flex-wrap: wrap; gap: 16px;
   justify-content: center;
@@ -387,7 +387,7 @@
 .brandCard img { width: 70px; height: 40px; object-fit: contain; }
 .brandCard p   { font-size: 13px; font-weight: 600; margin: 0; }
 
-/* â”€â”€ Reviews â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Reviews ─────────────────────────────────────────────────────────────── */
 .reviewRow {
   display: flex; flex-wrap: wrap; gap: 20px;
 }
@@ -402,7 +402,7 @@
 .stars { display: flex; gap: 2px; margin-top: 3px; }
 .reviewText { font-size: 13px; color: #555; font-style: italic; line-height: 1.6; margin: 0; }
 
-/* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .hero { height: 420px; }
   .heroContent { left: 5%; max-width: 90%; }
@@ -424,7 +424,7 @@
   .trustItem { border-right: none; border-bottom: 1px solid #f0f0f0; }
 }
 
-/* â”€â”€ Smart Variant Popup extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Smart Variant Popup extras ────────────────────────────────────────────── */
 .modalPrice {
   font-size: 18px; font-weight: 800; color: #ff3f6c; margin: 4px 0 0;
   display: flex; align-items: center; gap: 8px;

@@ -368,3 +368,144 @@ def dashboard_summary():
     except Exception as e:
         print("❌ Error in dashboard_summary:", e)
         return jsonify({"error": str(e)}), 500
+# ---------- E-commerce operations overview ----------
+from collections import Counter, defaultdict
+from utils.auth_utils import token_required
+from database import (
+    cart_collection, wishlist_collection, offers_collection,
+    complaints_collection, returns_collection
+)
+
+
+def _numeric(value, default=0):
+    try:
+        if isinstance(value, dict):
+            value = value.get("$numberInt", value.get("$numberDouble", default))
+        return float(value if value not in (None, "") else default)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _period_start(period, now):
+    days = {"daily": 1, "weekly": 7, "monthly": 30, "yearly": 365}.get(period, 30)
+    return now - timedelta(days=days), timedelta(days=days)
+
+
+@admin_dashboard_bp.route("/dashboard/overview", methods=["GET"])
+@token_required
+def ecommerce_dashboard_overview(current_user):
+    if current_user.get("role") not in ("admin", "subuser"):
+        return jsonify({"error": "Access denied"}), 403
+
+    period = request.args.get("period", "monthly").lower()
+    now = datetime.utcnow()
+    start, period_delta = _period_start(period, now)
+    previous_start = start - period_delta
+
+    orders = list(orders_collection.find({"created_at": {"$gte": previous_start}}))
+    current_orders = [order for order in orders if order.get("created_at") and order["created_at"] >= start]
+    previous_orders = [order for order in orders if order.get("created_at") and previous_start <= order["created_at"] < start]
+
+    def order_value(order):
+        return _numeric(order.get("final_amount", order.get("total_amount", 0)))
+
+    def sales_total(rows):
+        return round(sum(order_value(order) for order in rows), 2)
+
+    def growth(current, previous):
+        if previous == 0:
+            return 100 if current > 0 else 0
+        return round(((current - previous) / previous) * 100, 1)
+
+    gross_sales = sales_total(current_orders)
+    previous_sales = sales_total(previous_orders)
+    realized_statuses = {"paid", "delivered", "completed"}
+    realized_revenue = round(sum(order_value(o) for o in current_orders if str(o.get("status", "")).lower() in realized_statuses), 2)
+    discounts = round(sum(_numeric(o.get("discount_applied")) for o in current_orders), 2)
+    delivery_income = round(sum(_numeric(o.get("delivery_fee")) for o in current_orders), 2)
+    gift_orders = sum(1 for o in current_orders if o.get("order_gift", {}).get("isGift") or _numeric(o.get("gift_wrap_fee")) > 0)
+
+    status_counts = Counter(str(o.get("status") or "Unknown").title() for o in current_orders)
+    payment_counts = Counter(str(o.get("payment_method") or "Unknown").upper() for o in current_orders)
+
+    trend = defaultdict(lambda: {"revenue": 0, "orders": 0})
+    trend_format = "%H:00" if period == "daily" else "%d %b" if period in ("weekly", "monthly") else "%b %Y"
+    for order in current_orders:
+        created = order.get("created_at")
+        if not isinstance(created, datetime):
+            continue
+        label = created.strftime(trend_format)
+        trend[label]["revenue"] += order_value(order)
+        trend[label]["orders"] += 1
+    revenue_trend = [{"name": name, "revenue": round(values["revenue"], 2), "orders": values["orders"]} for name, values in trend.items()]
+
+    product_sales = defaultdict(lambda: {"quantity": 0, "revenue": 0})
+    for order in current_orders:
+        for item in order.get("order_items", []):
+            name = item.get("name") or "Unnamed product"
+            quantity = int(_numeric(item.get("quantity"), 1))
+            product_sales[name]["quantity"] += quantity
+            product_sales[name]["revenue"] += _numeric(item.get("price")) * quantity
+    top_products = sorted(
+        ({"name": name, "quantity": values["quantity"], "revenue": round(values["revenue"], 2)} for name, values in product_sales.items()),
+        key=lambda item: (item["quantity"], item["revenue"]), reverse=True
+    )[:8]
+
+    low_stock = []
+    out_of_stock = 0
+    for product in products_collection.find({}, {"name": 1, "variants": 1, "stock": 1, "quantity": 1, "images": 1, "image": 1}):
+        variants = product.get("variants") or [product]
+        for variant in variants:
+            stock = int(_numeric(variant.get("stock", variant.get("quantity", product.get("stock", product.get("quantity", 0))))))
+            if stock <= 0:
+                out_of_stock += 1
+            if stock <= 5:
+                images = product.get("images") or []
+                low_stock.append({
+                    "id": str(product["_id"]), "name": product.get("name", "Unnamed product"),
+                    "stock": stock, "size": variant.get("size", "-"), "color": variant.get("color", ""),
+                    "image": variant.get("image") or (images[0] if images else product.get("image", ""))
+                })
+    low_stock.sort(key=lambda item: item["stock"])
+
+    customer_count = users_collection.count_documents({"role": {"$nin": ["admin", "subuser"]}})
+    vendor_count = vendors_collection.count_documents({"status": {"$regex": "^approved$", "$options": "i"}})
+    product_count = products_collection.count_documents({})
+    active_carts = cart_collection.count_documents({"items.0": {"$exists": True}})
+    wishlist_count = wishlist_collection.count_documents({"items.0": {"$exists": True}})
+    active_offers = offers_collection.count_documents({"start_date": {"$lte": now}, "end_date": {"$gte": now}})
+    open_complaints = complaints_collection.count_documents({"status": {"$nin": ["Resolved", "Closed", "resolved", "closed"]}})
+    pending_returns = returns_collection.count_documents({"status": {"$nin": ["Completed", "Rejected", "completed", "rejected"]}})
+
+    recent = sorted(current_orders, key=lambda order: order.get("created_at") or datetime.min, reverse=True)[:8]
+    recent_orders = [serialize_order(order) for order in recent]
+    order_count = len(current_orders)
+
+    alerts = []
+    if out_of_stock: alerts.append({"type": "danger", "text": f"{out_of_stock} variants are out of stock", "path": "/admin/inventory"})
+    if open_complaints: alerts.append({"type": "warning", "text": f"{open_complaints} complaints need attention", "path": "/admin/complaints"})
+    if pending_returns: alerts.append({"type": "warning", "text": f"{pending_returns} returns are pending", "path": "/admin/orders"})
+    pending_orders = sum(count for status, count in status_counts.items() if status.lower() in ("pending", "placed", "processing"))
+    if pending_orders: alerts.append({"type": "info", "text": f"{pending_orders} orders are awaiting fulfilment", "path": "/admin/orders"})
+
+    return jsonify({
+        "period": period,
+        "kpis": {
+            "gross_sales": gross_sales, "realized_revenue": realized_revenue,
+            "orders": order_count, "average_order_value": round(gross_sales / order_count, 2) if order_count else 0,
+            "customers": customer_count, "active_vendors": vendor_count, "products": product_count,
+            "discounts": discounts, "delivery_income": delivery_income, "gift_orders": gift_orders,
+            "sales_growth": growth(gross_sales, previous_sales),
+            "orders_growth": growth(order_count, len(previous_orders)),
+            "active_carts": active_carts, "wishlists": wishlist_count,
+            "active_offers": active_offers, "open_complaints": open_complaints,
+            "pending_returns": pending_returns, "out_of_stock": out_of_stock,
+        },
+        "revenue_trend": revenue_trend,
+        "order_status": [{"name": name, "value": value} for name, value in status_counts.items()],
+        "payment_methods": [{"name": name, "value": value} for name, value in payment_counts.items()],
+        "top_products": top_products,
+        "low_stock": low_stock[:10],
+        "recent_orders": recent_orders,
+        "alerts": alerts,
+    }), 200

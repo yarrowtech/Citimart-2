@@ -21,30 +21,51 @@ const CollectionPage = () => {
       });
   }, [collectionSlug]);
 
-  const handleAddToCart = (product) => {
-    const customer = localStorage.getItem("customer");
-    if (!customer) {
+  const getCustomer = () => {
+    try {
+      return JSON.parse(localStorage.getItem("customer"));
+    } catch {
+      return null;
+    }
+  };
+
+  const addCustomerItem = async (path, product, successMessage) => {
+    const customer = getCustomer();
+    if (!customer?.id || !customer?.token) {
       navigate("/login");
       return;
     }
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(product);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart!");
-  };
 
-  const handleAddToWishlist = (product) => {
-    const customer = localStorage.getItem("customer");
-    if (!customer) {
-      navigate("/login");
-      return;
+    try {
+      const response = await fetch(`http://localhost:5000/customer/${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${customer.token}`,
+        },
+        body: JSON.stringify({
+          customer_id: customer.id,
+          product_id: product._id,
+          size: "N/A",
+          color: "N/A",
+          ...(path === "cart/add" ? { quantity: 1 } : {}),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to update your account");
+
+      window.dispatchEvent(new Event("citimart:counts-changed"));
+      alert(successMessage);
+    } catch (error) {
+      alert(error.message || "Something went wrong");
     }
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    wishlist.push(product);
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
-    alert("Added to wishlist!");
   };
 
+  const handleAddToCart = (product) =>
+    addCustomerItem("cart/add", product, "Added to cart!");
+
+  const handleAddToWishlist = (product) =>
+    addCustomerItem("wishlist/add", product, "Added to wishlist!");
   if (loading) return <p style={{ padding: "2rem" }}>Loading collection...</p>;
   if (!collection) return <p style={{ padding: "2rem" }}>Collection not found.</p>;
 

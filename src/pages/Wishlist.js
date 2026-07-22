@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Wishlist.module.css';
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busyItem, setBusyItem] = useState(null);
   const navigate = useNavigate();
 
   const customerId = localStorage.getItem('customer_id');
@@ -34,57 +36,54 @@ const Wishlist = () => {
       const data = await res.json();
       if (data.items) {
         setWishlist(data.items);
+        window.dispatchEvent(new Event("citimart:counts-changed"));
       } else {
         setWishlist([]);
+        window.dispatchEvent(new Event("citimart:counts-changed"));
       }
     } catch (err) {
       console.error('Error fetching wishlist:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const removeFromWishlist = async (productId, size, color) => {
+    const key = `remove-${productId}-${size}-${color}`;
+    setBusyItem(key);
     try {
-      const res = await fetch(`http://localhost:5000/customer/wishlist/remove`, {
+      const res = await fetch('http://localhost:5000/customer/wishlist/remove', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customer_id: customerId,
-          product_id: productId,
-          size,
-          color,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color }),
       });
-      if (res.ok) {
-        fetchWishlist();
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unable to remove item');
+      await fetchWishlist();
     } catch (err) {
-      console.error('Failed to remove from wishlist', err);
+      alert(err.message || 'Failed to remove wishlist item');
+    } finally {
+      setBusyItem(null);
     }
   };
 
   const moveToCart = async (productId, size, color) => {
+    const key = `move-${productId}-${size}-${color}`;
+    setBusyItem(key);
     try {
-      await fetch('http://localhost:5000/customer/cart/add', {
+      const res = await fetch('http://localhost:5000/customer/wishlist/move_to_cart', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customer_id: customerId,
-          product_id: productId,
-          size,
-          color,
-          quantity: 1,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color, quantity: 1 }),
       });
-
-      await removeFromWishlist(productId, size, color);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Unable to move item');
+      await fetchWishlist();
+      window.dispatchEvent(new Event('citimart:counts-changed'));
     } catch (err) {
-      console.error('Failed to move to cart', err);
+      alert(err.message || 'Failed to move item to cart');
+    } finally {
+      setBusyItem(null);
     }
   };
 
@@ -94,8 +93,10 @@ const Wishlist = () => {
     }
   }, [customerId, token]);
 
-  if (!customerId || !token) {
-    return null;
+  if (!customerId || !token) return null;
+
+  if (loading) {
+    return <div className={styles.emptyWishlistContainer}>Loading your wishlist...</div>;
   }
 
   if (wishlist.length === 0) {
@@ -103,7 +104,7 @@ const Wishlist = () => {
       <div className={styles.emptyWishlistContainer}>
         <div className={styles.emptyEmoji}>💔</div>
         <h3>Your wishlist is empty</h3>
-        <a href="/products" className={styles.shopLink}>🛒 Start Shopping</a>
+        <Link to="/products" className={styles.shopLink}>🛒 Start Shopping</Link>
       </div>
     );
   }
@@ -129,9 +130,9 @@ const Wishlist = () => {
                   className={styles.productImg}
                 />
                 <div className={styles.productInfo}>
-                  <a href={`/product/${product._id}`} className={styles.productName}>
+                  <Link to={`/products/${product._id}`} className={styles.productName}>
                     {product.name}
-                  </a>
+                  </Link>
                   <div className={styles.productPrice}>₹{product.price}</div>
 
                   {/* Show size only for Clothing or Handmade → Jewelry */}
@@ -152,12 +153,14 @@ const Wishlist = () => {
                   <div className={styles.actions}>
                     <button
                       className={styles.moveBtn}
+                      disabled={Boolean(busyItem)}
                       onClick={() => moveToCart(product._id, item.size, item.color)}
                     >
                       ➕ Move to Cart
                     </button>
                     <button
                       className={styles.removeBtn}
+                      disabled={Boolean(busyItem)}
                       onClick={() => removeFromWishlist(product._id, item.size, item.color)}
                     >
                       ❌ Remove

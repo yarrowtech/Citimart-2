@@ -23,6 +23,11 @@ const AdminOffers = () => {
     end_date: "",
     products: [],
     image: "",
+    code: "",
+    apply_mode: "automatic",
+    max_discount: "",
+    priority: 0,
+    stackable: false,
   });
   const [uploading, setUploading] = useState(false);
 
@@ -67,6 +72,11 @@ const AdminOffers = () => {
         end_date: offer.end_date?.slice(0, 10),
         products: offer.products?.map((p) => p._id) || [],
         image: offer.image || "",
+        code: offer.code || "",
+        apply_mode: offer.apply_mode || "automatic",
+        max_discount: offer.max_discount || "",
+        priority: offer.priority || 0,
+        stackable: Boolean(offer.stackable),
       });
     } else {
       setEditingOffer(null);
@@ -82,6 +92,11 @@ const AdminOffers = () => {
         end_date: "",
         products: [],
         image: "",
+    code: "",
+    apply_mode: "automatic",
+    max_discount: "",
+    priority: 0,
+    stackable: false,
       });
     }
     setModalOpen(true);
@@ -225,6 +240,7 @@ const handleSave = async () => {
             <th>Title</th>
             <th>Discount</th>
             <th>Type</th>
+            <th>Code / Mode</th>
             <th>Min Purchase</th>
             <th>Eligible Users</th>
             <th>Status</th>
@@ -237,8 +253,9 @@ const handleSave = async () => {
           {offers.map((offer) => (
             <tr key={offer._id}>
               <td>{offer.title}</td>
-              <td>{offer.discount}%</td>
+              <td>{offer.type === 'flat' ? <>₹{offer.discount}</> : <>{offer.discount}%</>}</td>
               <td>{offer.type}</td>
+              <td>{offer.code || 'Automatic'} / {offer.apply_mode || 'automatic'}</td>
               <td>{offer.min_purchase || "-"}</td>
               <td>{offer.eligible_users || "all"}</td>
               <td>{offer.status}</td>
@@ -315,7 +332,7 @@ const handleSave = async () => {
 
           {/* Discount */}
           <div className={styles.inputGroup}>
-            <label>Discount (%):</label>
+            <label>Discount value ({formData.type === 'flat' ? '₹' : '%'}):</label>
             <input
               type="number"
               value={formData.discount}
@@ -339,6 +356,37 @@ const handleSave = async () => {
             </select>
           </div>
 
+          <div className={styles.inputGroup}>
+            <label>How it applies:</label>
+            <select value={formData.apply_mode} onChange={(e) => setFormData({ ...formData, apply_mode: e.target.value })}>
+              <option value="automatic">Automatic (best eligible offer)</option>
+              <option value="coupon">Customer enters a code</option>
+            </select>
+          </div>
+
+          {formData.apply_mode === "coupon" && (
+            <div className={styles.inputGroup}>
+              <label>Coupon code:</label>
+              <input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} placeholder="e.g. SAVE20" />
+            </div>
+          )}
+
+          <div className={styles.inputGroup}>
+            <label>Maximum discount (₹, 0 = no cap):</label>
+            <input type="number" min="0" value={formData.max_discount} onChange={(e) => setFormData({ ...formData, max_discount: e.target.value })} />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>Priority (used when savings are equal):</label>
+            <input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: e.target.value })} />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>
+              <input type="checkbox" checked={formData.stackable} onChange={(e) => setFormData({ ...formData, stackable: e.target.checked })} />
+              Stackable (free-shipping offers can stack with the best discount)
+            </label>
+          </div>
           {/* Min Purchase */}
           <div className={styles.inputGroup}>
             <label>Min Purchase (₹):</label>
@@ -362,6 +410,7 @@ const handleSave = async () => {
               <option value="airforce">Airforce</option>
               <option value="loyal">Loyal Customers</option>
               <option value="student">Student</option>
+              <option value="personalized">Specific customers</option>
             </select>
           </div>
 

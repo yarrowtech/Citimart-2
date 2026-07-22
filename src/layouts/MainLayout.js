@@ -11,6 +11,8 @@ const brandsData = {
 
 const MainLayout = () => {
   const [customer, setCustomer] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const [categories, setCategories] = useState([]);
   const [activeMenu, setActiveMenu] = useState("");
   const [hoveredCategory, setHoveredCategory] = useState("");
@@ -43,30 +45,92 @@ const MainLayout = () => {
     fetchCategories();
   }, []);
 
-  // Customer authentication
+  // Keep the displayed customer synchronized with login/logout and other tabs.
   useEffect(() => {
-    const stored = localStorage.getItem("customer");
-    setCustomer(stored ? JSON.parse(stored) : null);
-
-    const handlePopState = () => {
-      const customerCheck = localStorage.getItem("customer");
-      if (!customerCheck && ["/cart", "/wishlist", "/customer-settings"].includes(window.location.pathname)) {
+    const syncCustomer = () => {
+      try {
+        setCustomer(JSON.parse(localStorage.getItem("customer") || "null"));
+      } catch {
+        setCustomer(null);
+      }
+    };
+    const protectCustomerPages = () => {
+      if (!localStorage.getItem("customer") && ["/cart", "/wishlist", "/customer-settings"].includes(window.location.pathname)) {
         navigate("/login", { replace: true });
       }
     };
+    const handleSessionChange = () => {
+      syncCustomer();
+      protectCustomerPages();
+    };
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [navigate, location]);
+    syncCustomer();
+    window.addEventListener("popstate", protectCustomerPages);
+    window.addEventListener("storage", handleSessionChange);
+    window.addEventListener("citimart:auth-changed", handleSessionChange);
+    return () => {
+      window.removeEventListener("popstate", protectCustomerPages);
+      window.removeEventListener("storage", handleSessionChange);
+      window.removeEventListener("citimart:auth-changed", handleSessionChange);
+    };
+  }, [navigate, location.pathname]);
 
+  useEffect(() => {
+    const customerId = customer?.id;
+    const token = customer?.token;
+    const controller = new AbortController();
+
+    setCartCount(0);
+    setWishlistCount(0);
+    if (!customerId || !token) return () => controller.abort();
+
+    const refreshHeaderCounts = async () => {
+      const headers = { Authorization: `Bearer ${token}` };
+      try {
+        const [cartResponse, wishlistResponse] = await Promise.all([
+          fetch(`http://localhost:5000/customer/cart/${customerId}`, { headers, signal: controller.signal }),
+          fetch(`http://localhost:5000/customer/wishlist/${customerId}`, { headers, signal: controller.signal }),
+        ]);
+
+        const activeCustomer = JSON.parse(localStorage.getItem("customer") || "null");
+        if (controller.signal.aborted || activeCustomer?.id !== customerId) return;
+
+        if (cartResponse.ok) {
+          const cartData = await cartResponse.json();
+          setCartCount((cartData.items || []).reduce((total, item) => total + Number(item.quantity || 1), 0));
+        } else setCartCount(0);
+
+        if (wishlistResponse.ok) {
+          const wishlistData = await wishlistResponse.json();
+          setWishlistCount((wishlistData.items || wishlistData.product_ids || []).length);
+        } else setWishlistCount(0);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Unable to refresh header counts:", error);
+          setCartCount(0);
+          setWishlistCount(0);
+        }
+      }
+    };
+
+    refreshHeaderCounts();
+    window.addEventListener("citimart:counts-changed", refreshHeaderCounts);
+    window.addEventListener("focus", refreshHeaderCounts);
+    return () => {
+      controller.abort();
+      window.removeEventListener("citimart:counts-changed", refreshHeaderCounts);
+      window.removeEventListener("focus", refreshHeaderCounts);
+    };
+  }, [customer?.id, customer?.token, location.pathname]);
   const handleLogout = () => {
-    localStorage.removeItem("customer");
-    localStorage.removeItem("wishlist");
-    localStorage.removeItem("cart");
+    ["customer", "customer_id", "token", "role", "userId", "name", "wishlist", "cart"].forEach((key) =>
+      localStorage.removeItem(key)
+    );
     setCustomer(null);
+    setCartCount(0);
+    setWishlistCount(0);
+    window.dispatchEvent(new Event("citimart:auth-changed"));
     navigate("/login", { replace: true });
-    window.history.pushState(null, "", "/login");
-    window.location.reload();
   };
 
   const handleProtectedClick = (path) => {
@@ -102,20 +166,28 @@ const MainLayout = () => {
         {/* Top Bar */}
         <div className={styles.topBar}>
           <div className={styles.topContainer}>
-            {!customer && <Link to="/register-vendor">Become a Seller</Link>}
+            {!customer && (
+              <Link to="/register-vendor" className={styles.sellerLink}>
+                Become a Seller
+              </Link>
+            )}
             <div className={styles.right}>
-              {customer && <span className={styles.greeting}>Hello, {customer.name?.split(" ")[0]}</span>}
+              {customer && (
+                <span className={styles.greeting} title={customer.name || "Customer"}>
+                  Hello, {customer.name?.split(" ")[0] || "Customer"}
+                </span>
+              )}
 
               <button className={styles.iconLink} onClick={() => handleProtectedClick("/wishlist")}>
-                <FaHeart /> Wishlist
+                <span className={styles.actionIcon}><FaHeart /></span> Wishlist{wishlistCount > 0 && <span className={styles.countBadge}>{wishlistCount > 99 ? "99+" : wishlistCount}</span>}
               </button>
               <button className={styles.iconLink} onClick={() => handleProtectedClick("/cart")}>
-                <FaShoppingCart /> Cart
+                <span className={styles.actionIcon}><FaShoppingCart /></span> Cart{cartCount > 0 && <span className={styles.countBadge}>{cartCount > 99 ? "99+" : cartCount}</span>}
               </button>
 
               {customer ? (
                 <>
-                  <Link to="/customer-settings" className={styles.settingsIcon}>
+                  <Link to="/customer-settings" className={styles.settingsIcon} aria-label="Account settings">
                     <FaCog />
                   </Link>
                   <button onClick={handleLogout} className={styles.logoutBtn}>
@@ -150,7 +222,7 @@ const MainLayout = () => {
                   setHoveredCategory(categories.length > 0 ? categories[0].name : "");
                 }}
               >
-                <span className={styles.menuTitle}>Categories ▾</span>
+                <span className={styles.menuTitle}>Categories &#9662;</span>
 
                 {activeMenu === "categories" && (
                   <div className={`${styles.dropdownMenu} ${styles.show}`}>
@@ -209,7 +281,7 @@ const MainLayout = () => {
                 onMouseEnter={() => setActiveMenu("brands")}
                 onMouseLeave={() => setActiveMenu("")}
               >
-                <span className={styles.menuTitle}>Brands ▾</span>
+                <span className={styles.menuTitle}>Brands &#9662;</span>
                 {activeMenu === "brands" && (
                   <div className={`${styles.dropdownMenu} ${styles.show}`}>
                     <div className={styles.categoryList}>
@@ -288,7 +360,7 @@ const MainLayout = () => {
               <h3>STORE LOCATION</h3>
               <div className={styles.address}>
                 <p>
-                  1, हुमायूँ प्लेस, कोलकाता-700087, 3A, Bertram St, Esplanade, Dharmatala, Kolkata, WB
+                  1, Humayun Place, 3A Bertram Street, Esplanade, Dharmatala, Kolkata, West Bengal 700087
                 </p>
               </div>
               <div className={styles.mapContainer}>
@@ -305,7 +377,7 @@ const MainLayout = () => {
               </div>
             </div>
           </div>
-          <div className={styles.copyright}>© 2025 CITIMART All rights reserved.</div>
+          <div className={styles.copyright}>&copy; 2025 CITIMART. All rights reserved.</div>
         </div>
       </footer>
     </div>

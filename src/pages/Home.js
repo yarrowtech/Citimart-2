@@ -582,7 +582,7 @@
 //         body: JSON.stringify({ customer_id: customer.id, product_id: product._id, size: size || "N/A", color: color || "N/A", quantity: 1 }),
 //       });
 //       const data = await res.json();
-//       if (data.message === "Added to cart") showToast("✅ Added to Cart!");
+//       if (data.message === "Added to cart") { showToast("✅ Added to Cart!"); window.dispatchEvent(new Event("citimart:counts-changed")); }
 //       else showToast(`❌ ${data.error || "Failed"}`);
 //     } catch { showToast("❌ Error adding to cart"); }
 //     setPopup(null);
@@ -597,7 +597,7 @@
 //         body: JSON.stringify({ customer_id: customer.id, product_id: product._id, size: size || "N/A", color: color || "N/A" }),
 //       });
 //       const data = await res.json();
-//       if (data.message === "Added to wishlist") showToast("❤️ Added to Wishlist!");
+//       if (data.message === "Added to wishlist") { showToast("❤️ Added to Wishlist!"); window.dispatchEvent(new Event("citimart:counts-changed")); }
 //       else showToast(`❌ ${data.error || "Failed"}`);
 //     } catch { showToast("❌ Error"); }
 //     setPopup(null);
@@ -1152,7 +1152,7 @@ const Home = () => {
         body: JSON.stringify({ customer_id: customer.id, product_id: product._id, size: size || "N/A", color: color || "N/A", quantity: 1 }),
       });
       const data = await res.json();
-      if (data.message === "Added to cart") showToast("✅ Added to Cart!");
+      if (data.message === "Added to cart") { showToast("✅ Added to Cart!"); window.dispatchEvent(new Event("citimart:counts-changed")); }
       else showToast(`❌ ${data.error || "Failed"}`);
     } catch { showToast("❌ Error adding to cart"); }
     setPopup(null);
@@ -1167,7 +1167,7 @@ const Home = () => {
         body: JSON.stringify({ customer_id: customer.id, product_id: product._id, size: size || "N/A", color: color || "N/A" }),
       });
       const data = await res.json();
-      if (data.message === "Added to wishlist") showToast("❤️ Added to Wishlist!");
+      if (data.message === "Added to wishlist") { showToast("❤️ Added to Wishlist!"); window.dispatchEvent(new Event("citimart:counts-changed")); }
       else showToast(`❌ ${data.error || "Failed"}`);
     } catch { showToast("❌ Error"); }
     setPopup(null);

@@ -1168,6 +1168,7 @@ const ProductDetail = () => {
 
       const data = await res.json();
       if (data.message === "Added to cart") {
+        window.dispatchEvent(new Event("citimart:counts-changed"));
         alert("✅ Added to Cart!");
         fetchProductDetails(); 
         return true;
@@ -1216,6 +1217,7 @@ const ProductDetail = () => {
 
       const data = await res.json();
       if (data.message === "Added to wishlist") {
+        window.dispatchEvent(new Event("citimart:counts-changed"));
         alert("✅ Added to Wishlist!");
         return true;
       } else {
@@ -1238,36 +1240,45 @@ const ProductDetail = () => {
   const handleAddToCart = () => 
     addToCartAPI(product._id, selectedSize, selectedColor);
 
-  const handleBuyNow = async () => {
-    const added = await addToCartAPI(product._id, selectedSize, selectedColor);
-    if (added) {
-      fetchProductDetails(); 
-      const subtotal = product.price * quantity;
-      const discount = offers.find(o => o.type === 'discount') 
-                         ? (subtotal * offers.find(o => o.type === 'discount').discount / 100) 
-                         : 0;
-      const deliveryFee = 50;
-      const giftWrapFee = giftOption ? 50 : 0;
-      const finalTotal = subtotal - discount + deliveryFee + giftWrapFee;
-
-      navigate("/checkout", {
-        state: {
-          cartItems: [
-            {
-              product,
-              quantity,
-              size: selectedSize,
-              color: selectedColor,
-              giftMessage,
-              isGift: giftOption,
-            },
-          ],
-          isGift: giftOption,
-          giftMessage,
-          totals: { subtotal, discount, deliveryFee, giftWrapFee, finalTotal },
-        },
-      });
+  const handleBuyNow = () => {
+    if (disableButtons()) {
+      alert("Please select an available size and color combination");
+      return;
     }
+
+    const selectedVariant = getSelectedVariant();
+    const availableStock = selectedVariant
+      ? Number(selectedVariant.stock?.$numberInt ?? selectedVariant.stock ?? 0)
+      : null;
+    if (availableStock !== null && availableStock < quantity) {
+      alert(`Only ${availableStock} item(s) available`);
+      return;
+    }
+
+    const subtotal = product.price * quantity;
+    const discountOffer = offers.find(o => o.type === 'discount');
+    const discount = discountOffer ? (subtotal * discountOffer.discount / 100) : 0;
+    const discountedTotal = subtotal - discount;
+    const deliveryFee = discountedTotal > 500 ? 0 : 50;
+    const giftWrapFee = giftOption ? 50 : 0;
+    const finalTotal = discountedTotal + deliveryFee + giftWrapFee;
+
+    navigate("/checkout", {
+      state: {
+        checkoutMode: "buyNow",
+        cartItems: [{
+          product,
+          quantity,
+          size: selectedSize || "N/A",
+          color: selectedColor || "N/A",
+          giftMessage,
+          isGift: giftOption,
+        }],
+        isGift: giftOption,
+        giftMessage,
+        totals: { subtotal, discount, deliveryFee, giftWrapFee, finalTotal },
+      },
+    });
   };
 
   const fetchProductDetails = async () => {

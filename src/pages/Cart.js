@@ -36,8 +36,13 @@ const Cart = () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) navigate("/login");
+      throw new Error(data.error || "Unable to load cart");
+    }
     setCartItems(data.items || []);
     calculateTotal(data.items || []);
+    window.dispatchEvent(new Event("citimart:counts-changed"));
   } catch (err) {
     console.error("Error fetching cart:", err);
   }
@@ -71,7 +76,9 @@ const Cart = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setWishlist(data.product_ids || []);
+      if (!res.ok) throw new Error(data.error || "Unable to load wishlist");
+      setWishlist((data.items || []).map(item => item.product?._id).filter(Boolean));
+      window.dispatchEvent(new Event("citimart:counts-changed"));
     } catch (err) {
       console.error("Error fetching wishlist:", err);
     }
@@ -97,8 +104,9 @@ const Cart = () => {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color, quantity: newQuantity }),
       });
-      if (res.ok) fetchCart();
-      else alert((await res.json()).error);
+      if (res.ok) { await fetchCart(); return true; }
+      alert((await res.json()).error);
+      return false;
     } catch (err) {
       console.error("Error updating quantity:", err);
     }
@@ -111,24 +119,29 @@ const Cart = () => {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color }),
       });
-      if (res.ok) fetchCart();
-      else alert((await res.json()).error);
+      if (res.ok) { await fetchCart(); return true; }
+      alert((await res.json()).error);
+      return false;
     } catch (err) {
       console.error("Error removing item:", err);
+      return false;
     }
   };
 
   const clearCart = async () => {
     try {
-      await fetch(`http://localhost:5000/customer/cart/clear/${customerId}`, {
+      const res = await fetch(`http://localhost:5000/customer/cart/clear/${customerId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unable to clear cart');
       setCartItems([]);
       setTotal(0);
       setTotalItems(0);
+      window.dispatchEvent(new Event('citimart:counts-changed'));
     } catch (err) {
-      console.error("Error clearing cart:", err);
+      alert(err.message || 'Failed to clear cart');
     }
   };
 
@@ -139,8 +152,9 @@ const Cart = () => {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, quantity: 1, size, color }),
       });
-      if (res.ok) fetchCart();
-      else alert((await res.json()).error);
+      if (res.ok) { await fetchCart(); return true; }
+      alert((await res.json()).error);
+      return false;
     } catch (err) {
       console.error("Error adding item to cart:", err);
     }
@@ -181,6 +195,7 @@ const Cart = () => {
 
 
   useEffect(() => {
+    if (!customerId || !token) { navigate("/login"); return; }
     fetchCart();
     fetchOffersOrSimilar();
     fetchWishlist();
@@ -201,6 +216,7 @@ const Cart = () => {
   navigate('/checkout', {
     state: {
       cartItems: cartWithGiftInfo,
+      checkoutMode: 'cart',
       isGift,        // the checkbox at bottom of cart for entire order
       giftMessage,
       totals: {
@@ -260,23 +276,27 @@ const handleRemoveItem = async () => {
 
 const handleMoveToWishlist = async () => {
   if (!removeModal.product) return;
+  try {
+    const addResponse = await fetch('http://localhost:5000/customer/wishlist/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        customer_id: customerId,
+        product_id: removeModal.product,
+        size: removeModal.size,
+        color: removeModal.color
+      }),
+    });
+    const addData = await addResponse.json();
+    if (!addResponse.ok) throw new Error(addData.error || 'Unable to add item to wishlist');
 
-  // Add to wishlist with size and color
-  await fetch('http://localhost:5000/customer/wishlist/add', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({
-      customer_id: customerId,
-      product_id: removeModal.product,
-      size: removeModal.size,
-      color: removeModal.color
-    }),
-  });
-
-  // Remove from cart
-  await removeFromCart(removeModal.product, removeModal.size, removeModal.color);
-
-  setRemoveModal({ visible: false, product: null, size: null, color: null });
+    const removed = await removeFromCart(removeModal.product, removeModal.size, removeModal.color);
+    if (!removed) throw new Error('Item was wishlisted, but could not be removed from cart');
+    window.dispatchEvent(new Event('citimart:counts-changed'));
+    setRemoveModal({ visible: false, product: null, size: null, color: null });
+  } catch (error) {
+    alert(error.message || 'Unable to move item to wishlist');
+  }
 };
 
 

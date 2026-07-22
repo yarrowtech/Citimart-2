@@ -6,6 +6,7 @@ from bson import ObjectId
 from datetime import datetime  
 import logging
 from utils.auth_utils import token_required
+from utils.pricing_utils import calculate_quote
 from database import (
     users_collection,
     cart_collection,
@@ -614,11 +615,8 @@ def checkout(current_user):
     phone = data.get("phone", "")
     address = data.get("address", "")
     payment_method = data.get("payment_method", "cod")
-
-    # frontend-calculated (optional)
-    frontend_amount = data.get("amount", 0)
-    frontend_delivery_fee = data.get("deliveryFee", 0)
-    frontend_gift_fee = data.get("giftWrapFee", 0)
+    checkout_mode = data.get("checkout_mode", "cart")
+    direct_items = data.get("items", [])
 
     # Gift info
     order_gift = {
@@ -626,16 +624,21 @@ def checkout(current_user):
         "giftMessage": data.get("giftMessage", "")
     }
 
-    # --- FETCH CART ---
+    # --- SELECT CART OR BUY-NOW ITEMS ---
     cart = cart_collection.find_one({"customer_id": customer_id})
-    if not cart or not cart.get("items"):
-        return jsonify({"message": "Cart is empty"}), 400
+    if checkout_mode == "buyNow":
+        source_items = direct_items
+    else:
+        source_items = cart.get("items", []) if cart else []
+
+    if not source_items:
+        return jsonify({"message": "No items to checkout"}), 400
 
     total = 0
     enriched_items = []
 
     # Enrich cart items & subtotal
-    for item in cart["items"]:
+    for item in source_items:
         product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
         if not product:
             continue
@@ -659,45 +662,26 @@ def checkout(current_user):
             "category": product.get("category", ""),
             "subcategory": product.get("subcategory", ""),
             "color": item.get("color", ""),
-            "isGift": item.get("isGift", False),
-            "giftMessage": item.get("giftMessage", "")
+            "isGift": item.get("isGift", item.get("gift_option", False)),
+            "giftMessage": item.get("giftMessage", item.get("gift_message", ""))
         })
 
-    # --- APPLY DISCOUNT ---
-    discount = 0
-    applied_offer = None
-    if coupon_code:
-        offer = offers_collection.find_one({"code": coupon_code})
-        if offer:
-            if offer.get("type") == "flat" and total >= offer.get("min_purchase", 0):
-                discount = offer.get("amount", 0)
-                applied_offer = offer["title"]
-            elif offer.get("type") == "percent" and total >= offer.get("min_purchase", 0):
-                discount = int(total * offer.get("discount_percent", 0) / 100)
-                applied_offer = offer["title"]
-            elif offer.get("type") == "bogo":
-                for item in cart["items"]:
-                    if item["quantity"] >= 2:
-                        free_items = item["quantity"] // 2
-                        product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
-                        discount += free_items * product.get("price", 0)
-                applied_offer = "Buy 1 Get 1 Free"
-            elif offer.get("type") == "free_shipping":
-                applied_offer = "Free Shipping"
-            elif offer.get("type") == "flat_price":
-                for item in cart["items"]:
-                    product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
-                    if product and product.get("category") == offer.get("category"):
-                        original_price = product.get("price", 0)
-                        new_price = offer.get("flat_price", original_price)
-                        discount += (original_price - new_price) * item["quantity"]
-                applied_offer = f"Flat Price {offer.get('flat_price')}"
-
-    # --- FINAL TOTAL ---
-    final_total = frontend_amount if frontend_amount else total - discount
-    delivery_fee = frontend_delivery_fee if frontend_delivery_fee else (50 if final_total < 500 and applied_offer != "Free Shipping" else 0)
-    gift_wrap_fee = frontend_gift_fee if frontend_gift_fee else (50 if any(i.get("isGift") for i in enriched_items) or order_gift.get("isGift") else 0)
-    final_total += delivery_fee + gift_wrap_fee
+    # The server is the only authority for discounts and fees.
+    quote = calculate_quote(
+        raw_items=source_items,
+        products_collection=products_collection,
+        offers_collection=offers_collection,
+        customer=current_user,
+        coupon_code=coupon_code,
+        is_gift=order_gift["isGift"],
+    )
+    total = quote["subtotal"]
+    discount = quote["discount"]
+    delivery_fee = quote["delivery_fee"]
+    gift_wrap_fee = quote["gift_wrap_fee"]
+    final_total = quote["final_total"]
+    applied_offers = quote["applied_offers"]
+    applied_offer = applied_offers[0]["title"] if applied_offers else None
 
     # --- CREATE ORDER ---
     order_id = orders_collection.insert_one({
@@ -709,6 +693,7 @@ def checkout(current_user):
         "gift_wrap_fee": gift_wrap_fee,
         "final_amount": final_total,
         "applied_offer": applied_offer,
+        "applied_offers": applied_offers,
         "phone": phone,
         "address": address,
         "payment_method": payment_method,
@@ -750,7 +735,8 @@ def checkout(current_user):
         )
 
     # --- CLEAR CART ---
-    cart_collection.delete_one({"customer_id": customer_id})
+    if checkout_mode == "cart":
+        cart_collection.delete_one({"customer_id": customer_id})
 
     return jsonify({
         "message": "Order placed successfully",
@@ -760,10 +746,43 @@ def checkout(current_user):
         "gift_wrap_fee": gift_wrap_fee,
         "final_amount": final_total,
         "applied_offer": applied_offer,
+        "applied_offers": applied_offers,
         "order_gift": order_gift,
         "order_id": str(order_id)
     })
 
+
+def _public_quote(quote):
+    """Return quote data without internal Mongo product documents."""
+    return {key: value for key, value in quote.items() if key != "items"}
+
+
+@customer_bp.route("/checkout-quote", methods=["POST"])
+@token_required
+def checkout_quote(current_user):
+    data = request.get_json(silent=True) or {}
+    customer_id = str(current_user["_id"])
+    if data.get("customer_id") and data["customer_id"] != customer_id:
+        return jsonify({"error": "Unauthorized access"}), 403
+
+    checkout_mode = data.get("checkout_mode", "cart")
+    if checkout_mode == "buyNow":
+        source_items = data.get("items", [])
+    else:
+        cart = cart_collection.find_one({"customer_id": customer_id})
+        source_items = cart.get("items", []) if cart else []
+    if not source_items:
+        return jsonify({"error": "No items to checkout"}), 400
+
+    quote = calculate_quote(
+        raw_items=source_items,
+        products_collection=products_collection,
+        offers_collection=offers_collection,
+        customer=current_user,
+        coupon_code=data.get("coupon_code"),
+        is_gift=bool(data.get("isGift")),
+    )
+    return jsonify(_public_quote(quote))
 
 @customer_bp.route("/cart-totals/<customer_id>", methods=["GET"])
 @token_required
@@ -1644,36 +1663,52 @@ client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 # -------------------------------
 
 @customer_bp.route("/create-order", methods=["POST"])
-def create_order():
+@token_required
+def create_order(current_user):
     try:
-        data = request.get_json()
-        total_inr = data.get("amount")  # amount in INR
-        if not total_inr or total_inr <= 0:
-            return jsonify({"success": False, "message": "Invalid amount"}), 400
+        data = request.get_json(silent=True) or {}
+        customer_id = str(current_user["_id"])
+        if data.get("customer_id") and data["customer_id"] != customer_id:
+            return jsonify({"success": False, "message": "Unauthorized access"}), 403
 
-        # Razorpay expects amount in paise
-        amount_paise = int(total_inr * 100)
-        receipt = f"receipt_{int(os.urandom(4).hex(), 16)}"
+        checkout_mode = data.get("checkout_mode", "cart")
+        if checkout_mode == "buyNow":
+            source_items = data.get("items", [])
+        else:
+            cart = cart_collection.find_one({"customer_id": customer_id})
+            source_items = cart.get("items", []) if cart else []
+        if not source_items:
+            return jsonify({"success": False, "message": "No items to checkout"}), 400
+
+        quote = calculate_quote(
+            raw_items=source_items,
+            products_collection=products_collection,
+            offers_collection=offers_collection,
+            customer=current_user,
+            coupon_code=data.get("coupon_code"),
+            is_gift=bool(data.get("isGift")),
+        )
+        amount_paise = int(round(quote["final_total"] * 100))
+        if amount_paise <= 0:
+            return jsonify({"success": False, "message": "Invalid order total"}), 400
 
         razorpay_order = client.order.create({
             "amount": amount_paise,
             "currency": "INR",
-            "receipt": receipt,
-            "payment_capture": 1
+            "receipt": f"receipt_{int(os.urandom(4).hex(), 16)}",
+            "payment_capture": 1,
         })
-
-        # Return only necessary info to frontend
         return jsonify({
             "success": True,
             "id": razorpay_order["id"],
             "amount": razorpay_order["amount"],
             "currency": razorpay_order["currency"],
-            "key": RAZORPAY_KEY_ID
+            "key": RAZORPAY_KEY_ID,
+            "quote": _public_quote(quote),
         })
     except Exception as e:
         print("Razorpay order creation failed:", e)
         return jsonify({"success": False, "message": "Failed to create Razorpay order"}), 500
-
 
 # -------------------------------
 # Verify Razorpay Payment
@@ -1715,10 +1750,13 @@ def verify_payment(current_user):
         if generated_signature != razorpay_signature:
             return jsonify({"success": False, "message": "Invalid payment signature"}), 400
 
-        # --- FETCH CART (same as checkout) ---
+        # --- SELECT CART OR BUY-NOW ITEMS ---
+        checkout_mode = data.get("checkout_mode", "cart")
+        direct_items = data.get("items", [])
         cart = cart_collection.find_one({"customer_id": str(current_user["_id"])})
-        if not cart or not cart.get("items"):
-            return jsonify({"success": False, "message": "Cart is empty"}), 400
+        source_items = direct_items if checkout_mode == "buyNow" else (cart.get("items", []) if cart else [])
+        if not source_items:
+            return jsonify({"success": False, "message": "No items to checkout"}), 400
 
         coupon_code = data.get("coupon_code")
         phone = data.get("phone", "")
@@ -1732,7 +1770,7 @@ def verify_payment(current_user):
         enriched_items = []
 
         # --- Enrich items & subtotal ---
-        for item in cart["items"]:
+        for item in source_items:
             product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
             if not product:
                 continue
@@ -1756,45 +1794,30 @@ def verify_payment(current_user):
                 "category": product.get("category", ""),
                 "subcategory": product.get("subcategory", ""),
                 "color": item.get("color", ""),
-                "isGift": item.get("isGift", False),
-                "giftMessage": item.get("giftMessage", "")
+                "isGift": item.get("isGift", item.get("gift_option", False)),
+                "giftMessage": item.get("giftMessage", item.get("gift_message", ""))
             })
 
-        # --- APPLY DISCOUNT (same logic as checkout) ---
-        discount = 0
-        applied_offer = None
-        if coupon_code:
-            offer = offers_collection.find_one({"code": coupon_code})
-            if offer:
-                if offer.get("type") == "flat" and total >= offer.get("min_purchase", 0):
-                    discount = offer.get("amount", 0)
-                    applied_offer = offer["title"]
-                elif offer.get("type") == "percent" and total >= offer.get("min_purchase", 0):
-                    discount = int(total * offer.get("discount_percent", 0) / 100)
-                    applied_offer = offer["title"]
-                elif offer.get("type") == "bogo":
-                    for item in cart["items"]:
-                        if item["quantity"] >= 2:
-                            free_items = item["quantity"] // 2
-                            product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
-                            discount += free_items * product.get("price", 0)
-                    applied_offer = "Buy 1 Get 1 Free"
-                elif offer.get("type") == "free_shipping":
-                    applied_offer = "Free Shipping"
-                elif offer.get("type") == "flat_price":
-                    for item in cart["items"]:
-                        product = products_collection.find_one({"_id": ObjectId(item["product_id"])})
-                        if product and product.get("category") == offer.get("category"):
-                            original_price = product.get("price", 0)
-                            new_price = offer.get("flat_price", original_price)
-                            discount += (original_price - new_price) * item["quantity"]
-                    applied_offer = f"Flat Price {offer.get('flat_price')}"
+        quote = calculate_quote(
+            raw_items=source_items,
+            products_collection=products_collection,
+            offers_collection=offers_collection,
+            customer=current_user,
+            coupon_code=coupon_code,
+            is_gift=order_gift["isGift"],
+        )
+        total = quote["subtotal"]
+        discount = quote["discount"]
+        delivery_fee = quote["delivery_fee"]
+        gift_wrap_fee = quote["gift_wrap_fee"]
+        final_total = quote["final_total"]
+        applied_offers = quote["applied_offers"]
+        applied_offer = applied_offers[0]["title"] if applied_offers else None
 
-        # --- FINAL TOTAL ---
-        final_total = total - discount
-        delivery_fee = 50 if final_total < 500 and applied_offer != "Free Shipping" else 0
-        gift_wrap_fee = 50 if any(i.get("isGift") for i in enriched_items) or order_gift.get("isGift") else 0
-        final_total += delivery_fee + gift_wrap_fee
+        razorpay_order = client.order.fetch(razorpay_order_id)
+        expected_paise = int(round(final_total * 100))
+        if int(razorpay_order.get("amount", -1)) != expected_paise:
+            return jsonify({"success": False, "message": "Payment amount does not match current order total"}), 400
 
         # --- SAVE ORDER ---
         order_data = {
@@ -1806,6 +1829,7 @@ def verify_payment(current_user):
             "gift_wrap_fee": gift_wrap_fee,
             "final_amount": final_total,
             "applied_offer": applied_offer,
+        "applied_offers": applied_offers,
             "address": address,
             "phone": phone,
             "payment_method": "razorpay",
@@ -1848,7 +1872,8 @@ def verify_payment(current_user):
             )
 
         # --- CLEAR CART ---
-        cart_collection.delete_one({"customer_id": str(current_user["_id"])})
+        if checkout_mode == "cart":
+            cart_collection.delete_one({"customer_id": str(current_user["_id"])})
 
         return jsonify({
             "success": True,
@@ -1860,6 +1885,7 @@ def verify_payment(current_user):
             "gift_wrap_fee": gift_wrap_fee,
             "final_amount": final_total,
             "applied_offer": applied_offer,
+        "applied_offers": applied_offers,
             "order_gift": order_gift,
             "enriched_items": enriched_items
         }), 201
