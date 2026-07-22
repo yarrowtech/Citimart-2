@@ -1,0 +1,358 @@
+.dashboardContainer {
+  padding: 2rem;
+  background: linear-gradient(135deg, #082194, #764ba2, #6b5b95); /* vibrant gradient */
+  color: #f1f5f9;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboardHeader h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  overflow-y: hidden;
+}
+
+.filterDropdown label {
+  margin-right: 0.5rem;
+  color: #cbd5e1;
+}
+
+.filterDropdown select {
+  padding: 0.4rem 0.6rem;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  border-radius: 4px;
+}
+
+.statsCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+.totalSales { background: linear-gradient(135deg, #84ffff, #523ffc); }
+.totalRevenue { background: linear-gradient(135deg, #43cea2, #1068c0); }
+.newUsers { background: linear-gradient(135deg, #ffca8a, #ffd200); }
+.activeVendors { background: linear-gradient(135deg, #bd97e5, #2575fc); }
+.subUsers { background: linear-gradient(135deg, #ffe7e2, #dd2476); }
+.reports { background: linear-gradient(135deg, #e0ccfa, #0072ff); }
+.card {
+  background-color: #1e293b;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+}
+
+.card h4 {
+  font-size: 1rem;
+  color: #00040a;
+  margin-bottom: 0.5rem;
+  overflow-y: hidden;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  color: #000000;
+  overflow-y: hidden;
+}
+
+.card p {
+  font-size: 0.875rem;
+  color: #070c13;
+  margin-top: 0.5rem;
+}
+
+.exportBtn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.exportBtn:hover {
+  background-color: #2563eb;
+}
+
+.chartSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chartCard {
+  background-color: #1e293b;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.chartCard h3 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+.ordersSection {
+  margin-top: 2rem;
+  background-color: #171d20;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+}
+
+.ordersSection h3 {
+  font-size: 1.25rem;
+  color: #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.ordersTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.ordersTable thead th {
+  padding: 0.75rem;
+  background-color: #334155;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.ordersTable tbody td {
+  padding: 0.75rem;
+  border-top: 1px solid #475569;
+  color: #e2e8f0;
+}
+
+.status {
+  font-weight: bold;
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.delivered {
+  background-color: #10b98133;
+  color: #10b981;
+}
+
+.pending {
+  background-color: #f59e0b33;
+  color: #f59e0b;
+}
+
+.canceled {
+  background-color: #ef444433;
+  color: #ef4444;
+}
+
+.notifications {
+  background-color: #fff48d;
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.notifications h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.75rem;
+  color: #000000;
+}
+
+.notifications ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  color: #e2e8f0;
+}
+
+.notifications li {
+  margin-bottom: 0.5rem;
+}
+
+.dropdownList {
+  background: #ffa5a5;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.stockAnalysis {
+  margin: 40px 0;
+}
+
+.stockGrid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stockCard {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  gap: 12px;
+  width: 230px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.stockCard img {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+}
+
+.dropdownIcon {
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.dropdownList {
+  list-style: none;
+  padding: 8px;
+  margin-top: 10px;
+  background-color: #c5d2e4;
+  border-radius: 8px;
+  border: 1px solid #444;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.stockSection {
+  margin-top: 3rem;
+  padding: 2rem;
+  background-color: #1a1c28;
+  border-radius: 16px;
+  color: #f0f0f0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 1;
+}
+
+.stockSection h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ffffff;
+}
+
+.stockCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.stockCard {
+  flex: 1 1 300px;
+  background: linear-gradient(135deg, #24283b 0%, #1e2130 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #2e334d;
+  transition: all 0.3s ease-in-out;
+}
+
+.stockCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.stockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.stockHeader button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.stockHeader button:hover {
+  background-color: #6366f1;
+}
+
+.stockList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.stockItem {
+  display: flex;
+  gap: 1rem;
+  background-color: #2b3046;
+  padding: 0.8rem;
+  border-radius: 10px;
+  align-items: center;
+  border: 1px solid #3c415e;
+}
+
+.stockImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #1f2436;
+  border: 1px solid #444;
+}
+
+.stockItem div {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.stockItem strong {
+  display: block;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+@media (max-width: 768px) {
+  .stockCategories {
+    flex-direction: column;
+  }
+
+  .stockCard {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,112 @@
+.contactPage {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.brandName {
+  color: #ff0000ff;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.contactForm {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.contactForm h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #2f00ffff;
+}
+
+.contactForm input,
+.contactForm textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.contactForm textarea {
+  height: 120px;
+  resize: none;
+}
+
+.contactForm button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #ff0000ff, #2f00ffff);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contactForm button:hover {
+  background: linear-gradient(90deg, #2f00ffff, #ff0000ff);
+}
+
+.successMessage {
+  color: green;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.errorMessage {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.storeInfo {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.storeInfo h2 {
+  color: #ff0000ff;
+  margin-bottom: 20px;
+}
+
+.storeInfo p {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.mapContainer {
+  margin-top: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+}

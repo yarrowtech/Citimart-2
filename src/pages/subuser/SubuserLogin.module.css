@@ -1,0 +1,258 @@
+/* Scoped styles for SubuserLogin only
+.loginContainer {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Poppins', sans-serif;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.loginContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.loginContainer h2 {
+  text-align: center;
+  color: #1f2937;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.loginContainer input {
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.loginContainer input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+}
+
+.loginContainer button {
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginContainer button:hover {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+}
+
+@media (max-width: 480px) {
+  .loginContainer {
+    margin: 40px 20px;
+    padding: 30px 20px;
+  }
+} */
+
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  font-family: 'Sora', sans-serif;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow1 {
+  position: absolute;
+  width: 420px; height: 420px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.28) 0%, transparent 70%);
+  top: -100px; left: -80px; pointer-events: none;
+}
+
+.glow2 {
+  position: absolute;
+  width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(236,72,153,0.22) 0%, transparent 70%);
+  bottom: -80px; right: -60px; pointer-events: none;
+}
+
+.loginCard {
+  width: 100%; max-width: 400px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.13);
+  padding: 2.5rem 2.2rem;
+  display: flex; flex-direction: column; gap: 18px;
+  position: relative; z-index: 1;
+  animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header { text-align: center; margin-bottom: 0.2rem; }
+
+.iconCircle {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem; font-size: 24px;
+  box-shadow: 0 6px 28px rgba(99,102,241,0.5);
+}
+
+.header h2 {
+  font-size: 21px; font-weight: 700; color: #fff;
+  letter-spacing: -0.3px; margin-bottom: 5px;
+}
+.header p { font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 300; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.7px; text-transform: uppercase;
+}
+
+/*
+  inputRow: flex row — items naturally share the same height.
+  align-items:stretch makes ALL children (icon, input, eye btn)
+  fill the full row height, so the eye button is always centered.
+  overflow:hidden clips everything to border-radius.
+*/
+.inputRow {
+  display: flex;
+  align-items: stretch;          /* all children same height */
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.inputRow:focus-within {
+  border-color: rgba(99,102,241,0.75);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+}
+
+.inputIcon {
+  flex-shrink: 0;
+  width: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+.textInput {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 10px 13px 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Sora', sans-serif;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.textInput::placeholder { color: rgba(255,255,255,0.2); }
+
+/*
+  eyeBtn: a flex child — NOT position:absolute.
+  align-items:stretch on parent means this button fills the full
+  row height automatically. It's always perfectly vertically centered.
+  All browser-default button styles are reset here.
+*/
+.eyeBtn {
+  flex-shrink: 0;
+  width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  font-size: 17px;
+  color: rgba(255,255,255,0.45);
+  padding: 0;
+  margin: 0;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  transition: background 0.18s, color 0.18s;
+}
+
+.eyeBtn:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+}
+.eyeBtn:focus-visible {
+  outline: 2px solid rgba(99,102,241,0.8);
+  outline-offset: -2px;
+}
+
+.forgotRow { text-align: right; margin-top: 4px; }
+.forgotBtn {
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-size: 12px; font-family: 'Sora', sans-serif; font-weight: 600;
+  background: linear-gradient(90deg, #818cf8, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: opacity 0.2s;
+}
+.forgotBtn:hover { opacity: 0.7; }
+
+.submitBtn {
+  margin-top: 6px; padding: 13px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700;
+  font-family: 'Sora', sans-serif; cursor: pointer;
+  box-shadow: 0 4px 22px rgba(99,102,241,0.45);
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+.submitBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.55); }
+.submitBtn:active { transform: translateY(0); }
+
+.divider { display: flex; align-items: center; gap: 12px; }
+.divider span { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+.divider small { font-size: 11px; color: rgba(255,255,255,0.22); }
+
+.footerNote {
+  text-align: center; font-size: 12px;
+  color: rgba(255,255,255,0.22); font-weight: 300;
+}
+
+@media (max-width: 480px) {
+  .loginCard { padding: 2rem 1.4rem; }
+}

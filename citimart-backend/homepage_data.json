@@ -1,0 +1,116 @@
+{
+  "brands": [
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1761730967/citimart/vendors/6901ce8781d97dfa688d4d1b/products/fwxkh2pg9pyvvrv6ozop.jpg",
+      "name": "Electro Lite "
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1758545465/citimart/vendors/68d134e697b27e2a89736574/products/i52laeague1kbch2qyq4.jpg",
+      "name": "Raya Clothing "
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756282029/citimart/vendors/68aeb9ec2c284c08dc0dc214/products/wmg3ts25u9umiww1nowk.jpg",
+      "name": "Kawaii Clothing"
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1757676748/citimart/vendors/68c3c0783c9f52909e893941/products/pgjccbophvrwzvtf5otx.jpg",
+      "name": "Savana\t"
+    }
+  ],
+  "categories": [
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1762755193/homepage_assets/pznnt4sb57hiua4xdyuv.jpg",
+      "name": "Clothing"
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1762755207/homepage_assets/luyc0jt0e8h3zl1ap0kc.jpg",
+      "name": "Accessories"
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1762755234/homepage_assets/c44uag5znnhnbk4srbev.jpg",
+      "name": "Handmade"
+    }
+  ],
+  "featuredProducts": [
+    {
+      "name": "Top red ",
+      "price": 677,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1757405281/kdebvkvohwl5nvo5uhis.webp",
+      "product_id": "68bfe062b1c5e73c4768629d"
+    },
+    {
+      "name": "Black powder shirt",
+      "price": 100,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756536213/ykg7bkpiucohbtpsab7v.jpg",
+      "product_id": "68b29d978c1614ad8602f3bf"
+    },
+    {
+      "name": "Top punk",
+      "price": "666",
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1757676748/citimart/vendors/68c3c0783c9f52909e893941/products/pgjccbophvrwzvtf5otx.jpg",
+      "product_id": "68c404cd3c9f52909e893948"
+    },
+    {
+      "name": "Coffee shirt",
+      "price": 1908,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756536213/ooavvbfy8eslllgxovhq.jpg",
+      "product_id": "68b29d978c1614ad8602f3c0"
+    },
+    {
+      "name": "Sunglasses blacky",
+      "price": 790,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756197053/jphiwiqm7o4pp3ppqy5l.jpg",
+      "product_id": "68ad70be281638dbc77398d6"
+    }
+  ],
+  "heroBanners": [
+    "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1600&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&auto=format&fit=crop&q=85  ",
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&auto=format&fit=crop&q=85  ",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&auto=format&fit=crop&q=85"
+  ],
+  "reviews": [
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1762759664/homepage_assets/no403xc5jlldfzjvhdad.jpg",
+      "name": "Nandini Biswas ",
+      "text": "I love the shopping with this website "
+    },
+    {
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1764933363/homepage_assets/kjsbo40ivsbmis4tbnj1.jpg",
+      "name": "Shreya Sen ",
+      "text": "Its so good , features are so smart"
+    }
+  ],
+  "trendingNow": [
+    {
+      "name": "Blue pillowish shirt",
+      "price": 100,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756536211/sog0g91bg8bmizowmj4k.jpg",
+      "product_id": "68b29d968c1614ad8602f3bb"
+    },
+    {
+      "name": "Fit Shape Jeans",
+      "price": "1789",
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1758545465/citimart/vendors/68d134e697b27e2a89736574/products/i52laeague1kbch2qyq4.jpg",
+      "product_id": "68d14639ee04015bf45e4153"
+    },
+    {
+      "name": "Red Purse Girly",
+      "price": "1799",
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1760097281/citimart/vendors/68aacce07140386c8783843f/products/vzwiv1iwpegp3beatn5q.jpg",
+      "product_id": "68e8f400a21703002a82925a"
+    },
+    {
+      "name": "Men's Black shirt ",
+      "price": 100,
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1756536210/d72h7qa6rh5szdvyujf4.jpg",
+      "product_id": "68b29d968c1614ad8602f3ba"
+    },
+    {
+      "name": "Pink Top",
+      "price": "899",
+      "image": "https://res.cloudinary.com/dfvrobw6x/image/upload/v1763637481/citimart/vendors/68aacce07140386c8783843f/products/btvnutdvrblrdej6aax1.jpg",
+      "product_id": "691ef8e72df91f0c506365e8"
+    }
+  ]
+}

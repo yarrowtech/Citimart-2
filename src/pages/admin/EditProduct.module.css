@@ -1,0 +1,207 @@
+.editProduct {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.editProduct h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form input,
+.form textarea,
+.form select {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.variantRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.variantRow input {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #1d4ed8;
+}
+
+button[type="button"] {
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+button[type="button"]:hover {
+  background-color: #e5e7eb;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.variantRow,
+.specRow,
+.pairInputRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.specRow input {
+  flex: 1;
+}
+
+.colorPalette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+.colorCircle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.colorCircle span {
+  display: none;
+}
+
+.colorCircle:hover {
+  border-color: #888;
+}
+
+.selected {
+  border: 2px solid #000;
+}
+
+.colorSearch {
+  width: 100%;
+  padding: 0.4rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.colorTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.colorTab {
+  padding: 0.3rem 0.6rem;
+  background: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.activeTab {
+  background-color: #333;
+  color: #fff;
+}
+
+.pairList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.pairItem {
+  background-color: #f0f0f0;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pairItem span {
+  font-size: 0.9rem;
+}

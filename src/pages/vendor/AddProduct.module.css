@@ -1,0 +1,425 @@
+/* Container & Layout */
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #1a202c;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Form groups */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Labels */
+.formGroup > label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #2d3748;
+}
+
+/* Inputs and selects */
+input,
+select,
+textarea {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  outline-offset: 2px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-family: inherit;
+  color: #1a202c;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 8px #63b3edaa;
+}
+
+/* Textarea */
+textarea {
+  min-height: 100px;
+  font-family: inherit;
+}
+
+/* Error message */
+.error {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Form row for Price & Discount */
+.formRow {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Variant Row */
+.variantRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* Variant Items */
+.variantItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #edf2f7;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 8px;
+  box-shadow: inset 0 0 5px #cbd5e0;
+}
+
+.variantItem button {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #e53e3e;
+  transition: color 0.2s ease;
+}
+
+.variantItem button:hover {
+  color: #9b2c2c;
+}
+
+/* Color Picker */
+.colorSearch {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e0;
+  font-size: 1rem;
+  transition: border-color 0.25s ease;
+}
+
+.colorSearch:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 6px #63b3edaa;
+}
+
+/* Color Tabs */
+.colorTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.colorTab {
+  padding: 6px 14px;
+  background: #edf2f7;
+  border-radius: 25px;
+  border: 1.5px solid transparent;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+.colorTab:hover {
+  background: #e2e8f0;
+}
+
+.activeTab {
+  background: #4299e1;
+  border-color: #3182ce;
+  color: #fff;
+}
+
+/* Color Palette Grid */
+.colorPalette {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+  gap: 10px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 10px;
+  background: #f7fafc;
+}
+
+/* Color Circles */
+.colorCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+  transition: border-color 0.25s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.colorCircle span {
+  display: none; /* Hide text inside circles for a clean look */
+}
+
+.colorCircle:hover {
+  border-color: #a0aec0;
+}
+
+/* Selected color highlight */
+.selected {
+  border-color: #3182ce !important;
+  box-shadow: 0 0 8px #4299e1;
+}
+
+/* Specifications rows */
+.specRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.specRow input {
+  flex: 1;
+}
+
+.specRow button {
+  background: #e53e3e;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.specRow button:hover {
+  background: #9b2c2c;
+}
+
+/* Add buttons */
+.addBtn {
+  background: #38a169;
+  color: white;
+  padding: 8px 18px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.addBtn:hover {
+  background: #2f855a;
+}
+
+/* Image Preview Row */
+.previewRow {
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.previewRow img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  border: 2px solid #cbd5e0;
+}
+
+/* Pair with inputs */
+.pairInputRow {
+  display: flex;
+  gap: 10px;
+}
+
+.pairInputRow input {
+  flex: 1;
+}
+
+.pairList {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pairItem {
+  background: #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pairItem button {
+  background: transparent;
+  border: none;
+  color: #e53e3e;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.pairItem button:hover {
+  color: #9b2c2c;
+}
+
+/* Submit & Reset Buttons */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.submitBtn {
+  background: #3182ce;
+  color: white;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitBtn:hover {
+  background: #2c5282;
+}
+
+.resetBtn {
+  background: #a0aec0;
+  color: white;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.resetBtn:hover {
+  background: #718096;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .formRow {
+    flex-direction: column;
+  }
+  .variantRow {
+    flex-direction: column;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}
+.flexRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.requestBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.categoryTree h3 {
+  margin-top: 10px;
+  color: #333;
+}
+
+.subCategory {
+  margin-left: 20px;
+}
+
+.textArea {
+  width: 100%;
+  height: 80px;
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

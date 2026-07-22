@@ -1,0 +1,115 @@
+/* ========================= */
+/* Admin Subusers Styles */
+/* ========================= */
+
+.subuserTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.subuserTable th,
+.subuserTable td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.subuserTable th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #111827;
+}
+
+.subuserTable tr:hover {
+  background: #f9fafb;
+}
+
+/* --- Buttons inside the table --- */
+.subuserTable button {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+}
+
+.subuserTable button:nth-child(1) {
+  background: #2563eb;
+  color: #fff;
+}
+
+.subuserTable button:nth-child(2) {
+  background: #dc2626;
+  color: #fff;
+}
+
+.subuserTable button:nth-child(3) {
+  background: #16a34a;
+  color: #fff;
+}
+
+/* ========================= */
+/* Responsive Styles */
+/* ========================= */
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .subuserTable,
+  .subuserTable thead {
+    display: block;
+  }
+
+  .subuserTable tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .subuserTable td,
+  .subuserTable th {
+    display: block;
+    border: none;
+    padding: 6px 0;
+  }
+
+  .subuserTable th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .subuserTable td {
+    font-size: 0.85rem;
+    color: #111827;
+  }
+
+  .subuserTable button {
+    margin: 5px 5px 0 0;
+    width: auto;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .subuserTable th {
+    font-size: 0.75rem;
+  }
+
+  .subuserTable td {
+    font-size: 0.8rem;
+  }
+
+  .subuserTable button {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}

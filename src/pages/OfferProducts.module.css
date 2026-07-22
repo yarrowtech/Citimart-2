@@ -1,0 +1,143 @@
+/* 🌐 OfferProducts.module.css */
+
+/* Page Wrapper */
+.offerProducts {
+  min-height: 100vh;
+  width: 100%;
+  background: #f8f9fc; /* clean light background */
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: #2b2d42;
+  padding: 2rem;
+  overflow-x: hidden; /* ✅ no horizontal scroll */
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.offerHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Banner Image */
+.offerBanner {
+  flex: 1 1 280px;
+  max-width: 320px;
+  border-radius: 0.8rem;
+  object-fit: cover;
+}
+
+/* Offer Info */
+.offerInfo {
+  flex: 2;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.offerDescription {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+.offerMeta {
+  font-size: 0.95rem;
+  color: #374151;
+  margin-top: 0.3rem;
+  font-weight: 500;
+}
+
+/* Loading & No Products */
+.loadingText,
+.noProducts {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 2rem;
+}
+
+/* Products Grid */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Product Card */
+.productCard {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Image Wrapper */
+.imageWrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageWrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.productCard:hover .imageWrapper img {
+  transform: scale(1.05);
+}
+
+/* Card Content */
+.cardContent {
+  padding: 1rem;
+  text-align: center;
+}
+
+.productName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.productPrice {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2563eb; /* professional blue */
+}

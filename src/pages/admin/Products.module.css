@@ -1,0 +1,178 @@
+.products {
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.addButton {
+  background-color: #ff3f6c;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.addButton:hover {
+  background-color: #ff527b;
+}
+
+.tableContainer {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  color: #666;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
+.active {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.editButton {
+  background-color: #3498db;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #2980b9;
+}
+
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
+} 
+
+
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+/* --- Moderation Modal Styles --- */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.modal label {
+  font-weight: 500;
+  display: block;
+  margin-top: 12px;
+}
+
+.modal select,
+.modal textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.modal textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancelBtn {
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirmBtn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background: #43a047;
+}

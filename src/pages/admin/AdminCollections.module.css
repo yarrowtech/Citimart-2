@@ -1,0 +1,137 @@
+.collectionsTab {
+  padding: 20px;
+}
+
+.collectionList {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.collectionCard {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.collectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collectionActions button {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.productList {
+  list-style: none;
+  padding: 0;
+  margin-top: 12px;
+}
+
+.productItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-top: 1px solid #eee;
+  padding: 8px 0;
+}
+
+.productImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.productInfo {
+  font-size: 14px;
+  color: #444;
+}
+
+.productColors {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.colorCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.collectionForm {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.collectionForm input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.productSelectionContainer {
+  margin-top: 12px;
+}
+
+.productSelectionLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+
+.productSelectionLabel img {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.primaryBtn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  margin-left: 8px;
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.collectionCheckbox {
+  width:16px !important;
+  height:16px !important;
+  min-width:16px !important;
+}

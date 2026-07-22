@@ -1,0 +1,170 @@
+.container {
+  max-width: 1250px;
+  margin: 30px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+/* ✅ Buttons */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btnAdd {
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  color: white;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 8px rgba(255, 118, 158, 0.4);
+}
+
+.btnAdd:hover {
+  transform: scale(1.05);
+}
+
+.btnEdit {
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  color: white;
+  margin-right: 8px;
+  box-shadow: 0 3px 8px rgba(66, 165, 245, 0.3);
+}
+
+.btnEdit:hover {
+  transform: scale(1.05);
+}
+
+.btnDelete {
+  background: linear-gradient(135deg, #ff6b6b, #e53935);
+  color: white;
+  box-shadow: 0 3px 8px rgba(229, 57, 53, 0.3);
+}
+
+.btnDelete:hover {
+  transform: scale(1.05);
+}
+
+/* ✅ Table Styling */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.table th {
+  background: #f8f9fa;
+  color: #444;
+  font-weight: 700;
+  padding: 14px;
+  text-align: center;
+}
+
+.table td {
+  background: #ffffff;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.table tr {
+  transition: all 0.3s ease;
+}
+
+.table tr:hover td {
+  background: #f1f8ff;
+}
+
+/* ✅ Modal */
+.modalContent {
+  padding: 26px;
+  background: #ffffff;
+  border-radius: 14px;
+  max-width: 500px;
+  margin: auto;
+  box-shadow: 0px 8px 22px rgba(0, 0, 0, 0.15);
+  animation: scaleIn 0.3s ease-in-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ✅ Inputs */
+.inputGroup {
+  margin-bottom: 16px;
+}
+
+.inputGroup label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.inputGroup input,
+.inputGroup textarea,
+.inputGroup select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus,
+.inputGroup select:focus {
+  border-color: #4cafef;
+  box-shadow: 0 0 0 3px rgba(76, 175, 239, 0.2);
+}
+
+/* ✅ Modal Buttons */
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btnSave {
+  background: linear-gradient(135deg, #4caf50, #43a047);
+  color: white;
+}
+
+.btnSave:hover {
+  transform: scale(1.05);
+}
+
+.btnCancel {
+  background: linear-gradient(135deg, #757575, #616161);
+  color: white;
+}
+
+.btnCancel:hover {
+  transform: scale(1.05);
+}

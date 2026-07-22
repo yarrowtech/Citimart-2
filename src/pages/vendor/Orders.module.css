@@ -1,0 +1,194 @@
+.orders {
+  padding: 30px;
+  background: #f4f6f8;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  color: #2c3e50;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th, .table td {
+  padding: 15px 18px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table th {
+  background: linear-gradient(90deg, #5b6cc9, #43a047);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+}
+
+.table tr:hover {
+  background: #f9f9f9;
+}
+
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.itemImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+}
+
+.payment {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.paid {
+  background-color: #28a745;
+}
+
+.pending {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.failed {
+  background-color: #dc3545;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.status.placed {
+  background-color: #007bff;
+}
+
+.status.shipped {
+  background-color: #17a2b8;
+}
+
+.status.delivered {
+  background-color: #28a745;
+}
+
+.status.cancelled {
+  background-color: #dc3545;
+}
+
+/* Action Buttons */
+.actionBtn, .deleteBtn {
+  padding: 6px 12px;
+  margin: 3px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* View Button */
+.viewBtn {
+  background-color: #3498db;
+  color: white;
+}
+
+.viewBtn:hover {
+  background-color: #2980b9;
+}
+
+/* Update Button */
+.updateBtn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.updateBtn:hover {
+  background-color: #e68900;
+}
+
+/* Delete Button */
+.deleteBtn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.deleteBtn:hover {
+  background-color: #c0392b;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 999;
+}
+
+.modalContent {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.closeBtn {
+  margin-top: 15px;
+  background-color: #555;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+.closeBtn:hover {
+  background-color: #333;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

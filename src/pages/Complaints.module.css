@@ -1,0 +1,104 @@
+.complaintsPage {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-family: "Poppins", sans-serif;
+}
+
+h2, h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.fileButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto 1.5rem;
+  transition: 0.3s;
+}
+
+.fileButton:hover {
+  background: #0056b3;
+}
+
+.emptyText {
+  text-align: center;
+  color: #777;
+}
+
+.complaintTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.complaintTable th, .complaintTable td {
+  border: 1px solid #ddd;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.complaintTable th {
+  background: #f3f6fa;
+}
+
+.resolved {
+  color: green;
+  font-weight: 600;
+}
+
+.pending {
+  color: orange;
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form input,
+.form select,
+.form textarea {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.formButtons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.submitBtn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #ccc;
+  color: black;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+}

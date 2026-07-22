@@ -1,0 +1,343 @@
+/* --- Base styles (from earlier) --- */
+:root {
+  --sidebar-bg: #1f2937;
+  --sidebar-active: #374151;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --text-light: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --bg-light: #f9fafb;
+  --bg-white: #ffffff;
+  --danger: #dc2626;
+  --success: #16a34a;
+}
+
+.settingsContainer {
+  display: flex;
+  height: 100vh;
+  font-family: "Inter", sans-serif;
+  background: var(--bg-light);
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebarHeader {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebarHeader h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.nav {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav li {
+  padding: 14px 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s ease-in-out;
+}
+
+.nav li:hover {
+  background: var(--sidebar-active);
+  color: var(--text-light);
+}
+
+.nav li.active {
+  background: var(--primary);
+  color: var(--text-light);
+  font-weight: 600;
+  border-left: 4px solid var(--primary-hover);
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background: var(--bg-light);
+}
+
+.tabContent {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 25px 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Forms --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form input,
+.form select,
+.form textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.form button {
+  align-self: flex-start;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.form button:hover {
+  background: var(--primary-hover);
+}
+
+/* --- Checkbox Grid --- */
+.checkboxGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+/* --- Table --- */
+.subuserTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: var(--bg-white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.subuserTable th,
+.subuserTable td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subuserTable th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #111827;
+}
+
+.subuserTable tr:hover {
+  background: #f9fafb;
+}
+
+.subuserTable button {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+}
+
+.subuserTable button:nth-child(1) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.subuserTable button:nth-child(2) {
+  background: var(--danger);
+  color: #fff;
+}
+
+.subuserTable button:nth-child(3) {
+  background: var(--success);
+  color: #fff;
+}
+
+/* ========================= */
+/* RESPONSIVE STYLES */
+/* ========================= */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .settingsContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    height: 60px;
+  }
+
+  .sidebarHeader {
+    padding: 0;
+    border: none;
+  }
+
+  .nav {
+    flex-grow: unset;
+  }
+
+  .nav ul {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav li {
+    padding: 10px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .mainContent {
+    padding: 20px;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .tabContent {
+    padding: 20px;
+  }
+
+  .form {
+    gap: 12px;
+  }
+
+  .form input,
+  .form select,
+  .form textarea {
+    font-size: 0.85rem;
+  }
+
+  .form button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .checkboxGroup {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .subuserTable,
+  .subuserTable thead {
+    display: block;
+  }
+
+  .subuserTable tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .subuserTable td,
+  .subuserTable th {
+    display: block;
+    border: none;
+    padding: 6px 0;
+  }
+
+  .subuserTable th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .subuserTable td {
+    font-size: 0.85rem;
+    color: #111827;
+  }
+
+  .subuserTable button {
+    margin: 5px 5px 0 0;
+    width: auto;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .sidebar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px;
+  }
+
+  .sidebarHeader h1 {
+    font-size: 1rem;
+  }
+
+  .nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .nav li {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .mainContent {
+    padding: 15px;
+  }
+
+  .tabContent h2 {
+    font-size: 1.1rem;
+  }
+
+  .form label {
+    font-size: 0.8rem;
+  }
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.checkboxText {
+  font-size: 14px;
+}

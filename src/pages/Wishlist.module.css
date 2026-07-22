@@ -1,0 +1,222 @@
+/* ====== Wishlist Page ====== */
+.wishlistPage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f0f4ff, #f5f5f5);
+  min-height: 80vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ====== Main Card ====== */
+.wishlistMain {
+  flex: 2;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem 2rem;
+  width: 100%;
+  max-width: 720px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.wishlistMain:hover {
+  transform: translateY(-2px);
+}
+
+/* ====== Title ====== */
+.wishlistTitle {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  color: #0a3d62;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ====== Wishlist Items ====== */
+.wishlistList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.wishlistItem {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: #fdfdfd;
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.wishlistItem:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  transform: translateY(-3px);
+}
+
+/* ====== Product Image ====== */
+.productImg {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
+  transition: transform 0.2s ease;
+}
+
+.productImg:hover {
+  transform: scale(1.05);
+}
+
+/* ====== Product Info ====== */
+.productInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.productName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.productName:hover {
+  color:  #1e3a8a;
+  text-decoration: underline;
+}
+
+.productPrice {
+  color: #111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* ====== Color Box ====== */
+.colorContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.colorBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: transform 0.2s ease;
+}
+
+.colorBox:hover {
+  transform: scale(1.2);
+}
+
+/* ====== Action Buttons ====== */
+.actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.7rem;
+}
+
+.moveBtn {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.moveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.removeBtn {
+  background: linear-gradient(135deg, #f87171, #b91c1c);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.removeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* ====== Empty Wishlist ====== */
+.emptyWishlistContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2rem;
+  margin: 2rem auto;
+  max-width: 520px;
+  text-align: center;
+}
+
+.emptyEmoji {
+  font-size: 4rem;
+  margin-bottom: 0.7rem;
+}
+
+.shopLink {
+  margin-top: 1rem;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.15rem;
+  transition: color 0.2s ease;
+}
+
+.shopLink:hover {
+  color: #2759ff;
+  text-decoration: underline;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 600px) {
+  .wishlistMain {
+    padding: 1rem 1rem;
+  }
+
+  .wishlistItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .productImg {
+    width: 90px;
+    height: 90px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

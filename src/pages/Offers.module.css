@@ -1,0 +1,82 @@
+.offersPage {
+  background: #fff0f6;
+  min-height: 100vh;
+  padding: 2rem 0 3rem 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.pageTitle {
+  text-align: center;
+  color: #ff3f6c;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.pageSubtitle {
+  text-align: center;
+  color: #282c3f;
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.offersList {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.offerSection {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(255, 63, 108, 0.08);
+  padding: 2rem 1.5rem;
+  border: 2px solid #ffdde7;
+  transition: box-shadow 0.2s;
+}
+
+.offerSection:hover {
+  box-shadow: 0 6px 24px rgba(255, 63, 108, 0.15);
+  border-color: #ff3f6c;
+}
+
+.offerTitle {
+  color: #ff3f6c;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.offerDescription {
+  color: #282c3f;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.offerDetails {
+  color: #94969f;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+  .offersList {
+    gap: 1.2rem;
+  }
+  .offerSection {
+    padding: 1.2rem 0.5rem;
+  }
+  .offerTitle {
+    font-size: 1.1rem;
+  }
+  .offerDescription, .offerDetails {
+    font-size: 0.95rem;
+  }
+} 

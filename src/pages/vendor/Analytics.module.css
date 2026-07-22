@@ -1,0 +1,273 @@
+.dashboard {
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.dashboard h1,
+h2 {
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+.statsGrid h3 {
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+}
+
+.statIcon {
+  font-size: 1.8rem;
+  color: #4a90e2;
+  margin-top: 0.2rem;
+}
+
+.statInfo h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.statValue {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+  margin-top: 0.25rem;
+}
+
+.tableContainer {
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.tableContainer h3 {
+  margin-top: 1rem;
+  color: #333;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.table th,
+.table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+ul li {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #444;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 2rem;
+}
+
+.filters select {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background: #fafbfc;
+  color: #333;
+  font-size: 1rem;
+}
+
+.filters svg {
+  color: #4a90e2;
+  font-size: 1.2rem;
+}
+
+
+/* Up/Down Icons */
+.upIcon {
+  color: #27ae60;
+  font-size: 1.1rem;
+}
+
+.downIcon {
+  color: #e74c3c;
+  font-size: 1.1rem;
+}
+
+/* Paid/Pending Icons */
+.paidIcon {
+  color: #27ae60;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+}
+
+.pendingIcon {
+  color: #e67e22;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+}
+
+/* Star Icon */
+.starIcon {
+  color: #f5b50a;
+  margin-right: 0.4rem;
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .statCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .statIcon {
+    font-size: 1.5rem;
+  }
+
+  .statInfo h3 {
+    font-size: 0.95rem;
+  }
+
+  .statValue {
+    font-size: 1.1rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.9rem;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+    padding: 1rem;
+  }
+
+  .trendChart {
+    height: 80px;
+  }
+
+  .trendBar {
+    width: 18px;
+  }
+}
+
+.trendChartContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 12px;               /* space between bars */
+  height: 200px;           /* fixed chart height */
+  width: 100%;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  padding: 5px 10px;       /* minimal padding to avoid cutting bars */
+  border-radius: 8px;
+}
+
+.trendBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30px;             /* width of each bar */
+}
+
+.trendBarFill {
+  width: 100%;
+  background-color: #4caf50;  /* bright green */
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+
+.trendLabel {
+  margin-top: 6px;
+  font-size: 12px;
+  text-align: center;
+  color: #333;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .trendChartContainer {
+    gap: 8px;
+  }
+  .trendBar {
+    width: 20px;
+  }
+}
+.trendChartContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px; /* fixed chart height */
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.trendBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30px;
+}
+
+.trendBarFill {
+  width: 100%;
+  background-color: #4caf50;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}

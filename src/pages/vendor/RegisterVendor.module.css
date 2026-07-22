@@ -1,0 +1,260 @@
+/* CitiMart Form Styles — Local Scope */
+.citiMartForm {
+  max-width: 900px;
+  margin: 3rem auto;
+  background: linear-gradient(145deg, #ffffff, #eaf9ff, #f3e9ff);
+  padding: 3rem 3.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+  font-family: "Poppins", "Segoe UI", "Roboto", sans-serif;
+  transition: all 0.3s ease;
+  border: 1px solid #d8ebf8;
+}
+
+.citiMartForm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.citiMartForm h2 {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-size: 2.3rem;
+  background: linear-gradient(to right, #0a8894, #0f71d3, #9c27b0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.citiMartForm .fieldset {
+  border: 1.5px solid #c5e3f6;
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #f9fdff, #fdf8ff);
+  box-shadow: inset 0 0 10px rgba(220, 240, 255, 0.4);
+}
+
+.citiMartForm legend {
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #0b4f6c;
+  padding: 0 12px;
+  margin-left: 1rem;
+  background: linear-gradient(to right, #0a8894, #0f71d3);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.citiMartForm label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  color: #122f57;
+  font-size: 1rem;
+}
+
+.citiMartForm input,
+.citiMartForm select,
+.citiMartForm textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 0.35rem;
+  border: 1.5px solid #cce0ef;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+}
+
+.citiMartForm input:focus,
+.citiMartForm select:focus,
+.citiMartForm textarea:focus {
+  outline: none;
+  border-color: #0a8894;
+  box-shadow: 0 0 6px rgba(10, 136, 148, 0.3),
+              0 0 12px rgba(15, 113, 211, 0.15);
+}
+
+.citiMartForm input[type="radio"],
+.citiMartForm input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+  accent-color: #0a8894;
+}
+
+.citiMartForm textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.citiMartForm .error {
+  color: #e53935;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.citiMartForm p {
+  margin: 1rem 0 0.4rem;
+  font-weight: 600;
+  color: #0f71d3;
+  font-size: 1rem;
+}
+
+.citiMartForm .terms {
+  margin-bottom: 1.75rem;
+  font-size: 0.95rem;
+  color: #123456;
+}
+
+.citiMartForm .submitButton {
+  background: linear-gradient(135deg, #0a8894, #0f71d3, #9c27b0);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(15, 113, 211, 0.25);
+}
+
+.citiMartForm .submitButton:hover {
+  background: linear-gradient(135deg, #06767f, #0a56aa, #7a1fa2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15, 113, 211, 0.35);
+}
+
+.citiMartForm .submitButton:active {
+  transform: scale(0.98);
+}
+
+.citiMartForm .successMessage {
+  text-align: center;
+  padding: 3rem;
+  background: linear-gradient(145deg, #e6fff2, #ebfff9, #f0fffa);
+  border-left: 8px solid #26a96c;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 128, 0, 0.15);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.citiMartForm .successMessage h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: #26a96c;
+}
+
+.citiMartForm .successMessage h2 {
+  color: #237e4b;
+  margin-bottom: 0.75rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.citiMartForm .successMessage p {
+  color: #2e7d32;
+  font-size: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .citiMartForm {
+    padding: 2rem 1.5rem;
+    border-radius: 14px;
+  }
+
+  .citiMartForm h2 {
+    font-size: 1.9rem;
+  }
+
+  .citiMartForm .fieldset {
+    padding: 1.25rem;
+  }
+
+  .citiMartForm .submitButton {
+    font-size: 1rem;
+    padding: 0.85rem 1.5rem;
+  }
+}
+
+.citiMartForm::-webkit-scrollbar {
+  width: 8px;
+}
+.citiMartForm::-webkit-scrollbar-thumb {
+  background: linear-gradient(#0a8894, #0f71d3);
+  border-radius: 10px;
+}
+.citiMartForm::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#06767f, #0b4f6c);
+}
+.vendorPageBackground {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 1rem;
+  background: linear-gradient(90deg, #b8e1dd 0%, #a8c6ea 50%, #c9b6e4 100%);
+
+  background-attachment: fixed;
+}
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.formLogo {
+  width: 80px;   /* logo size */
+  height: 80px;
+  object-fit: contain;
+  border-radius: 0; /* no rounded corners */
+  box-shadow: none; /* remove any shadow */
+}
+
+.citiMartForm h2 {
+  font-size: 2rem;
+  color: #003f5c;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .formHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .formLogo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .citiMartForm h2 {
+    font-size: 1.6rem;
+  }
+}

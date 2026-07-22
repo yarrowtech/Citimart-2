@@ -1,0 +1,204 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+    overflow-x: auto; 
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filters input,
+.filters select {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.inventoryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+.inventoryTable th,
+.inventoryTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.inventoryTable th {
+  background-color: #f4f4f4;
+}
+
+.inventoryTable input[type="number"] {
+  width: 60px;
+}
+
+.lowStock {
+  color: red;
+  font-weight: bold;
+}
+
+.addButton {
+  padding: 10px 15px;
+  background-color: #2f8fef;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.addButton:hover {
+  background-color: #1a6fd4;
+}
+
+.tableButton {
+  padding: 5px 10px;
+  margin: 0 3px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  transition: background-color 0.2s;
+}
+
+.tableButton:hover {
+  background-color: #e0e0e0;
+}
+
+.editButton {
+  color: #1a6fd4;
+  border-color: #1a6fd4;
+}
+
+.deleteButton {
+  color: #d9534f;
+  border-color: #d9534f;
+}
+.productImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  gap: 5px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.saveButton {
+  background-color: #2f8fef;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background-color: #ccc;
+  color: black;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.fastMoving {
+  background: #ffe600;
+  color: #000;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.popularLowStock {
+  background: #ff4d4f;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.restockSuggest {
+  background: #2f8fef;
+  color: white;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+.variantBoxWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.colorBox {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.sizeText {
+  position: absolute;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+}
+

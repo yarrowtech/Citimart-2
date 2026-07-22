@@ -1,0 +1,547 @@
+.container {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 220px;
+  background: #f0f0f0;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar h3 {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.sidebar li:hover {
+  background: #ddd;
+}
+
+.active {
+  background: #4f46e5;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad390);
+
+
+
+}
+/* ---------------- Categories Section ---------------- */
+.categoriesContainer {
+  margin-top: 1.5rem;
+}
+
+.categoryCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.categoryCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.categoryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoryTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.editBtn {
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.editBtn:hover {
+  background: #1d4ed8;
+}
+
+.subcategory {
+  margin-top: 0.75rem;
+  padding-left: 1rem;
+  border-left: 2px solid #e5e7eb;
+}
+
+.subcategoryName {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.subChildren {
+  list-style: disc;
+  margin-left: 1.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* ---------------- Category Form ---------------- */
+.categoryForm {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+}
+
+.categoryForm h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.formRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.formRow input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.addBtn {
+  background: #10b981;
+  color: white;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.addBtn:hover {
+  background: #059669;
+}
+
+.submitBtn {
+  background: #2563eb;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submitBtn:hover {
+  background: #1e40af;
+}
+select[multiple] {
+  min-height: 100px; 
+  width: 100%;
+}
+
+
+
+/* ==================== COLLECTIONS ==================== */
+.collectionsTab {
+  padding: 30px;
+  font-family: "Poppins", "Inter", sans-serif;
+  color: #333;
+}
+
+/* Collection cards grid */
+.collectionList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+/* Collection Card like Product Selection */
+.collectionCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+background: linear-gradient(135deg, #fddb92, #d1fdff);
+
+
+
+
+
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+  min-height: 90px;
+}
+
+.collectionCard:hover {
+  transform: translateY(-3px);
+  background: #eef3ff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Image */
+.collectionCard img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #007bff;
+}
+
+/* Info */
+.collectionCard .productInfo {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #444;
+}
+
+.collectionCard .productInfo strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Variant colors */
+.productColors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.colorCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ==================== PRODUCT SELECTION ==================== */
+.productSelectionContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+  max-height: 300px; /* scrollable area */
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Product card inside selection */
+.productSelectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+ background: linear-gradient(135deg, #e8d4ff, #aff6f8);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+}
+
+.productSelectionLabel:hover {
+  transform: translateY(-3px);
+  background: #eef3ff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Checkbox */
+.productSelectionLabel input[type="checkbox"] {
+  margin-top: 4px;
+}
+
+/* Product image */
+.productSelectionLabel img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #007bff;
+}
+
+/* Product details text */
+.productSelectionLabel div {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #444;
+}
+
+/* ==================== VARIANTS & COLORS ==================== */
+.productColors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* Circle with color + size */
+.colorCircle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  cursor: default;
+}
+/* Inventory Card Container */
+.inventoryCard {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inventoryCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Product Header */
+.inventoryCard .productHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.inventoryCard .productImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Variants Table */
+.inventoryCard .variantTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.inventoryCard .variantTable th,
+.inventoryCard .variantTable td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.inventoryCard .variantTable th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.inventoryCard .variantTable tr:hover {
+  background-color: #fafafa;
+}
+
+/* Color Circle */
+.inventoryCard .colorCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid #ccc;
+}
+
+/* Quantity Input */
+.inventoryCard .qtyInput {
+  width: 60px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+/* Buttons */
+.inventoryCard button {
+  background-color: #3a1c71;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.inventoryCard button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+.inventoryCard button:hover:not(:disabled) {
+  background-color: #5c2fa5;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .inventoryCard .productHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inventoryCard .productImage {
+    width: 100%;
+    height: auto;
+  }
+
+  .inventoryCard .variantTable th,
+  .inventoryCard .variantTable td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+/* Media Tab Scoped */
+.mediaTab .dropZone {
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.mediaTab .dropZone:hover {
+  background-color: #f5f5f5;
+}
+
+.mediaTab .fileInputLabel {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.mediaTab .mediaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mediaTab .mediaCard {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mediaTab .mediaCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mediaTab .deleteBtn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(255, 0, 0, 0.8);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .mediaTab .mediaGrid {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mediaTab .mediaCard {
+    width: 90px;
+    height: 90px;
+  }
+
+  .mediaTab .dropZone {
+    padding: 15px;
+  }
+
+  .mediaTab .fileInputLabel {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+}

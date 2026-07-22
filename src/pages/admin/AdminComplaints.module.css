@@ -1,0 +1,84 @@
+.container {
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  overflow-x: auto;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* ✅ Wrap table inside this for smooth horizontal scroll */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+/* ✅ Table Styling */
+.table {
+  width: 100%;
+  min-width: 1000px; /* ensures scroll appears if too wide */
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: visible; /* ✅ ensure dropdowns/buttons visible */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Ensure full content visible */
+.table th,
+.table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f5f6fa;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ✅ Wider Action column */
+.table td:last-child {
+  min-width: 160px; /* ensures buttons/text fully visible */
+}
+
+.pending {
+  color: #d97706;
+  font-weight: 500;
+}
+
+.resolved {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.statusSelect {
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.info {
+  color: #666;
+  padding: 20px;
+}
+
+.error {
+  color: red;
+  padding: 20px;
+}
+
+/* ✅ Make buttons in Action look better */
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

@@ -1,0 +1,178 @@
+/* Orders.module.css */
+
+.ordersPage {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: #222;
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  color: #777;
+}
+
+.empty img {
+  max-width: 150px;
+  opacity: 0.5;
+  margin-bottom: 15px;
+}
+
+.orderCard {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  padding: 20px 25px;
+  transition: box-shadow 0.3s ease;
+}
+
+.orderCard:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 18px;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.item {
+  display: flex;
+  gap: 15px;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  flex: 1 1 250px;
+  align-items: center;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+.item img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.item div p {
+  margin: 3px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.orderFooter {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  font-size: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  color: #444;
+}
+
+.orderFooter p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.buttonsGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.buttonsGroup button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  user-select: none;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.invoiceBtn {
+  background-color: #2f80ed;
+  color: white;
+}
+
+.invoiceBtn:hover {
+  background-color: #1366d6;
+}
+
+.trackingBtn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.trackingBtn:hover {
+  background-color: #1e8449;
+}
+
+.reviewBtn {
+  background-color: #f2994a;
+  color: white;
+}
+
+.reviewBtn:hover {
+  background-color: #d87f2a;
+}
+
+/* Modal styles - fallback if you want to override inline styles */
+
+
+
+@media (max-width: 640px) {
+  .orderHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .items {
+    flex-direction: column;
+  }
+
+  .item {
+    flex: 1 1 100%;
+  }
+
+  .orderFooter {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .buttonsGroup {
+    flex-wrap: wrap;
+  }
+}
