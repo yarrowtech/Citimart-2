@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Wishlist.module.css';
 
+import { API_BASE } from "../config";
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/wishlist/${customerId}`, {
+      const res = await fetch(`${API_BASE}/customer/wishlist/${customerId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +53,7 @@ const Wishlist = () => {
     const key = `remove-${productId}-${size}-${color}`;
     setBusyItem(key);
     try {
-      const res = await fetch('http://localhost:5000/customer/wishlist/remove', {
+      const res = await fetch(`${API_BASE}/customer/wishlist/remove`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color }),
@@ -71,7 +72,7 @@ const Wishlist = () => {
     const key = `move-${productId}-${size}-${color}`;
     setBusyItem(key);
     try {
-      const res = await fetch('http://localhost:5000/customer/wishlist/move_to_cart', {
+      const res = await fetch(`${API_BASE}/customer/wishlist/move_to_cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color, quantity: 1 }),

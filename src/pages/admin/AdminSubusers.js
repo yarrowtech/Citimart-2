@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./AdminSubusers.module.css";
 import { FaUserPlus, FaUsersCog, FaShieldAlt, FaEdit, FaTrash, FaKey, FaSave, FaTimes } from "react-icons/fa";
 
+import { API_BASE } from "../../config";
 const rolePermissions = {
   Viewer: ["content", "reports", "faq"],
   "Order Manager": ["promotions", "complaints", "campaigns", "reports"],
@@ -63,7 +64,7 @@ const AdminSubusers = () => {
 
   // Fetch all subusers
   useEffect(() => {
-    fetch("http://localhost:5000/admin/subusers")
+    fetch(`${API_BASE}/admin/subusers`)
       .then((res) => res.json())
       .then((data) => setSubusers(data))
       .catch((err) => console.error("Error fetching subusers:", err));
@@ -73,7 +74,7 @@ const AdminSubusers = () => {
   useEffect(() => {
     const pt = (form.parentType || "").toLowerCase();
     if (pt && !["admin", "merchandise", "marketing", "headoffice"].includes(pt)) {
-      fetch(`http://localhost:5000/admin/parent-accounts/${pt}`)
+      fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
         .then((res) => res.json())
         .then((data) => setParentAccounts(data))
         .catch(() => setParentAccounts([]));
@@ -87,7 +88,7 @@ const AdminSubusers = () => {
     if (!editForm) return;
     const pt = (editForm.parentType || "").toLowerCase();
     if (pt && !["admin", "merchandise", "marketing", "headoffice"].includes(pt)) {
-      fetch(`http://localhost:5000/admin/parent-accounts/${pt}`)
+      fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
         .then((res) => res.json())
         .then((data) => setParentAccounts(data))
         .catch(() => setParentAccounts([]));
@@ -122,7 +123,7 @@ const AdminSubusers = () => {
   const handleAddSubuser = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/admin/subusers", {
+      const res = await fetch(`${API_BASE}/admin/subusers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, redirectUrl: roleRedirects[form.role] }),
@@ -153,7 +154,7 @@ const AdminSubusers = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this subuser?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/admin/subusers/${id}`, {
+      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -200,7 +201,7 @@ const AdminSubusers = () => {
 
   const handleSaveEdit = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/subusers/${id}`, {
+      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...editForm, redirectUrl: roleRedirects[editForm.role] }),
@@ -223,7 +224,7 @@ const AdminSubusers = () => {
     if (!window.confirm("Send password reset link to this subuser?")) return;
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/subusers/${id}/reset-password`,
+        `${API_BASE}/admin/subusers/${id}/reset-password`,
         { method: "POST" }
       );
       const data = await res.json();

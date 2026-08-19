@@ -12,8 +12,9 @@ import {
   FaUndoAlt, FaUsers
 } from "react-icons/fa";
 import styles from "./Dashboard.module.css";
+import { API_BASE } from "../../config";
 
-const API = "http://localhost:5000/api";
+const API = `${API_BASE}/api`;
 const PIE_COLORS = ["#6d28d9", "#8b5cf6", "#a78bfa", "#ec4899", "#f59e0b", "#14b8a6"];
 const EMPTY = { kpis: {}, revenue_trend: [], order_status: [], payment_methods: [], top_products: [], low_stock: [], recent_orders: [], alerts: [] };
 

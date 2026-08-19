@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE } from "../../config";
 import styles from "./AdminComplaints.module.css"; // optional, for styling
 
 const AdminComplaints = () => {
@@ -10,7 +11,7 @@ const AdminComplaints = () => {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const response = await fetch("http://localhost:5000/admin/complaints");
+        const response = await fetch(`${API_BASE}/admin/complaints`);
         if (!response.ok) throw new Error("Failed to fetch complaints");
         const data = await response.json();
         setComplaints(data);
@@ -27,7 +28,7 @@ const AdminComplaints = () => {
   const handleStatusChange = async (id, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/admin/complaints/${id}`,
+        `${API_BASE}/admin/complaints/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

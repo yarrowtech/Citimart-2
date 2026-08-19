@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styles from './Cart.module.css';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
+import { API_BASE } from "../config";
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [coupon, setCoupon] = useState('');
@@ -32,7 +33,7 @@ const Cart = () => {
   //  FETCH CART ========
   const fetchCart = async () => {
   try {
-    const res = await fetch(`http://localhost:5000/customer/cart/${customerId}`, {
+    const res = await fetch(`${API_BASE}/customer/cart/${customerId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -52,14 +53,14 @@ const Cart = () => {
   const fetchOffersOrSimilar = async () => {
   try {
     // Fetch offers
-    const res = await fetch(`http://localhost:5000/customer/cart/offers/${customerId}`, {
+    const res = await fetch(`${API_BASE}/customer/cart/offers/${customerId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     setOffers(data.offers || []);
 
     // Always fetch similar (don’t depend on offers)
-    const simRes = await fetch(`http://localhost:5000/customer/cart/similar/${customerId}`, {
+    const simRes = await fetch(`${API_BASE}/customer/cart/similar/${customerId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const simData = await simRes.json();
@@ -72,7 +73,7 @@ const Cart = () => {
 
   const fetchWishlist = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/wishlist/${customerId}`, {
+      const res = await fetch(`${API_BASE}/customer/wishlist/${customerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -99,7 +100,7 @@ const Cart = () => {
   const updateQuantity = async (productId, size, color, newQuantity) => {
     if (newQuantity < 1) return;
     try {
-      const res = await fetch('http://localhost:5000/customer/cart/update_quantity', {
+      const res = await fetch(`${API_BASE}/customer/cart/update_quantity`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color, quantity: newQuantity }),
@@ -114,7 +115,7 @@ const Cart = () => {
 
   const removeFromCart = async (productId, size, color) => {
     try {
-      const res = await fetch('http://localhost:5000/customer/cart/remove_item', {
+      const res = await fetch(`${API_BASE}/customer/cart/remove_item`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color }),
@@ -130,7 +131,7 @@ const Cart = () => {
 
   const clearCart = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/cart/clear/${customerId}`, {
+      const res = await fetch(`${API_BASE}/customer/cart/clear/${customerId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -147,7 +148,7 @@ const Cart = () => {
 
   const addToCart = async (productId, size = null, color = null) => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/cart/add`, {
+      const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ customer_id: customerId, product_id: productId, quantity: 1, size, color }),
@@ -162,7 +163,7 @@ const Cart = () => {
 
   const addToWishlist = async (productId, size = null, color = null) => {
   try {
-    const res = await fetch('http://localhost:5000/customer/wishlist/add', {
+    const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ customer_id: customerId, product_id: productId, size, color }),
@@ -177,7 +178,7 @@ const Cart = () => {
 
   const removeFromWishlist = async (productId) => {
   try {
-    const res = await fetch('http://localhost:5000/customer/wishlist/remove', {
+    const res = await fetch(`${API_BASE}/customer/wishlist/remove`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ customer_id: customerId, product_id: productId }),
@@ -203,7 +204,7 @@ const Cart = () => {
 
   const getImage = (item) => {
     const img = item.product?.images?.[0];
-    return img ? (img.startsWith('http') ? img : `http://localhost:5000${img}`) : '/images/logo.png';
+    return img ? (img.startsWith('http') ? img : `${API_BASE}${img}`) : '/images/logo.png';
   };
 
  const handleBuy = () => {
@@ -277,7 +278,7 @@ const handleRemoveItem = async () => {
 const handleMoveToWishlist = async () => {
   if (!removeModal.product) return;
   try {
-    const addResponse = await fetch('http://localhost:5000/customer/wishlist/add', {
+    const addResponse = await fetch(`${API_BASE}/customer/wishlist/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -315,7 +316,7 @@ const disableButtons = (product) => {
 };
 const openVariantModal = async (productId) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${productId}`);
+    const res = await fetch(`${API_BASE}/api/products/${productId}`);
     const data = await res.json();
     if (data.product) {
       setVariantPopup({ product: data.product });
@@ -331,7 +332,7 @@ const openVariantModal = async (productId) => {
 
 const openWishlistVariantModal = async (productId) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${productId}`);
+    const res = await fetch(`${API_BASE}/api/products/${productId}`);
     const data = await res.json();
     if (data.product) {
       setVariantPopup({ product: data.product, mode: "wishlist" }); // 👈 mark mode

@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MerchandiseDashboard.module.css";
 
+import { API_BASE } from "../../config";
 const TABS = ["Products", "Inventory", "Categories", "Collections", "Media", "Pricing","Promotions"];
 
 const MerchandiseDashboard = () => {
@@ -39,7 +40,7 @@ const [adjustForm, setAdjustForm] = useState({}); // { [variantId]: { type: "add
 useEffect(() => {
   const fetchInventory = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE}/api/products`);
       const data = await res.json();
       setInventoryProducts(data.products || []);
     } catch (err) {
@@ -89,7 +90,7 @@ const updateVariantStock = async (productId, variantId, currentStockRaw) => {
   setUpdatingStock(productId);
 
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${productId}/stock`, {
+    const res = await fetch(`${API_BASE}/api/products/${productId}/stock`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -180,7 +181,7 @@ const addSubcategory = () => {
 useEffect(() => {
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/categories");
+      const res = await fetch(`${API_BASE}/api/categories`);
       const data = await res.json();
 
       const formatted = (Array.isArray(data) ? data : data.categories || []).map((cat) => ({
@@ -218,7 +219,7 @@ const handleAddCategory = async () => {
   };
 
   try {
-    const res = await fetch("http://localhost:5000/api/categories", {
+    const res = await fetch(`${API_BASE}/api/categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newCategory),
@@ -263,7 +264,7 @@ const handleUpdateCategory = async () => {
   };
 
   try {
-    const res = await fetch(`http://localhost:5000/api/categories/${editingCategory}`, {
+    const res = await fetch(`${API_BASE}/api/categories/${editingCategory}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedCategory),
@@ -296,7 +297,7 @@ const [loadingCollections, setLoadingCollections] = useState(true);
 useEffect(() => {
   const fetchCollections = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products/collections");
+      const res = await fetch(`${API_BASE}/api/products/collections`);
       const data = await res.json();
       setCollections(data.collections || []);
     } catch (err) {
@@ -314,7 +315,7 @@ const [allProducts, setAllProducts] = useState([]);
 useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE}/api/products`);
       const data = await res.json();
       setAllProducts(data.products || []);
     } catch (err) {
@@ -351,8 +352,8 @@ const saveCollection = async () => {
 
   try {
     const url = editingCollection
-      ? `http://localhost:5000/api/products/collections/${editingCollection}`
-      : "http://localhost:5000/api/products/collections";
+      ? `${API_BASE}/api/products/collections/${editingCollection}`
+      : `${API_BASE}/api/products/collections`;
 
     const method = editingCollection ? "PUT" : "POST";
 
@@ -415,7 +416,7 @@ const deleteCollection = async (id) => {
   if (!window.confirm("Are you sure you want to delete this collection?")) return;
   try {
     const res = await fetch(
-      `http://localhost:5000/api/products/collections/${id}?role=merchandise`,
+      `${API_BASE}/api/products/collections/${id}?role=merchandise`,
       { method: "DELETE" }
     );
     const data = await res.json();
@@ -524,7 +525,7 @@ const [promotionForm, setPromotionForm] = useState({
 useEffect(() => {
   const fetchPromotions = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/promotions");
+      const res = await fetch(`${API_BASE}/api/promotions`);
       const data = await res.json();
       setPromotions(data.promotions || []);
     } catch (err) {
@@ -555,8 +556,8 @@ const savePromotion = async () => {
 
   try {
     const url = promotionForm._id
-      ? `http://localhost:5000/api/promotions/${promotionForm._id}`
-      : "http://localhost:5000/api/promotions";
+      ? `${API_BASE}/api/promotions/${promotionForm._id}`
+      : `${API_BASE}/api/promotions`;
     const method = promotionForm._id ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -592,7 +593,7 @@ const editPromotion = (p) => {
 const deletePromotion = async (id) => {
   if (!window.confirm("Are you sure you want to delete this promotion?")) return;
   try {
-    const res = await fetch(`http://localhost:5000/api/promotions/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_BASE}/api/promotions/${id}`, { method: "DELETE" });
     if (res.ok) setPromotions(promotions.filter(p => p._id !== id));
   } catch (err) {
     console.error("Error deleting promotion:", err);

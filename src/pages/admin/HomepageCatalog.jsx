@@ -1,8 +1,7 @@
 // src/pages/admin/HomepageCatalog.jsx
 import React, { useState, useEffect } from "react";
 import styles from "./HomepageCatalog.module.css"; // keep your CSS module
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE } from "../../config";
 
 const HomepageCatalog = () => {
   const [formData, setFormData] = useState({

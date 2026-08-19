@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './Dashboard.module.css';
+import { API_BASE } from "../../config";
 import {
   FaBox,
   FaShoppingBag,
@@ -27,7 +28,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem('token');
 
-        const res = await axios.get('http://localhost:5000/vendor/dashboard', {
+        const res = await axios.get(`${API_BASE}/vendor/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

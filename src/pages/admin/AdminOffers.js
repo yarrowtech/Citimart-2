@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import styles from "./AdminOffers.module.css";
 
+import { API_BASE } from "../../config";
 const CLOUDINARY_UPLOAD_PRESET = "Citimart"; 
 const CLOUDINARY_CLOUD_NAME = "dfvrobw6x"; 
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -33,7 +34,7 @@ const AdminOffers = () => {
 
   // Fetch offers
   const fetchOffers = () => {
-    fetch("http://localhost:5000/api/offers/all", {
+    fetch(`${API_BASE}/api/offers/all`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
     })
       .then((res) => res.json())
@@ -47,7 +48,7 @@ const AdminOffers = () => {
 
   // Fetch products
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch(`${API_BASE}/api/products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setProducts(data);
@@ -176,8 +177,8 @@ const handleSave = async () => {
 
     const method = editingOffer ? "PUT" : "POST";
     const url = editingOffer
-      ? `http://localhost:5000/api/offers/${editingOffer._id}`
-      : "http://localhost:5000/api/offers";
+      ? `${API_BASE}/api/offers/${editingOffer._id}`
+      : `${API_BASE}/api/offers`;
 
     const res = await fetch(url, {
       method,
@@ -207,7 +208,7 @@ const handleSave = async () => {
     if (!window.confirm("Are you sure you want to delete this offer?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/offers/${id}`, {
+      const res = await fetch(`${API_BASE}/api/offers/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
       });

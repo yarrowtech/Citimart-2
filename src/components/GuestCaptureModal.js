@@ -2,8 +2,7 @@
 // Shown instead of a blind redirect when a guest tries to add to cart/wishlist.
 // Lets them request a registration link by email, or fall back to the normal login page.
 import React, { useState } from "react";
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE } from "../config";
 
 const GuestCaptureModal = ({ productName, onClose, onLoginInstead }) => {
   const [email, setEmail] = useState("");

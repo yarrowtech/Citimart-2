@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import styles from "./CategoryAdmin.module.css";
+import { API_BASE } from "../../config";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE}/api`;
 
 const CategoryAdminFull = () => {
   const [categories, setCategories] = useState([]);

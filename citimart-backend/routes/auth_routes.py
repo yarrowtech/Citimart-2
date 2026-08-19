@@ -18,7 +18,10 @@ auth_bp = Blueprint('auth', __name__)
 # ------------------ REGISTER (Customer) ------------------
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.json
+    data = request.json or {}
+
+    if not data.get("email") or not data.get("password") or not data.get("name"):
+        return jsonify({"error": "name, email, and password are required"}), 400
 
     if users_collection.find_one({"email": data["email"]}):
         return jsonify({"error": "Email already exists"}), 400

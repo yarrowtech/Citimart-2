@@ -4,6 +4,7 @@ import styles from "./MainLayout.module.css";
 import { FaUser, FaShoppingCart, FaHeart, FaCog } from "react-icons/fa";
 import logo from "../assets/log.JPG";
 
+import { API_BASE } from "../config";
 const brandsData = {
   "Popular Brands": ["Nike", "Adidas", "Levi's", "Zara"],
   "Luxury Brands": ["Gucci", "Prada", "Louis Vuitton"]
@@ -25,7 +26,7 @@ const MainLayout = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/categories"); 
+        const res = await fetch(`${API_BASE}/api/categories`); 
         const data = await res.json();
         if (Array.isArray(data.categories)) {
           setCategories(data.categories);
@@ -88,8 +89,8 @@ const MainLayout = () => {
       const headers = { Authorization: `Bearer ${token}` };
       try {
         const [cartResponse, wishlistResponse] = await Promise.all([
-          fetch(`http://localhost:5000/customer/cart/${customerId}`, { headers, signal: controller.signal }),
-          fetch(`http://localhost:5000/customer/wishlist/${customerId}`, { headers, signal: controller.signal }),
+          fetch(`${API_BASE}/customer/cart/${customerId}`, { headers, signal: controller.signal }),
+          fetch(`${API_BASE}/customer/wishlist/${customerId}`, { headers, signal: controller.signal }),
         ]);
 
         const activeCustomer = JSON.parse(localStorage.getItem("customer") || "null");

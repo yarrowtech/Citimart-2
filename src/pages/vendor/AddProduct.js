@@ -2132,6 +2132,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./AddProduct.module.css";
 import SizeChartUpload from "./SizeChartUpload";
 
+import { API_BASE } from "../../config";
 const hexValues = ["00", "33", "66", "99", "CC", "FF"];
 const WEB_SAFE_COLORS = [];
 for (let r of hexValues)
@@ -2345,7 +2346,7 @@ const AddProduct = () => {
     const fetchVendorProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/vendor/profile", {
+        const res = await fetch(`${API_BASE}/vendor/profile`, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           credentials: "include",
         });
@@ -2364,7 +2365,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchAllCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/categories");
+        const res = await fetch(`${API_BASE}/api/categories`);
         if (!res.ok) throw new Error();
         const data = await res.json();
         const obj = {};
@@ -2450,7 +2451,7 @@ const AddProduct = () => {
     form.images.forEach(f => fd.append("images", f));
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/vendor/add-product", {
+      const res = await fetch(`${API_BASE}/vendor/add-product`, {
         method: "POST", credentials: "include",
         headers: { Authorization: `Bearer ${token}` }, body: fd,
       });
@@ -2473,7 +2474,7 @@ const AddProduct = () => {
     if (!requestSelections.length && !requestInput.trim()) { alert("Please add a selection or write a request"); return; }
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/vendor/request-category", {
+      const res = await fetch(`${API_BASE}/vendor/request-category`, {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ selections: requestSelections, note: requestInput }),
@@ -2510,7 +2511,7 @@ const AddProduct = () => {
       (product.images || []).forEach(f => fd.append("images", f));
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/vendor/add-product", {
+        const res = await fetch(`${API_BASE}/vendor/add-product`, {
           method: "POST", credentials: "include",
           headers: { Authorization: `Bearer ${token}` }, body: fd,
         });

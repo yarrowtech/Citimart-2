@@ -3,6 +3,7 @@ import styles from "./RegisterVendor.module.css";
 import logo from "../../assets/logo.jpeg";
 
 
+import { API_BASE } from "../../config";
 const initialState = {
   fullName: "",
   email: "",
@@ -42,7 +43,7 @@ export default function RegisterVendor() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/categories");
+        const res = await fetch(`${API_BASE}/api/categories`);
         const data = await res.json();
         // Expected format: [{ name: "Clothing", subCategories: [{ name: "Men", childCategories: ["Shirts", "Jeans"] }] }]
         if (Array.isArray(data.categories)) setCategoriesData(data.categories);
@@ -142,7 +143,7 @@ export default function RegisterVendor() {
         } else formData.append(key, form[key]);
       }
 
-      const res = await fetch("http://localhost:5000/auth/register-vendor", {
+      const res = await fetch(`${API_BASE}/auth/register-vendor`, {
         method: "POST",
         body: formData,
       });

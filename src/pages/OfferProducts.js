@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import styles from "./OfferProducts.module.css";
 
+import { API_BASE } from "../config";
 const OfferProducts = () => {
   const { offerId } = useParams();
   const [offer, setOffer] = useState(null);
@@ -9,7 +10,7 @@ const OfferProducts = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/offers/${offerId}/products`)
+    fetch(`${API_BASE}/api/offers/${offerId}/products`)
       .then((res) => res.json())
       .then((data) => {
         setOffer(data.offer || null);
@@ -22,7 +23,7 @@ const OfferProducts = () => {
   const getImageUrl = (image) => {
     if (!image) return "/images/default-placeholder.png";
     if (image.startsWith("http")) return image;
-    return `http://localhost:5000${image}`;
+    return `${API_BASE}${image}`;
   };
 
   // 🟢 Offer type label mapping

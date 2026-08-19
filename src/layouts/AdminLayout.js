@@ -18,6 +18,7 @@ import {
 
 import logo from '../assets/logo.jpeg';
 
+import { API_BASE } from "../config";
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ const AdminLayout = () => {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
       try {
-        const response = await fetch('http://localhost:5000/api/dashboard/overview?period=daily', {
+        const response = await fetch(`${API_BASE}/api/dashboard/overview?period=daily`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const payload = await response.json();

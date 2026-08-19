@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import styles from "./SubuserSetup.module.css";
 
+import { API_BASE } from "../../config";
 const SubuserSetup = () => {
   const [searchParams] = useSearchParams();
   const [password, setPassword] = useState("");
@@ -21,7 +22,7 @@ const SubuserSetup = () => {
     if (password !== confirm) return alert("Passwords do not match");
 
     try {
-      const res = await fetch("http://localhost:5000/subuser/setup", {
+      const res = await fetch(`${API_BASE}/subuser/setup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),

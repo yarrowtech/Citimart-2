@@ -1,5 +1,6 @@
 
-const API_URL = 'http://localhost:5000/api/products/'; // ✅ if Flask blueprint has url_prefix='/api'
+import { API_BASE } from "../config";
+const API_URL = `${API_BASE}/api/products/`; // ✅ if Flask blueprint has url_prefix='/api'
 
 
 export const fetchProducts = async () => {

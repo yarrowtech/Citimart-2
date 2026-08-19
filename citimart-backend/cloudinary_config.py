@@ -11,4 +11,4 @@ cloudinary.config(
     secure=True
 )
 
-print("✅ Cloudinary loaded with key:", cloudinary.config().api_key)
+print("Cloudinary loaded with key:", cloudinary.config().api_key)

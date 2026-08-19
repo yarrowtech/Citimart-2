@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import styles from './CheckoutPage.module.css';
 
+import { API_BASE } from "../config";
 const CheckoutPage = () => {
   const location = useLocation();
   const { 
@@ -71,7 +72,7 @@ const CheckoutPage = () => {
   const calculateTotals = async (items, code = couponCode) => {
     if (!items.length) return;
     try {
-      const res = await fetch('http://localhost:5000/customer/checkout-quote', {
+      const res = await fetch(`${API_BASE}/customer/checkout-quote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -108,7 +109,7 @@ const CheckoutPage = () => {
   // Fetch cart and calculate totals
   const fetchCart = async () => {
   try {
-    const res = await fetch(`http://localhost:5000/customer/cart/${customerId}`, {
+    const res = await fetch(`${API_BASE}/customer/cart/${customerId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -136,7 +137,7 @@ const CheckoutPage = () => {
   // Fetch customer info
   const fetchCustomerInfo = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/${customerId}/profile`, {
+      const res = await fetch(`${API_BASE}/customer/${customerId}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -183,7 +184,7 @@ const CheckoutPage = () => {
     // COD flow
     if (paymentMethod === "cod") {
       try {
-        const res = await fetch('http://localhost:5000/customer/checkout', {
+        const res = await fetch(`${API_BASE}/customer/checkout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({
@@ -245,7 +246,7 @@ navigate('/order-success', {
       const loaded = await loadRazorpayScript();
       if (!loaded) return alert("Failed to load Razorpay SDK. Please refresh the page.");
 
-      const orderRes = await fetch('http://localhost:5000/customer/create-order', {
+      const orderRes = await fetch(`${API_BASE}/customer/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -266,7 +267,7 @@ navigate('/order-success', {
         order_id: orderData.id,
         handler: async (response) => {
           try {
-            const verifyRes = await fetch('http://localhost:5000/customer/verify-payment', {
+            const verifyRes = await fetch(`${API_BASE}/customer/verify-payment`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
               body: JSON.stringify({
@@ -397,7 +398,7 @@ navigate('/order-success', {
                     src={item.product?.images?.[0] 
                       ? item.product.images[0].startsWith('http') 
                         ? item.product.images[0] 
-                        : `http://localhost:5000/${item.product.images[0]}` 
+                        : `${API_BASE}/${item.product.images[0]}` 
                       : '/images/logo.png'}
                     alt={item.product?.name || ''}
                     className={styles.itemImage}

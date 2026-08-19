@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaHeart } from "react-icons/fa";
 
+import { API_BASE } from "../config";
 const CollectionPage = () => {
   const { collectionSlug } = useParams();
   const [collection, setCollection] = useState(null);
@@ -9,7 +10,7 @@ const CollectionPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/collections/${collectionSlug}`) 
+    fetch(`${API_BASE}/api/collections/${collectionSlug}`) 
       .then((res) => res.json())
       .then((data) => {
         setCollection(data.collection || null);
@@ -37,7 +38,7 @@ const CollectionPage = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/customer/${path}`, {
+      const response = await fetch(`${API_BASE}/customer/${path}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

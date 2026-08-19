@@ -1,4 +1,4 @@
-print("✅ offers_routes.py started")
+print("offers_routes.py started")
 
 import os
 import uuid

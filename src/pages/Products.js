@@ -346,8 +346,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaRupeeSign, FaShoppingBag, FaSort, FaClock, FaHeart, FaShoppingCart, FaFilter, FaTimes } from "react-icons/fa";
 import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Products.module.css";
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE } from "../config";
 const PLACEHOLDER = "/images/default-placeholder.png";
 
 function useQuery() { return new URLSearchParams(useLocation().search); }

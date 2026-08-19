@@ -217,6 +217,7 @@
 // src/components/SizeChart.jsx
 import React, { useState, useEffect } from "react";
 
+import { API_BASE } from "../config";
 // ── Fallback dummy data ───────────────────────────────────────────────────────
 const SIZE_DATA = {
   tops: {
@@ -319,7 +320,7 @@ const SizeChart = ({ category, subcategory, onClose, productId, variants = [], s
   useEffect(() => {
     if (!productId) return;
     setLoadingApi(true);
-    fetch(`http://localhost:5000/api/products/${productId}/sizechart`)
+    fetch(`${API_BASE}/api/products/${productId}/sizechart`)
       .then(r => r.json())
       .then(data => {
         const sc = data.size_chart || {};

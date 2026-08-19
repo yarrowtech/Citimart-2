@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./AdminInventory.module.css";
+import { API_BASE as BACKEND_BASE } from "../../config";
 
-const API_BASE = "http://localhost:5000/api"; // Backend
+const API_BASE = `${BACKEND_BASE}/api`; // Backend
 
 const AdminInventory = () => {
   const [inventory, setInventory] = useState([]);

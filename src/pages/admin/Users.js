@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './Users.module.css';
 import { FaUsers, FaUserCheck, FaHourglassHalf, FaLayerGroup, FaSearch, FaEdit, FaTrash, FaShieldAlt, FaTimes, FaSave } from 'react-icons/fa';
 
+import { API_BASE } from "../../config";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
@@ -12,7 +13,7 @@ const Users = () => {
 
   // Fetch users
   useEffect(() => {
-    fetch('http://localhost:5000/admin/users')
+    fetch(`${API_BASE}/admin/users`)
       .then(res => res.json())
       .then(data => setUsers(data.users))
       .catch(err => console.error('Failed to fetch users:', err));
@@ -21,7 +22,7 @@ const Users = () => {
   const handleDelete = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}`, {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -39,7 +40,7 @@ const Users = () => {
 
   const handleEditSubmit = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}`, {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -58,7 +59,7 @@ const Users = () => {
   // Approve request
 const handleApprove = async (userId) => {
   try {
-    const res = await fetch(`http://localhost:5000/admin/users/${userId}/segment/approve`, {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}/segment/approve`, {
       method: 'POST'
     });
     if (res.ok) {
@@ -92,7 +93,7 @@ const handleApprove = async (userId) => {
 // Reject request
 const handleReject = async (userId) => {
   try {
-    const res = await fetch(`http://localhost:5000/admin/users/${userId}/segment/reject`, {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}/segment/reject`, {
       method: 'POST'
     });
     if (res.ok) {

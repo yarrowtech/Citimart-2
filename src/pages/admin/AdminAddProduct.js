@@ -1800,6 +1800,7 @@ import styles from "./AdminAddProduct.module.css";
 import axios from "axios";
 import SizeChartUpload from "./SizeChartUpload";
 
+import { API_BASE } from "../../config";
 const hexValues = ["00", "33", "66", "99", "CC", "FF"];
 const WEB_SAFE_COLORS = [];
 for (let r of hexValues)
@@ -1909,7 +1910,7 @@ const AddProduct = () => {
   const [uploading,         setUploading]         = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/categories")
+    axios.get(`${API_BASE}/api/categories`)
       .then(r => { if (r.data.categories) setCategories(r.data.categories); })
       .catch(e => console.error("Failed to fetch categories:", e));
   }, []);
@@ -2003,7 +2004,7 @@ const AddProduct = () => {
       fd.append("status",     "active");
       fd.append("images",     JSON.stringify(uploadedImageUrls));
 
-      const response = await axios.post("http://localhost:5000/api/products/add", fd);
+      const response = await axios.post(`${API_BASE}/api/products/add`, fd);
       if (response.data.product_id) {
         setSubmitResult({ productId: response.data.product_id });
         alert("✅ Product added successfully!");
@@ -2102,7 +2103,7 @@ const AddProduct = () => {
         fd.append("variants", JSON.stringify(variantsToSend));
         fd.append("images", JSON.stringify([url]));
         fd.append("added_by", "admin"); fd.append("status", "active");
-        await axios.post("http://localhost:5000/api/products/add", fd);
+        await axios.post(`${API_BASE}/api/products/add`, fd);
       }
       alert("✅ Bulk upload completed!");
       setBulkImages([]); setBulkCategory(""); setBulkSubCategory(""); setBulkChildCategory("");

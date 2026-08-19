@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import styles from "./AdminCollections.module.css"; 
+import styles from "./AdminCollections.module.css";
+import { API_BASE as BACKEND_BASE } from "../../config";
 
-const API_BASE = "http://localhost:5000/api/products/collections";
+const API_BASE = `${BACKEND_BASE}/api/products/collections`;
 
 const AdminCollections = () => {
   const [collections, setCollections] = useState([]);
@@ -36,7 +37,7 @@ const AdminCollections = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(`${BACKEND_BASE}/api/products`);
       setAllProducts(res.data.products || []);
     } catch (err) {
       console.error("❌ Error fetching products:", err);

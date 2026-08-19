@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 
+import { API_BASE } from "../../config";
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL"];
 const MEASUREMENT_FIELDS = ["chest", "waist", "hips", "shoulder", "length"];
 
@@ -38,7 +39,7 @@ const SizeChartUpload = ({ productId, onDone }) => {
       if (mode === "csv" && csvFile) {
         const fd = new FormData();
         fd.append("file", csvFile);
-        res = await fetch(`http://localhost:5000/api/products/${productId}/sizechart/upload`, {
+        res = await fetch(`${API_BASE}/api/products/${productId}/sizechart/upload`, {
           method: "POST", credentials: "include", headers, body: fd,
         });
       } else {
@@ -50,7 +51,7 @@ const SizeChartUpload = ({ productId, onDone }) => {
         if (!Object.keys(payload).length) {
           setStatus("err"); setMessage("Fill in at least one measurement row."); return;
         }
-        res = await fetch(`http://localhost:5000/api/products/${productId}/sizechart/upload`, {
+        res = await fetch(`${API_BASE}/api/products/${productId}/sizechart/upload`, {
           method: "POST", credentials: "include",
           headers: { ...headers, "Content-Type": "application/json" },
           body: JSON.stringify(payload),

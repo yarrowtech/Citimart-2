@@ -1,4 +1,5 @@
-from flask import Flask
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from cloudinary_config import cloudinary
@@ -9,14 +10,34 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
 
-    # Correct CORS setup
+    from config import ALLOWED_ORIGINS
+
+    # Correct CORS setup — origins come from ALLOWED_ORIGINS env var in production,
+    # defaults to the local dev frontend ports so nothing changes locally.
     CORS(
         app,
         supports_credentials=True,
-        origins=["http://localhost:3000", "http://localhost:3001"],
+        origins=ALLOWED_ORIGINS,
         allow_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "OPTIONS", "PUT", "DELETE","PATCH"]
     )
+
+    # Many routes do `ObjectId(some_id_from_the_url_or_body)` with no validation —
+    # a malformed id raises InvalidId and would otherwise 500/crash. One handler
+    # here covers every such call site instead of patching each route.
+    from bson.errors import InvalidId
+    @app.errorhandler(InvalidId)
+    def handle_invalid_id(e):
+        return jsonify({"error": "Invalid ID format"}), 400
+
+    # Catch anything else that slips past route-level try/excepts: return clean
+    # JSON instead of leaking a stack trace. Only takes effect when debug=False —
+    # in debug mode Flask's interactive debugger takes over regardless, which
+    # is what you want for local development.
+    @app.errorhandler(Exception)
+    def handle_uncaught_exception(e):
+        app.logger.exception("Unhandled exception")
+        return jsonify({"error": "Internal server error"}), 500
 
     # --- Register Blueprints ---
     from routes.auth_routes import auth_bp
@@ -77,4 +98,9 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    # Debug defaults to on for local `python app.py` runs (unchanged dev behavior).
+    # In production, set FLASK_DEBUG=false and run via a real WSGI server instead
+    # of this dev server — see wsgi.py + gunicorn (added to requirements.txt).
+    debug = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+    port = int(os.getenv("PORT", "5000"))
+    app.run(debug=debug, port=port)

@@ -3,6 +3,7 @@ import styles from './Orders.module.css';
 import jsPDF from "jspdf";
 
 
+import { API_BASE } from "../config";
 const Modal = ({ title, children, onClose }) => {
   return (
     <div
@@ -64,7 +65,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/customer/orders/${customerId}`, {
+      const res = await fetch(`${API_BASE}/customer/orders/${customerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -214,7 +215,7 @@ const StarRating = ({ rating, onChange }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/customer/review/${reviewOrder._id}`, {
+      const res = await fetch(`${API_BASE}/customer/review/${reviewOrder._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -383,7 +384,7 @@ const StarRating = ({ rating, onChange }) => {
             formData.append("rating", item.rating);
             if (item.imageFile) formData.append("image", item.imageFile);
 
-            await fetch(`http://localhost:5000/customer/review/${reviewOrder._id}/${item.product._id}`, {
+            await fetch(`${API_BASE}/customer/review/${reviewOrder._id}/${item.product._id}`, {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,

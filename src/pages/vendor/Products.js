@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import styles from './Products.module.css';
 import { useNavigate } from 'react-router-dom';
 
+import { API_BASE } from "../../config";
 const VendorProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
 
   const fetchProducts = () => {
-    fetch('http://localhost:5000/vendor/my-products', {
+    fetch(`${API_BASE}/vendor/my-products`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -30,7 +31,7 @@ const VendorProducts = () => {
   const token = localStorage.getItem("token");
 
   try {
-    const res = await fetch(`http://localhost:5000/vendor/delete-product/${productId}`, {
+    const res = await fetch(`${API_BASE}/vendor/delete-product/${productId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,9 +55,9 @@ const VendorProducts = () => {
 
   const getImageUrl = (image) => {
     if (!image) return '/images/default-placeholder.png';
-    if (image.startsWith('/uploads/')) return `http://localhost:5000${image}`;
+    if (image.startsWith('/uploads/')) return `${API_BASE}${image}`;
     if (image.startsWith('http')) return image;
-    return `http://localhost:5000${image}`;
+    return `${API_BASE}${image}`;
   };
 
   return (

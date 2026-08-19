@@ -439,6 +439,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./EditProducts.module.css";
 
+import { API_BASE } from "../../config";
 const HEX_VALUES = ["00", "33", "66", "99", "CC", "FF"];
 const WEB_SAFE_COLORS = [];
 for (let r of HEX_VALUES)
@@ -569,7 +570,7 @@ const EditProducts = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res  = await fetch(`http://localhost:5000/api/categories/vendor/${vendorId}`);
+        const res  = await fetch(`${API_BASE}/api/categories/vendor/${vendorId}`);
         const data = await res.json();
         if (res.ok && data.categories) {
           const formatted = {};
@@ -589,7 +590,7 @@ const EditProducts = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res  = await fetch(`http://localhost:5000/api/products/${productId}`);
+        const res  = await fetch(`${API_BASE}/api/products/${productId}`);
         const data = await res.json();
         if (!res.ok || !data.product) { alert("Product not found"); navigate("/vendor/products"); return; }
         if (data.product.added_by !== "vendor" || data.product.vendor_id !== vendorId) {
@@ -735,7 +736,7 @@ const EditProducts = () => {
 
       newImages.forEach(f => form.append("images", f));
 
-      const res    = await fetch(`http://localhost:5000/vendor/update-product/${productId}`, {
+      const res    = await fetch(`${API_BASE}/vendor/update-product/${productId}`, {
         method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: form,
       });
       const result = await res.json();
@@ -920,7 +921,7 @@ const EditProducts = () => {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
           {formData.images.map((img, i) => (
             <div key={i} style={{ position: "relative" }}>
-              <img src={img.startsWith("http") ? img : `http://localhost:5000/${img}`}
+              <img src={img.startsWith("http") ? img : `${API_BASE}/${img}`}
                 alt="" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb" }} />
               <button type="button" onClick={() => handleRemoveExistingImage(i)}
                 style={{ position: "absolute", top: -6, right: -6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>❌</button>

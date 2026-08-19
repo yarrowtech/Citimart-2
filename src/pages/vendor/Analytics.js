@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaRupeeSign, FaShoppingBag, FaChartLine, FaBox, FaArrowUp, FaArrowDown, FaUserPlus, FaUserCheck, FaStar, FaMapMarkerAlt, FaClipboardList, FaCheckCircle, FaTimesCircle, FaMoneyCheckAlt, FaWallet, FaUndo, FaExclamationTriangle, FaHistory, FaBullhorn, FaHeart, FaFilter } from 'react-icons/fa';
 import styles from './Analytics.module.css';
 
+import { API_BASE } from "../../config";
 const dateRanges = [
   { label: 'Today', value: 'today' },
   { label: 'This Week', value: 'week' },
@@ -24,7 +25,7 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/vendor/analytics', {
+      const res = await fetch(`${API_BASE}/vendor/analytics`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./Products.module.css";
 import { useNavigate } from "react-router-dom";
 
+import { API_BASE } from "../../config";
 const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -11,7 +12,7 @@ const Products = () => {
   const [comment, setComment] = useState("");
 
   const fetchProducts = () => {
-    fetch("http://localhost:5000/api/products/all?admin=true")
+    fetch(`${API_BASE}/api/products/all?admin=true`)
       .then((res) => res.json())
       .then((data) => {
         const adminProducts = data.products || [];
@@ -35,7 +36,7 @@ const Products = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this product?");
       if (!confirmDelete) return;
 
-      fetch(`http://localhost:5000/api/products/${product._id}?is_admin=true`, {
+      fetch(`${API_BASE}/api/products/${product._id}?is_admin=true`, {
         method: "DELETE",
       })
         .then((res) => res.json())
@@ -60,7 +61,7 @@ const Products = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/products/review/${selectedProduct._id}`, {
+      const res = await fetch(`${API_BASE}/api/products/review/${selectedProduct._id}`, {
 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

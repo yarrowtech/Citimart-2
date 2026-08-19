@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE as BACKEND_BASE } from "../config";
 
-const API_BASE = "http://localhost:5000/api/products/collections"; // Flask endpoint
+const API_BASE = `${BACKEND_BASE}/api/products/collections`; // Flask endpoint
 
 const CollectionsListPage = () => {
   const [collections, setCollections] = useState([]);

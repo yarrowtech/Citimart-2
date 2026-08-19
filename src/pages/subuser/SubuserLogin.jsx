@@ -179,6 +179,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { API_BASE } from "../../config";
 const SubuserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -188,7 +189,7 @@ const SubuserLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/subuser/login/subuser", {
+      const res = await fetch(`${API_BASE}/subuser/login/subuser`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

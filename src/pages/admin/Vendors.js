@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Vendors.module.css";
+import { API_BASE } from "../../config";
 
 
 
@@ -25,7 +26,7 @@ const Vendors = () => {
   const [hoveredVendor, setHoveredVendor] = useState(null);
   const [pendingRequests, setPendingRequests] = useState({});
 
-  const BACKEND_URL = "http://localhost:5000";
+  const BACKEND_URL = API_BASE;
 
   useEffect(() => {
     fetchPendingApplications();
@@ -593,7 +594,7 @@ const fetchCategories = async () => {
                     src={
                       p.images?.[0]?.startsWith("http")
                         ? p.images[0]
-                        : `http://localhost:5000${p.images?.[0]}`
+                        : `${BACKEND_URL}${p.images?.[0]}`
                     }
                     alt={p.name}
                     style={{

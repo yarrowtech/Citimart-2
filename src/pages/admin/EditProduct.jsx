@@ -457,6 +457,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styles from "./EditProduct.module.css";
 import axios from "axios";
 
+import { API_BASE } from "../../config";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dfvrobw6x/image/upload";
 const CLOUDINARY_UPLOAD_PRESET = "Citimart";
 
@@ -573,14 +574,14 @@ const EditProduct = () => {
 
   // ── Fetch categories from API ──
   useEffect(() => {
-    axios.get("http://localhost:5000/api/categories")
+    axios.get(`${API_BASE}/api/categories`)
       .then(r => { if (r.data.categories) setCategories(r.data.categories); })
       .catch(e => console.error("Failed to fetch categories:", e));
   }, []);
 
   // ── Fetch product ──
   useEffect(() => {
-    fetch(`http://localhost:5000/api/products/${id}`)
+    fetch(`${API_BASE}/api/products/${id}`)
       .then(r => r.json())
       .then(data => {
         if (!data.product) { alert("Product not found"); navigate("/admin/products"); return; }
@@ -700,7 +701,7 @@ const EditProduct = () => {
       const allImages = [...productData.images, ...uploadedUrls];
       allImages.forEach(img => fd.append("images", img));
 
-      const res = await axios.put(`http://localhost:5000/api/products/${id}?is_admin=true`, fd);
+      const res = await axios.put(`${API_BASE}/api/products/${id}?is_admin=true`, fd);
       if (res.status === 200) {
         alert("✅ Product updated successfully!");
         navigate("/admin/products");
@@ -911,7 +912,7 @@ const EditProduct = () => {
             <div className={styles.previewGrid}>
               {productData.images.map((img, i) => (
                 <div key={i} className={styles.previewImgWrapper}>
-                  <img src={img.startsWith("http") ? img : `http://localhost:5000/${img}`}
+                  <img src={img.startsWith("http") ? img : `${API_BASE}/${img}`}
                     alt="" className={styles.previewImg} />
                   <button type="button" className={styles.removeBtn} onClick={() => removeExistingImage(i)}>❌</button>
                 </div>

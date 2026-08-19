@@ -838,8 +838,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaStar, FaTag } from "react-icons/fa";
 import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Home.module.css";
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE } from "../config";
 const PLACEHOLDER_IMG = "https://via.placeholder.com/500x500?text=No+Image";
 
 const STATIC_HOME = {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { API_BASE } from "../config";
 const PopupOffer = () => {
   const [offer, setOffer] = useState(null);
   const [visible, setVisible] = useState(false);
@@ -12,7 +13,7 @@ const PopupOffer = () => {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       try {
-        const res = await fetch("http://localhost:5000/api/offers/eligible", { headers });
+        const res = await fetch(`${API_BASE}/api/offers/eligible`, { headers });
         const data = await res.json();
 
         // filter popup-type offer

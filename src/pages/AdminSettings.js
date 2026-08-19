@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./AdminSettings.module.css";
 
+import { API_BASE } from "../config";
 const tabs = [
   "Platform",
   "Subusers",
@@ -54,7 +55,7 @@ const [platformSettings, setPlatformSettings] = useState({
 
 // Fetch saved platform settings from backend
 useEffect(() => {
-  fetch("http://localhost:5000/admin/platform-settings")
+  fetch(`${API_BASE}/admin/platform-settings`)
     .then((res) => res.json())
     .then((data) => setPlatformSettings(data))
     .catch((err) => console.error("Error fetching platform settings:", err));
@@ -81,7 +82,7 @@ const handlePlatformSave = async (e) => {
       formData.append(key, platformSettings[key]);
     });
 
-    const res = await fetch("http://localhost:5000/admin/platform-settings", {
+    const res = await fetch(`${API_BASE}/admin/platform-settings`, {
       method: "POST",
       body: formData,
     });
@@ -219,7 +220,7 @@ const renderPlatformTab = () => (
 
   // Fetch subusers from backend
   useEffect(() => {
-    fetch("http://localhost:5000/admin/subusers")
+    fetch(`${API_BASE}/admin/subusers`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -234,7 +235,7 @@ useEffect(() => {
   const pt = (form.parentType || "").toLowerCase(); // safe fallback
 
   if (pt && pt !== "admin" && pt !== "merchandise",pt !== "marketing") {
-    fetch(`http://localhost:5000/admin/parent-accounts/${pt}`)
+    fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
       .then((res) => res.json())
       .then((data) => setParentAccounts(data))
       .catch((err) => {
@@ -252,7 +253,7 @@ useEffect(() => {
   const pt = (editForm.parentType || "").toLowerCase(); // safe fallback
 
   if (pt && pt !== "admin" && pt !== "merchandise" && pt !== "marketing") {
-    fetch(`http://localhost:5000/admin/parent-accounts/${pt}`)
+    fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
       .then((res) => res.json())
       .then((data) => setParentAccounts(data))
       .catch((err) => {
@@ -293,7 +294,7 @@ useEffect(() => {
 const handleAddSubuser = async (e) => {
   e.preventDefault();
   try {
-    const res = await fetch("http://localhost:5000/admin/subusers", {
+    const res = await fetch(`${API_BASE}/admin/subusers`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form, redirectUrl: roleRedirects[form.role] }),
@@ -317,7 +318,7 @@ const handleAddSubuser = async (e) => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this subuser?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/admin/subusers/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, { method: "DELETE" });
       if (res.ok) {
         setSubusers(subusers.filter((su) => su._id !== id));
       }
@@ -366,7 +367,7 @@ const handleAddSubuser = async (e) => {
 
   const handleSaveEdit = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/subusers/${id}`, {
+      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...editForm, redirectUrl: roleRedirects[editForm.role] }),
@@ -387,7 +388,7 @@ const handleAddSubuser = async (e) => {
 const handleResetPassword = async (id) => {
   if (!window.confirm("Reset this subuser’s password? They will get a new setup link.")) return;
   try {
-    const res = await fetch(`http://localhost:5000/admin/subusers/${id}/reset-password`, {
+    const res = await fetch(`${API_BASE}/admin/subusers/${id}/reset-password`, {
       method: "POST",
     });
     const data = await res.json();

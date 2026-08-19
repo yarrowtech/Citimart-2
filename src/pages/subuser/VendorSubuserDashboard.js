@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "./VendorSubuserDashboard.module.css";
+import { API_BASE } from "../../config";
 
-const API_BASE = "http://localhost:5000";
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = API_BASE;
 
 const TABS = [
   "Vendor Registration",
