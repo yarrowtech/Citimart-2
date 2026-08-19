@@ -150,14 +150,16 @@
 // export default Register;
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Register.module.css';
 
 const Register = () => {
+  const [searchParams] = useSearchParams();
+
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: searchParams.get('email') || '',   // ✅ prefilled from guest invite link
     phone: '',           // ✅ new optional field
     password: '',
     confirmPassword: '',

@@ -39,6 +39,8 @@ def create_app():
     from routes.public_routes import public_bp
     from routes.customer_auth_routes import customer_auth_bp
     from routes.vendor_auth_routes import vendor_auth_bp
+    from routes.guest_routes import guest_bp
+    from routes.delivery_routes import delivery_bp
 
 
 
@@ -66,6 +68,8 @@ def create_app():
     app.register_blueprint(public_bp)
     app.register_blueprint(customer_auth_bp)
     app.register_blueprint(vendor_auth_bp)
+    app.register_blueprint(guest_bp)
+    app.register_blueprint(delivery_bp)
 
 
     return app

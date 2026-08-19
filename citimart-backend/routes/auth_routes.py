@@ -4,7 +4,7 @@ import cloudinary.uploader
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
-from database import users_collection, vendors_collection,subusers_collection
+from database import users_collection, vendors_collection,subusers_collection, guest_leads_collection
 from utils.auth_utils import generate_token
 from utils.email_utils import send_email
 import random, string
@@ -28,10 +28,17 @@ def register():
     users_collection.insert_one({
         "name": data["name"],
         "email": data["email"],
-        "phone": data.get("phone") or None, 
+        "phone": data.get("phone") or None,
         "password": hashed_password,
         "role": "customer"
     })
+
+    # If this email was invited via the guest-capture flow, mark it converted
+    from datetime import datetime as _dt
+    guest_leads_collection.update_one(
+        {"email": data["email"].strip().lower()},
+        {"$set": {"converted": True, "converted_at": _dt.utcnow()}}
+    )
 
     return jsonify({"message": "Registration successful!"}), 201
 

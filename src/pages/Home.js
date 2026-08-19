@@ -836,6 +836,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaStar, FaTag } from "react-icons/fa";
+import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Home.module.css";
 
 const API_BASE = "http://localhost:5000";
@@ -1094,6 +1095,7 @@ const Home = () => {
   const [index,        setIndex]        = useState(0);
   const [popup,        setPopup]        = useState(null); // { product, mode }
   const [toast,        setToast]        = useState("");
+  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
   const autoplayRef = useRef(null);
   const AUTOPLAY_MS = 5000;
 
@@ -1141,10 +1143,10 @@ const Home = () => {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2500); };
 
   // ── Cart / Wishlist ──
-  const requireLogin = () => { navigate("/login"); return false; };
+  const requireLogin = (product) => { setGuestCapture({ productName: product?.name || "" }); return false; };
 
   const addToCart = async (product, size, color) => {
-    if (!customer) return requireLogin();
+    if (!customer) return requireLogin(product);
     try {
       const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: "POST",
@@ -1159,7 +1161,7 @@ const Home = () => {
   };
 
   const addToWishlist = async (product, size, color) => {
-    if (!customer) return requireLogin();
+    if (!customer) return requireLogin(product);
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
         method: "POST",
@@ -1197,6 +1199,15 @@ const Home = () => {
           mode={popup.mode}
           onClose={() => setPopup(null)}
           onConfirm={handlePopupConfirm}
+        />
+      )}
+
+      {/* ── GUEST CAPTURE (shown instead of a blind redirect when not logged in) ── */}
+      {guestCapture && (
+        <GuestCaptureModal
+          productName={guestCapture.productName}
+          onClose={() => setGuestCapture(null)}
+          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
         />
       )}
 

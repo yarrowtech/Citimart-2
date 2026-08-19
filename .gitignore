@@ -21,6 +21,10 @@ instance/
 *.sqlite
 *.sqlite3
 
+# Recommender: exported real data snapshots (may contain customer info) and trained artifacts
+citimart-recommender/data/
+citimart-recommender/models/
+
 # Editor and OS files
 .vscode/
 .idea/

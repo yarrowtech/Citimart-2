@@ -305,16 +305,16 @@
 }
 .cartActionBtn:hover { opacity: 0.88; transform: translateY(-1px); }
 .wishlistActionBtn {
-  width: 44px; height: 44px; flex-shrink: 0;
+  width: 40px; height: 40px; min-width: 40px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  background: #fff; color: #ff3f6c;
-  border: 2px solid #ff3f6c; border-radius: 10px;
-  font-size: 20px; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  background: transparent; color: #ff3f6c;
+  border: none; border-radius: 50%;
+  cursor: pointer; padding: 0;
+  transition: transform 0.2s, color 0.2s;
 }
-.wishlistActionBtn:hover { background: #ff3f6c; color: #fff; transform: translateY(-1px); }
-.heartIcon { color: #ff3f6c; font-size: 20px; }
-.wishlistActionBtn:hover .heartIcon { color: #fff; }
+.wishlistActionBtn:hover { background: transparent; color: #e7335b; transform: scale(1.2); }
+.heartIcon { color: inherit; font-size: 22px; }
+.wishlistActionBtn:hover .heartIcon { color: inherit; }
 
 /* ── Offer strip ─────────────────────────────────────────────────────────── */
 .offerStrip {

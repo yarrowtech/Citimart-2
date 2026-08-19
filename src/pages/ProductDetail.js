@@ -1000,7 +1000,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import VariantSelector from "../pages/Variantselector"; 
+import VariantSelector from "../pages/Variantselector";
+import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./ProductDetail.module.css";
 import {
   FaHeart,
@@ -1021,11 +1022,13 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [pincode, setPincode] = useState("");
   const [deliveryMsg, setDeliveryMsg] = useState("");
+  const [deliverable, setDeliverable] = useState(null); // null | true | false
   const [quantity, setQuantity] = useState(1);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [frequentlyBought, setFrequentlyBought] = useState([]);
-  const [variantPopup, setVariantPopup] = useState(null); 
-  const [fbtQueue, setFbtQueue] = useState([]); 
+  const [variantPopup, setVariantPopup] = useState(null);
+  const [fbtQueue, setFbtQueue] = useState([]);
+  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
   const [offers, setOffers] = useState([]);
   // For popup variant selections (do NOT touch main product selection)
   const [popupSelectedColor, setPopupSelectedColor] = useState("");
@@ -1124,7 +1127,7 @@ const ProductDetail = () => {
   // ✅ Add to Cart API
   const addToCartAPI = async (productId, size, color) => {
     if (!customer) {
-      navigate("/login");
+      setGuestCapture({ productName: product?.name || "" });
       return false;
     }
 
@@ -1185,7 +1188,7 @@ const ProductDetail = () => {
   // ✅ Add to Wishlist API
   const addToWishlistAPI = async (productId, size, color) => {
     if (!customer) {
-      navigate("/login");
+      setGuestCapture({ productName: product?.name || "" });
       return false;
     }
 
@@ -1308,16 +1311,30 @@ const ProductDetail = () => {
     }
   };
 
-  const checkDelivery = () => {
+  const checkDelivery = async () => {
     if (pincode.length !== 6) {
+      setDeliverable(null);
       setDeliveryMsg("Enter a valid pincode");
-    } else {
-      setDeliveryMsg("Delivery available in 3-5 days 🚚");
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/delivery/check?pincode=${pincode}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setDeliverable(null);
+        setDeliveryMsg(data.error || "Enter a valid pincode");
+        return;
+      }
+      setDeliverable(data.serviceable);
+      setDeliveryMsg(data.message);
+    } catch {
+      setDeliverable(null);
+      setDeliveryMsg("Couldn't check delivery right now — try again");
     }
   };
 
   const addBothToCart = async () => {
-    if (!customer) return navigate("/login");
+    if (!customer) return setGuestCapture({ productName: product?.name || "" });
 
     const requiresSize = 
       product.category?.toLowerCase() === "clothing" ||
@@ -1490,6 +1507,13 @@ const ProductDetail = () => {
 
   return (
     <div className={styles.amazonLayout}>
+      {guestCapture && (
+        <GuestCaptureModal
+          productName={guestCapture.productName}
+          onClose={() => setGuestCapture(null)}
+          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
+        />
+      )}
       {/* LEFT SECTION */}
       <div className={styles.leftSection}>
         <div className={styles.imageGallery}>
@@ -1853,7 +1877,14 @@ const ProductDetail = () => {
           />
           <button onClick={checkDelivery}>Check</button>
         </div>
-        {deliveryMsg && <p className={styles.deliveryMsg}>{deliveryMsg}</p>}
+        {deliveryMsg && (
+          <p
+            className={styles.deliveryMsg}
+            style={deliverable === false ? { color: "#dc2626", fontWeight: 600 } : undefined}
+          >
+            {deliverable === false ? "❌ " : ""}{deliveryMsg}
+          </p>
+        )}
         <p>
           Ships from: <strong>Citimart</strong>
         </p>

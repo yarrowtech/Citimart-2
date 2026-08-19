@@ -344,6 +344,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaRupeeSign, FaShoppingBag, FaSort, FaClock, FaHeart, FaShoppingCart, FaFilter, FaTimes } from "react-icons/fa";
+import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Products.module.css";
 
 const API_BASE = "http://localhost:5000";
@@ -548,6 +549,7 @@ const Products = () => {
 
   const [popup,  setPopup]  = useState(null); // { product, mode }
   const [toast,  setToast]  = useState("");
+  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
 
   const customer = (() => { try { return JSON.parse(localStorage.getItem("customer")); } catch { return null; } })();
 
@@ -626,7 +628,7 @@ const Products = () => {
 
   // ── Cart / Wishlist ──
   const addToCart = async (product, size, color) => {
-    if (!customer) { navigate("/login"); return; }
+    if (!customer) { setGuestCapture({ productName: product?.name || "" }); return; }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: "POST",
@@ -641,7 +643,7 @@ const Products = () => {
   };
 
   const addToWishlist = async (product, size, color) => {
-    if (!customer) { navigate("/login"); return; }
+    if (!customer) { setGuestCapture({ productName: product?.name || "" }); return; }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
         method: "POST",
@@ -686,6 +688,13 @@ const Products = () => {
       {popup && (
         <VariantPopup product={popup.product} mode={popup.mode}
           onClose={() => setPopup(null)} onConfirm={handleConfirm} />
+      )}
+      {guestCapture && (
+        <GuestCaptureModal
+          productName={guestCapture.productName}
+          onClose={() => setGuestCapture(null)}
+          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
+        />
       )}
 
       <div className={styles.container}>

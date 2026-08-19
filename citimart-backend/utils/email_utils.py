@@ -196,3 +196,59 @@ def send_subuser_invitation_email(subuser_email, parent_type, role, permissions,
     except Exception as e:
         print("❌ Subuser invitation email error:", e)
         return False
+
+# ----------------------------
+# Guest → Registration Invite Email (HTML)
+# ----------------------------
+def send_guest_invite_email(guest_email, register_link, product_name=None):
+    try:
+        subject = "Join Citimart — finish what you started!"
+
+        interest_line = (
+            f"<p>We noticed you were checking out <strong>{product_name}</strong> — "
+            f"create your free account to add it to your cart or wishlist.</p>"
+            if product_name else
+            "<p>Create your free account to shop, save items to your wishlist, and checkout faster.</p>"
+        )
+
+        html_body = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Citimart</title>
+  <style>
+    body {{ margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4; }}
+    .container {{ max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden; }}
+    .header {{ background: linear-gradient(135deg,#ff3f6c,#ff8c42); padding:24px; text-align:center; color:#ffffff; }}
+    .header h1 {{ margin:0; font-size:26px; }}
+    .content {{ padding:24px; color:#333333; font-size:15px; line-height:1.6; }}
+    .btn {{ background-color:#ff3f6c; color:#ffffff; padding:12px 28px; text-decoration:none; border-radius:6px; font-weight:bold; display:inline-block; }}
+    .footer {{ background:#f4f4f4; text-align:center; padding:12px; font-size:12px; color:#888888; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to Citimart 👋</h1>
+    </div>
+    <div class="content">
+      <p>Hi there,</p>
+      {interest_line}
+      <p style="text-align:center; margin:28px 0;">
+        <a href="{register_link}" class="btn">Create My Account</a>
+      </p>
+      <p style="font-size:12px; color:#888888;">If you didn't request this, you can safely ignore this email.</p>
+    </div>
+    <div class="footer">
+      &copy; {datetime.utcnow().year} Citimart. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+"""
+        return send_email(guest_email, subject, html_body, html=True)
+    except Exception as e:
+        print("❌ Guest invite email error:", e)
+        return False
