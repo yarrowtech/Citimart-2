@@ -1,0 +1,135 @@
+/* Shared design system for every subuser dashboard panel */
+
+.panel { display: flex; flex-direction: column; gap: 20px; }
+
+.panelHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.panelTitle { font-size: 20px; font-weight: 800; color: #111827; margin: 0; }
+.panelSubtitle { font-size: 13px; color: #6b7280; margin: 4px 0 0; }
+
+/* ── Buttons ── */
+.btnPrimary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent, #6366f1), var(--accent-2, #8b5cf6));
+  color: #fff; font-weight: 700; font-size: 13.5px; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.28);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.btnPrimary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.36); }
+.btnPrimary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.btnSecondary {
+  padding: 9px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700;
+  background: #fff; color: #374151; border: 1.5px solid #e5e7eb;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btnSecondary:hover { border-color: var(--accent, #6366f1); color: var(--accent, #6366f1); }
+
+.btnDanger {
+  padding: 8px 14px; border-radius: 9px; cursor: pointer; font-size: 12.5px; font-weight: 700;
+  background: #fef2f2; color: #dc2626; border: 1.5px solid #fecaca;
+}
+.btnDanger:hover { background: #fee2e2; }
+
+.btnSuccess {
+  padding: 8px 14px; border-radius: 9px; cursor: pointer; font-size: 12.5px; font-weight: 700;
+  background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0;
+}
+.btnSuccess:hover { background: #dcfce7; }
+
+.btnIcon {
+  width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 14px;
+}
+.btnIcon:hover { border-color: var(--accent, #6366f1); }
+
+/* ── Cards / stat grid ── */
+.statGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.statCard {
+  background: #fff; border-radius: 16px; padding: 18px 20px;
+  border: 1px solid #f1f2f6; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.statIcon {
+  width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--accent, #6366f1) 14%, white); font-size: 18px;
+}
+.statValue { font-size: 24px; font-weight: 800; color: #111827; }
+.statLabel { font-size: 12.5px; color: #6b7280; font-weight: 600; }
+
+.card {
+  background: #fff; border-radius: 16px; padding: 20px;
+  border: 1px solid #f1f2f6; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ── Table ── */
+.tableWrap { overflow-x: auto; border-radius: 14px; border: 1px solid #f1f2f6; }
+.table { width: 100%; border-collapse: collapse; background: #fff; font-size: 13.5px; }
+.table th {
+  text-align: left; padding: 12px 16px; background: #f9fafb; color: #6b7280;
+  font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap; border-bottom: 1px solid #f1f2f6;
+}
+.table td { padding: 12px 16px; border-bottom: 1px solid #f5f6f8; color: #1f2937; vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: #fafbff; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+  border-radius: 999px; font-size: 11.5px; font-weight: 700;
+}
+.badgeGreen { background: #f0fdf4; color: #16a34a; }
+.badgeRed { background: #fef2f2; color: #dc2626; }
+.badgeAmber { background: #fffbeb; color: #d97706; }
+.badgeBlue { background: #eff6ff; color: #2563eb; }
+.badgeGray { background: #f3f4f6; color: #6b7280; }
+
+/* ── Forms ── */
+.formGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.formGroup { display: flex; flex-direction: column; gap: 6px; }
+.formGroup label { font-size: 12px; font-weight: 700; color: #374151; }
+.input, .textarea, .select {
+  padding: 10px 12px; border-radius: 10px; border: 1.5px solid #e5e7eb;
+  font-size: 13.5px; font-family: inherit; color: #111827; background: #fff;
+  transition: border-color 0.15s;
+}
+.input:focus, .textarea:focus, .select:focus {
+  outline: none; border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6366f1) 15%, transparent);
+}
+.textarea { resize: vertical; min-height: 80px; }
+
+/* ── States ── */
+.emptyState {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 48px 20px; color: #9ca3af; text-align: center;
+}
+.emptyIcon { font-size: 34px; opacity: 0.6; }
+.loadingState { padding: 48px 20px; text-align: center; color: #9ca3af; font-size: 14px; }
+.errorState {
+  padding: 14px 16px; border-radius: 10px; background: #fef2f2; color: #dc2626;
+  font-size: 13px; font-weight: 600; border: 1px solid #fecaca;
+}
+
+/* ── Modal (used for create/edit forms) ── */
+.modalBackdrop { position: fixed; inset: 0; background: rgba(15,15,25,0.5); z-index: 500; }
+.modalCard {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 501; background: #fff; border-radius: 18px; width: min(94vw, 560px);
+  max-height: 86vh; overflow-y: auto; box-shadow: 0 30px 70px rgba(0,0,0,0.28);
+}
+.modalHeader {
+  padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, var(--accent, #6366f1), var(--accent-2, #8b5cf6));
+  color: #fff; position: sticky; top: 0;
+}
+.modalHeader h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.modalClose {
+  width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.2); color: #fff; font-size: 16px;
+}
+.modalBody { padding: 22px; display: flex; flex-direction: column; gap: 16px; }

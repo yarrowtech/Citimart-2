@@ -1,860 +1,456 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { API_BASE } from "../config";
+import s from "./subuser/SubuserShared.module.css";
 import styles from "./AdminSettings.module.css";
 
-import { API_BASE } from "../config";
-const tabs = [
-  "Platform",
-  "Subusers",
-  "Users",
-  "Vendors",
-  "Products",
-  "Payments",
-  "Shipping",
-  "Notifications",
-  "Orders",
-  "Security",
-  "Integrations",
+const TABS = [
+  { key: "platform", label: "Platform", icon: "⚙️" },
+  { key: "maintenance", label: "Maintenance Mode", icon: "🚧" },
+  { key: "errors", label: "Error Logs", icon: "🐞" },
+  { key: "tickets", label: "Support Tickets", icon: "🎫" },
+  { key: "subusers", label: "Subusers", icon: "👥" },
+  { key: "security", label: "Security", icon: "🔐" },
 ];
 
-// Role → Default Permissions
-const rolePermissions = {
-  Viewer: ["content", "reports", "faq"],
-  "Order Manager": ["promotions", "complaints", "campaigns", "reports"],
-  "Inventory Manager": ["merchandise", "analytics", "reports"],
-  "Merchandise Manager": ["merchandise", "promotions", "segmentation", "reports", "analytics"],
-  "Marketing Manager": ["media", "promotions", "campaigns"],
-  "Support Staff": ["complaints", "faq", "content", "reports"],
-  Moderator: ["segmentation", "promotions", "content", "campaigns", "reports", "analytics"],
-};
+// ── Platform tab ─────────────────────────────────────────────────────────
+const PlatformTab = () => {
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
-// Role → Dashboard Redirect
-const roleRedirects = {
-  Viewer: "/customer-subuser-dashboard",
-  "Order Manager": "/vendor-subuser-dashboard",
-  "Inventory Manager": "/vendor-subuser-dashboard",
-  "Merchandise Manager": "/merchandise-dashboard",
-  "Marketing Manager": "/marketing-dashboard",
-  "Support Staff": "/head-office-subuser",
-  Moderator: "/head-office-subuser",
-};
-
-const AdminSettings = () => {
-  const [activeTab, setActiveTab] = useState("Platform"); 
-
-// --- Platform state ---
-const [platformSettings, setPlatformSettings] = useState({
-  platformName: "",
-  supportEmail: "",
-  contactNumber: "",
-  currency: "INR",
-  timeZone: "Asia/Kolkata",
-  logo: null,
-  defaultLanguage: "English",
-  maintenanceMode: false,
-});
-
-// Fetch saved platform settings from backend
-useEffect(() => {
-  fetch(`${API_BASE}/admin/platform-settings`)
-    .then((res) => res.json())
-    .then((data) => setPlatformSettings(data))
-    .catch((err) => console.error("Error fetching platform settings:", err));
-}, []);
-
-// Handle form changes
-const handlePlatformChange = (e) => {
-  const { name, type, value, checked, files } = e.target;
-  if (type === "checkbox") {
-    setPlatformSettings({ ...platformSettings, [name]: checked });
-  } else if (type === "file") {
-    setPlatformSettings({ ...platformSettings, [name]: files[0] });
-  } else {
-    setPlatformSettings({ ...platformSettings, [name]: value });
-  }
-};
-
-// Save platform settings
-const handlePlatformSave = async (e) => {
-  e.preventDefault();
-  try {
-    const formData = new FormData();
-    Object.keys(platformSettings).forEach((key) => {
-      formData.append(key, platformSettings[key]);
-    });
-
-    const res = await fetch(`${API_BASE}/admin/platform-settings`, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    if (res.ok) alert("Platform settings saved successfully!");
-    else alert(data.error || "Failed to save platform settings");
-  } catch (err) {
-    console.error(err);
-    alert("Error saving platform settings");
-  }
-};
-
-// Render Platform tab
-const renderPlatformTab = () => (
-  <div className={styles.tabContent}>
-    <h2>Platform Settings</h2>
-    <form className={styles.form} onSubmit={handlePlatformSave}>
-      <label>
-        Platform Name
-        <input
-          type="text"
-          name="platformName"
-          value={platformSettings.platformName}
-          placeholder="e.g., Citimart"
-          onChange={handlePlatformChange}
-        />
-      </label>
-
-      <label>
-        Support Email
-        <input
-          type="email"
-          name="supportEmail"
-          value={platformSettings.supportEmail}
-          placeholder="support@citimart.com"
-          onChange={handlePlatformChange}
-        />
-      </label>
-
-      <label>
-        Contact Number
-        <input
-          type="tel"
-          name="contactNumber"
-          value={platformSettings.contactNumber}
-          placeholder="+91 98765 43210"
-          onChange={handlePlatformChange}
-        />
-      </label>
-
-      <label>
-        Currency
-        <select
-          name="currency"
-          value={platformSettings.currency}
-          onChange={handlePlatformChange}
-        >
-          <option value="INR">INR</option>
-          <option value="USD">USD</option>
-        </select>
-      </label>
-
-      <label>
-        Time Zone
-        <input
-          type="text"
-          name="timeZone"
-          value={platformSettings.timeZone}
-          placeholder="Asia/Kolkata"
-          onChange={handlePlatformChange}
-        />
-      </label>
-
-      <label>
-        Default Language
-        <select
-          name="defaultLanguage"
-          value={platformSettings.defaultLanguage}
-          onChange={handlePlatformChange}
-        >
-          <option>English</option>
-          <option>Hindi</option>
-        </select>
-      </label>
-
-      <label className={styles.checkboxLabel}>
-  <input
-    type="checkbox"
-    name="maintenanceMode"
-    checked={platformSettings.maintenanceMode}
-    onChange={handlePlatformChange}
-  />
-  <span className={styles.checkboxText}>
-    Maintenance Mode {platformSettings.maintenanceMode ? "(ON)" : "(OFF)"}
-  </span>
-</label>
-
-
-      <label>
-        Logo
-        <input type="file" name="logo" onChange={handlePlatformChange} />
-      </label>
-
-      <button type="submit">Save</button>
-    </form>
-  </div>
-);
-
-  // ---- Subuser state ----
-  const [subusers, setSubusers] = useState([]);
-  const [parentAccounts, setParentAccounts] = useState([]);
-
-  const [form, setForm] = useState({
-    email: "",
-    parentType: "Customer",
-    parentId: "",
-    role: "Viewer",
-    permissions: {
-      segmentation: false,
-      promotions: false,
-      content: false,
-      reports: false,
-      merchandise: false,
-      complaints: false,
-      analytics: false,
-      campaigns: false,
-      faq: false,
-      media: false, 
-    },
-  });
-
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState(null);
-
-  // Fetch subusers from backend
   useEffect(() => {
-    fetch(`${API_BASE}/admin/subusers`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => setSubusers(data))
-      .catch((err) => console.error("Fetch error:", err));
+    fetch(`${API_BASE}/admin/settings/platform`)
+      .then((res) => res.json())
+      .then(setForm)
+      .catch(() => setError("Failed to load platform settings"));
   }, []);
 
-  // Fetch parent accounts when parentType changes (Add Form)
-// ---- Fetch parent accounts safely (Add Form) ----
-useEffect(() => {
-  const pt = (form.parentType || "").toLowerCase(); // safe fallback
-
-  if (pt && pt !== "admin" && pt !== "merchandise",pt !== "marketing") {
-    fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
-      .then((res) => res.json())
-      .then((data) => setParentAccounts(data))
-      .catch((err) => {
-        console.error("Error fetching parent accounts:", err);
-        setParentAccounts([]); // fallback to empty
-      });
-  } else {
-    setParentAccounts([]);
-  }
-}, [form.parentType]);
-
-// ---- Fetch parent accounts safely (Edit Form) ----
-useEffect(() => {
-  if (!editForm) return;
-  const pt = (editForm.parentType || "").toLowerCase(); // safe fallback
-
-  if (pt && pt !== "admin" && pt !== "merchandise" && pt !== "marketing") {
-    fetch(`${API_BASE}/admin/parent-accounts/${pt}`)
-      .then((res) => res.json())
-      .then((data) => setParentAccounts(data))
-      .catch((err) => {
-        console.error("Error fetching parent accounts:", err);
-        setParentAccounts([]); // fallback to empty
-      });
-  } else {
-    setParentAccounts([]);
-  }
-}, [editForm?.parentType]);
-
-
-  // ---- Add Subuser ----
-  const handleFormChange = (e) => {
-  const { name, value } = e.target;
-
-  if (name === "role") {
-    const newPerms = {};
-    const currentPerms = form.permissions || {}; // fallback
-    Object.keys(currentPerms).forEach((p) => {
-      newPerms[p] = rolePermissions[value]?.includes(p) || false;
-    });
-    setForm({ ...form, role: value, permissions: newPerms });
-  } else {
-    setForm({ ...form, [name]: value });
-  }
-};
-
-
-  const handlePermissionChange = (e) => {
-    setForm({
-      ...form,
-      permissions: { ...form.permissions, [e.target.name]: e.target.checked },
-    });
-  };
-
-// Inside handleAddSubuser
-const handleAddSubuser = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(`${API_BASE}/admin/subusers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, redirectUrl: roleRedirects[form.role] }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert("Subuser added! An email has been sent for password setup.");
-      setSubusers([...subusers, data.subuser]);
-      setForm({ /* reset form */ });
-    } else {
-      alert(data.error || "Failed to add subuser");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong while adding subuser.");
-  }
-};
-
-
-  // ---- Delete Subuser ----
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subuser?")) return;
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    setSaved(false);
     try {
-      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setSubusers(subusers.filter((su) => su._id !== id));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // ---- Edit Subuser ----
-  const handleEdit = (subuser) => {
-    setEditingId(subuser._id);
-    setEditForm({ ...subuser });
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditForm(null);
-  };
-
- const handleEditFormChange = (e) => {
-  if (!editForm) return; // safety check
-
-  const { name, value } = e.target;
-
-  if (name === "role") {
-    const newPerms = {};
-    const currentPerms = editForm.permissions || {}; // fallback
-    Object.keys(currentPerms).forEach((p) => {
-      newPerms[p] = rolePermissions[value]?.includes(p) || false;
-    });
-    setEditForm({ ...editForm, role: value, permissions: newPerms });
-  } else {
-    setEditForm({ ...editForm, [name]: value });
-  }
-};
-
-  const handleEditPermissionChange = (e) => {
-    setEditForm({
-      ...editForm,
-      permissions: {
-        ...editForm.permissions,
-        [e.target.name]: e.target.checked,
-      },
-    });
-  };
-
-  const handleSaveEdit = async (id) => {
-    try {
-      const res = await fetch(`${API_BASE}/admin/subusers/${id}`, {
+      const res = await fetch(`${API_BASE}/admin/settings/platform`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editForm, redirectUrl: roleRedirects[editForm.role] }),
+        body: JSON.stringify(form),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setSubusers(subusers.map((su) => (su._id === id ? data.subuser : su)));
-        setEditingId(null);
-        setEditForm(null);
-      } else {
-        alert(data.error || "Update failed");
-      }
+      if (!res.ok) throw new Error("Save failed");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      console.error(err);
+      setError(err.message);
+    } finally {
+      setSaving(false);
     }
   };
-// ---- Reset Password ----
-const handleResetPassword = async (id) => {
-  if (!window.confirm("Reset this subuser’s password? They will get a new setup link.")) return;
-  try {
-    const res = await fetch(`${API_BASE}/admin/subusers/${id}/reset-password`, {
-      method: "POST",
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert("Password reset email sent to subuser.");
-    } else {
-      alert(data.error || "Failed to reset password");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong while resetting the password.");
-  }
+
+  if (!form) return <div className={s.loadingState}>Loading platform settings…</div>;
+
+  return (
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Platform Settings</h2>
+          <p className={s.panelSubtitle}>Core store information used across the site.</p>
+        </div>
+      </div>
+      {error && <div className={s.errorState}>{error}</div>}
+      {saved && <div className={`${s.badge} ${s.badgeGreen}`} style={{ width: "fit-content" }}>✓ Saved</div>}
+      <form onSubmit={handleSave} className={s.card}>
+        <div className={s.formGrid}>
+          <div className={s.formGroup}>
+            <label>Platform Name</label>
+            <input className={s.input} value={form.platformName || ""}
+              onChange={(e) => setForm({ ...form, platformName: e.target.value })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Support Email</label>
+            <input className={s.input} type="email" value={form.supportEmail || ""}
+              onChange={(e) => setForm({ ...form, supportEmail: e.target.value })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Contact Number</label>
+            <input className={s.input} value={form.contactNumber || ""}
+              onChange={(e) => setForm({ ...form, contactNumber: e.target.value })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Currency</label>
+            <select className={s.select} value={form.currency || "INR"}
+              onChange={(e) => setForm({ ...form, currency: e.target.value })}>
+              <option value="INR">INR (₹)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+          <div className={s.formGroup}>
+            <label>Time Zone</label>
+            <input className={s.input} value={form.timeZone || ""}
+              onChange={(e) => setForm({ ...form, timeZone: e.target.value })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Default Language</label>
+            <select className={s.select} value={form.defaultLanguage || "English"}
+              onChange={(e) => setForm({ ...form, defaultLanguage: e.target.value })}>
+              <option>English</option>
+              <option>Hindi</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" className={s.btnPrimary} disabled={saving} style={{ marginTop: 16 }}>
+          {saving ? "Saving…" : "Save Platform Settings"}
+        </button>
+      </form>
+    </div>
+  );
 };
 
-  // Tabs rendering
-   const renderContent = () => {
-    switch (activeTab) {
-      case "Platform":
-       return renderPlatformTab();
+// ── Maintenance mode tab ─────────────────────────────────────────────────
+const MaintenanceTab = () => {
+  const [status, setStatus] = useState(null);
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
+  const fetchStatus = useCallback(() => {
+    fetch(`${API_BASE}/admin/settings/maintenance`)
+      .then((res) => res.json())
+      .then((data) => {
+        setStatus(data.maintenanceMode);
+        setMessage(data.maintenanceMessage || "");
+      })
+      .catch(() => setError("Failed to load maintenance status"));
+  }, []);
 
-      case "Subusers":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Manage Subusers</h2>
-            <form className={styles.form} onSubmit={handleAddSubuser}>
-              <label>Subuser Email</label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleFormChange}
-                placeholder="subuser@citimart.com"
-                required
-              />
+  useEffect(() => { fetchStatus(); }, [fetchStatus]);
 
-              <label>Assign To</label>
-              <select
-                name="parentType"
-                value={form.parentType}
-                onChange={handleFormChange}
-              >
-                <option value="Customer">Customer</option>
-                <option value="Vendor">Vendor</option>
-                <option value="Admin">Admin</option>
-                <option value="Merchandise">Merchandise</option>
-                <option value="Marketing">Marketing</option>
-                <option value="HeadOffice">Head Office</option>
-              </select>
+  const toggle = async (enable) => {
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE}/admin/settings/maintenance`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ maintenanceMode: enable, maintenanceMessage: message }),
+      });
+      if (!res.ok) throw new Error("Update failed");
+      fetchStatus();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-              <label>Parent Account</label>
-              {form.parentType === "Admin" || form.parentType === "Merchandise" || form.parentType === "Marketing"|| form.parentType === "HeadOffice" ? (
-                <p>No parent account required</p>
-              ) : (
-                <select
-                  name="parentId"
-                  value={form.parentId}
-                  onChange={handleFormChange}
-                  required
-                >
-                  <option value="">-- Select Parent --</option>
-                  {parentAccounts.map((acc) => (
-                    <option key={acc._id} value={acc._id}>
-                      {acc.email}
-                    </option>
-                  ))}
-                </select>
-              )}
+  if (status === null) return <div className={s.loadingState}>Loading maintenance status…</div>;
 
-              <label>Role</label>
-              <select
-  name="role"
-  value={form.role}
-  onChange={handleFormChange}
->
-  {Object.keys(rolePermissions).map((role) => (
-    <option key={role} value={role}>
-      {role}
-    </option>
-  ))}
-</select>
+  return (
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Maintenance Mode</h2>
+          <p className={s.panelSubtitle}>
+            When enabled, the storefront and vendor tools return 503 to visitors. Admin, subuser, and login routes always stay reachable so you can turn it back off.
+          </p>
+        </div>
+        <span className={`${s.badge} ${status ? s.badgeRed : s.badgeGreen}`}>
+          {status ? "🔴 Maintenance ON" : "🟢 Site Live"}
+        </span>
+      </div>
 
+      {error && <div className={s.errorState}>{error}</div>}
 
-              <label>Permissions</label>
-              <div className={styles.checkboxGroup}>
-                {Object.keys(form.permissions || {}).map((perm) => (
-  <label key={perm}>
-    <input
-      type="checkbox"
-      name={perm}
-      checked={form.permissions[perm]}
-      onChange={handlePermissionChange}
-    />
-    {perm.charAt(0).toUpperCase() + perm.slice(1)}
-  </label>
-))}
+      <div className={s.card}>
+        <div className={s.formGroup}>
+          <label>Message shown to visitors while maintenance is on</label>
+          <textarea className={s.textarea} value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="We're down for scheduled maintenance. Please check back soon." />
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+          {!status ? (
+            <button className={s.btnDanger} disabled={saving} onClick={() => toggle(true)}>
+              {saving ? "…" : "🚧 Enable Maintenance Mode"}
+            </button>
+          ) : (
+            <button className={s.btnSuccess} disabled={saving} onClick={() => toggle(false)}>
+              {saving ? "…" : "✓ Disable Maintenance Mode — Go Live"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-                
-              </div>
+// ── Error logs tab ───────────────────────────────────────────────────────
+const ErrorLogsTab = () => {
+  const [logs, setLogs] = useState([]);
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-              <button type="submit">Add Subuser</button>
-            </form>
+  const fetchLogs = useCallback(() => {
+    setLoading(true);
+    fetch(`${API_BASE}/admin/settings/error-logs`)
+      .then((res) => res.json())
+      .then((data) => { setLogs(data.logs || []); setCount(data.count || 0); })
+      .catch(() => setError("Failed to load error logs"))
+      .finally(() => setLoading(false));
+  }, []);
 
-            <h3>Existing Subusers</h3>
-            {subusers.length === 0 ? (
-              <p>No subusers added yet.</p>
-            ) : (
-              <table className={styles.subuserTable}>
-                <thead>
-                  <tr>
-                    <th>Email</th>
-                    <th>Type</th>
-                    <th>Parent</th>
-                    <th>Role</th>
-                    <th>Permissions</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subusers.map((su) => (
-                    <tr key={su._id}>
-                      <td>
-                        {editingId === su._id ? (
-                          <input
-                            type="email"
-                            name="email"
-                            value={editForm?.email || ""}
-                            onChange={handleEditFormChange}
-                          />
-                        ) : (
-                          su.email
-                        )}
-                      </td>
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
-                      <td>
-                        {editingId === su._id ? (
-                          <select
-                            name="parentType"
-                            value={editForm.parentType}
-                            onChange={handleEditFormChange}
-                          >
-                            <option value="Customer">Customer</option>
-                            <option value="Vendor">Vendor</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Merchandise">Merchandise</option>
-                          </select>
-                        ) : (
-                          su.parentType
-                        )}
-                      </td>
-
-                      <td>
-                        {editingId === su._id ? (
-                          editForm.parentType === "Admin" || editForm.parentType === "Merchandise" || editForm.parentType === "Marketing" || editForm.parentType === "HeadOffice"  ? (
-                            <p>No parent account required</p>
-                          ) : (
-                            <select
-                              name="parentId"
-                              value={editForm.parentId}
-                              onChange={handleEditFormChange}
-                              required
-                            >
-                              <option value="">-- Select Parent --</option>
-                              {parentAccounts.map((acc) => (
-                                <option key={acc._id} value={acc._id}>
-                                  {acc.email}
-                                </option>
-                              ))}
-                            </select>
-                          )
-                        ) : (
-                          su.parentId || "N/A"
-                        )}
-                      </td>
-
-                      <td>
-                        {editingId === su._id ? (
-                         <select
-  name="role"
-  value={editForm.role}
-  onChange={handleEditFormChange}
->
-  {Object.keys(rolePermissions).map((role) => (
-    <option key={role} value={role}>
-      {role}
-    </option>
-  ))}
-</select>
-
-                        ) : (
-                          su.role
-                        )}
-                      </td>
-
-                      <td>
-                        {editingId === su._id ? (
-                          <div className={styles.checkboxGroup}>
-                           {Object.keys(editForm?.permissions || {}).map((perm) => (
-  <label key={perm}>
-    <input
-      type="checkbox"
-      name={perm}
-      checked={editForm.permissions[perm]}
-      onChange={handleEditPermissionChange}
-    />
-    {perm.charAt(0).toUpperCase() + perm.slice(1)}
-  </label>
-))}
-
-                          </div>
-                        ) : (
-                          Object.keys(su.permissions)
-                            .filter((p) => su.permissions[p])
-                            .join(", ") || "None"
-                        )}
-                      </td>
-
-                      <td>
-                        {editingId === su._id ? (
-                          <>
-                            <button onClick={() => handleSaveEdit(su._id)}>Save</button>
-                            <button onClick={handleCancelEdit}>Cancel</button>
-                          </>
-                        ) : (
-                          <>
-                            <button onClick={() => handleEdit(su)}>Edit</button>
-                            <button onClick={() => handleDelete(su._id)}>Delete</button>
-                            <button onClick={() => handleResetPassword(su._id)}>Reset Password</button>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        );
-
-
-
-
-      case 'Users':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Admin Users</h2>
-            <form className={styles.form}>
-              <label>Add Admin Email</label>
-              <input type="email" placeholder="admin@citimart.com" />
-
-              <label>Assign Role</label>
-              <select>
-                <option>Super Admin</option>
-                <option>Support</option>
-                <option>Moderator</option>
-              </select>
-
-              <button type="submit">Add Admin</button>
-            </form>
-          </div>
-        );
-
-      case 'Vendors':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Vendor Settings</h2>
-            <form className={styles.form}>
-              <label>Vendor Approval Mode</label>
-              <select>
-                <option>Manual</option>
-                <option>Auto</option>
-              </select>
-
-              <label>Default Commission (%)</label>
-              <input type="number" placeholder="e.g., 10" />
-
-              <label>Enable Vendor Tiers</label>
-              <select>
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Products':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Product Settings</h2>
-            <form className={styles.form}>
-              <label>Listing Approval</label>
-              <select>
-                <option>Manual</option>
-                <option>Auto</option>
-              </select>
-
-              <label>Moderation Required</label>
-              <select>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-
-              <label>Banned Keywords</label>
-              <textarea placeholder="e.g., fake, replica"></textarea>
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Payments':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Payment Settings</h2>
-            <form className={styles.form}>
-              <label>Commission Rate (%)</label>
-              <input type="number" placeholder="e.g., 5" />
-
-              <label>Payment Gateway</label>
-              <select>
-                <option>Razorpay</option>
-                <option>Cashfree</option>
-                <option>PayPal</option>
-              </select>
-
-              <label>Payout Cycle</label>
-              <select>
-                <option>Weekly</option>
-                <option>Bi-weekly</option>
-              </select>
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Shipping':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Shipping Info</h2>
-            <form className={styles.form}>
-              <label>Default Courier</label>
-              <input type="text" placeholder="e.g., Delhivery, Bluedart" />
-
-              <label>Return Address</label>
-              <textarea placeholder="Return center full address"></textarea>
-
-              <label>Shipping Zones</label>
-              <textarea placeholder="e.g., North, South, East, West"></textarea>
-
-              <button type="submit">Update Shipping</button>
-            </form>
-          </div>
-        );
-
-      case 'Notifications':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Notification Preferences</h2>
-            <form className={styles.form}>
-              <label>Email Provider</label>
-              <select>
-                <option>SMTP</option>
-                <option>Mailgun</option>
-                <option>Amazon SES</option>
-              </select>
-
-              <label>Enable SMS Alerts</label>
-              <select>
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-
-              <label>Order Email Template</label>
-              <textarea placeholder="HTML content or message"></textarea>
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Orders':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Order Management</h2>
-            <form className={styles.form}>
-              <label>Auto-Cancel (days)</label>
-              <input type="number" placeholder="e.g., 7" />
-
-              <label>Return Window (days)</label>
-              <input type="number" placeholder="e.g., 15" />
-
-              <label>Allow Exchange</label>
-              <select>
-                <option>Allowed</option>
-                <option>Not Allowed</option>
-              </select>
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Security':
-        return (
-          <div className={styles.tabContent}>
-            <h2>Security Settings</h2>
-            <form className={styles.form}>
-              <label>Enable 2FA</label>
-              <select>
-                <option>Enabled</option>
-                <option>Disabled</option>
-              </select>
-
-              <label>Password Expiry (days)</label>
-              <input type="number" placeholder="e.g., 90" />
-
-              <label>Login Attempt Limit</label>
-              <input type="number" placeholder="e.g., 5" />
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      case 'Integrations':
-        return (
-          <div className={styles.tabContent}>
-            <h2>API & Integrations</h2>
-            <form className={styles.form}>
-              <label>Google Analytics ID</label>
-              <input type="text" placeholder="e.g., UA-12345678" />
-
-              <label>Cashfree API Key</label>
-              <input type="text" placeholder="Cashfree key" />
-
-              <label>Razorpay Key</label>
-              <input type="text" placeholder="Razorpay key" />
-
-              <button type="submit">Save</button>
-            </form>
-          </div>
-        );
-
-      default:
-       return <div className={styles.tabContent}><h2>{activeTab}</h2></div>;
+  const handleClear = async () => {
+    if (!window.confirm("Clear all error logs? This cannot be undone.")) return;
+    try {
+      await fetch(`${API_BASE}/admin/settings/error-logs`, { method: "DELETE" });
+      fetchLogs();
+    } catch {
+      setError("Failed to clear logs");
     }
   };
 
   return (
-      <div className={styles.settingsContainer}>
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Error Logs</h2>
+          <p className={s.panelSubtitle}>Unhandled backend exceptions, most recent first ({count} total).</p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className={s.btnSecondary} onClick={fetchLogs}>↻ Refresh</button>
+          {logs.length > 0 && <button className={s.btnDanger} onClick={handleClear}>Clear All</button>}
+        </div>
+      </div>
+
+      {error && <div className={s.errorState}>{error}</div>}
+
+      {loading ? (
+        <div className={s.loadingState}>Loading logs…</div>
+      ) : logs.length === 0 ? (
+        <div className={s.emptyState}><span className={s.emptyIcon}>✅</span>No errors logged — clean slate.</div>
+      ) : (
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <thead><tr><th>Time</th><th>Method</th><th>Path</th><th>Error</th></tr></thead>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log._id}>
+                  <td style={{ whiteSpace: "nowrap" }}>{log.created_at ? new Date(log.created_at).toLocaleString() : "—"}</td>
+                  <td><span className={`${s.badge} ${s.badgeBlue}`}>{log.method}</span></td>
+                  <td style={{ fontFamily: "monospace", fontSize: 12 }}>{log.path}</td>
+                  <td style={{ color: "#dc2626", maxWidth: 400 }}>{log.error_message}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Support tickets tab ──────────────────────────────────────────────────
+const STATUS_OPTIONS = ["open", "in_progress", "resolved"];
+const statusBadgeClass = (status) => {
+  if (status === "resolved") return `${s.badge} ${s.badgeGreen}`;
+  if (status === "in_progress") return `${s.badge} ${s.badgeBlue}`;
+  return `${s.badge} ${s.badgeAmber}`;
+};
+
+const TicketsTab = () => {
+  const [messages, setMessages] = useState([]);
+  const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const fetchMessages = useCallback(() => {
+    setLoading(true);
+    const qs = filter ? `?status=${filter}` : "";
+    fetch(`${API_BASE}/admin/settings/contact-messages${qs}`)
+      .then((res) => res.json())
+      .then((data) => setMessages(data.messages || []))
+      .catch(() => setError("Failed to load support tickets"))
+      .finally(() => setLoading(false));
+  }, [filter]);
+
+  useEffect(() => { fetchMessages(); }, [fetchMessages]);
+
+  const updateStatus = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      await fetch(`${API_BASE}/admin/settings/contact-messages/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      fetchMessages();
+    } catch {
+      setError("Failed to update ticket");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  return (
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Support Tickets</h2>
+          <p className={s.panelSubtitle}>Messages submitted through the Contact Us form.</p>
+        </div>
+        <select className={s.select} value={filter} onChange={(e) => setFilter(e.target.value)} style={{ maxWidth: 180 }}>
+          <option value="">All statuses</option>
+          {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt.replace("_", " ")}</option>)}
+        </select>
+      </div>
+
+      {error && <div className={s.errorState}>{error}</div>}
+
+      {loading ? (
+        <div className={s.loadingState}>Loading tickets…</div>
+      ) : messages.length === 0 ? (
+        <div className={s.emptyState}><span className={s.emptyIcon}>🎫</span>No support tickets found.</div>
+      ) : (
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Received</th><th>Status</th></tr></thead>
+            <tbody>
+              {messages.map((m) => (
+                <tr key={m._id}>
+                  <td>{m.name}<br /><span style={{ color: "#9ca3af", fontSize: 11 }}>{m.email}</span></td>
+                  <td>{m.subject || "—"}</td>
+                  <td style={{ maxWidth: 280 }}>{m.message}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>{m.created_at ? new Date(m.created_at).toLocaleDateString() : "—"}</td>
+                  <td>
+                    <select
+                      className={s.select}
+                      value={m.status}
+                      disabled={updatingId === m._id}
+                      onChange={(e) => updateStatus(m._id, e.target.value)}
+                      style={{ minWidth: 130 }}
+                    >
+                      {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt.replace("_", " ")}</option>)}
+                    </select>
+                    <div style={{ marginTop: 6 }}>
+                      <span className={statusBadgeClass(m.status)}>{m.status.replace("_", " ")}</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Subusers tab — links out to the dedicated management page ───────────
+const SubusersTab = () => (
+  <div className={s.panel}>
+    <div className={s.panelHeader}>
+      <div>
+        <h2 className={s.panelTitle}>Subusers</h2>
+        <p className={s.panelSubtitle}>Invite, edit, and manage subuser accounts and their permissions.</p>
+      </div>
+    </div>
+    <div className={s.card} style={{ textAlign: "center", padding: 40 }}>
+      <p style={{ color: "#6b7280", marginBottom: 16 }}>
+        Full subuser management — invitations, roles, permissions, password resets — lives on its own dedicated page.
+      </p>
+      <Link to="/admin/subusers" className={s.btnPrimary} style={{ textDecoration: "none", display: "inline-flex" }}>
+        Open Subuser Management →
+      </Link>
+    </div>
+  </div>
+);
+
+// ── Security tab — real admin account list ───────────────────────────────
+const SecurityTab = () => {
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch(`${API_BASE}/admin/settings/admin-accounts`)
+      .then((res) => res.json())
+      .then((data) => setAdmins(data.admins || []))
+      .catch(() => setError("Failed to load admin accounts"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Security — Admin Accounts</h2>
+          <p className={s.panelSubtitle}>Everyone with admin-level access to this system.</p>
+        </div>
+      </div>
+
+      {error && <div className={s.errorState}>{error}</div>}
+
+      {loading ? (
+        <div className={s.loadingState}>Loading admin accounts…</div>
+      ) : admins.length === 0 ? (
+        <div className={s.emptyState}><span className={s.emptyIcon}>🔐</span>No admin accounts found.</div>
+      ) : (
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <thead><tr><th>Name</th><th>Email</th><th>Logins</th><th>Last Login</th></tr></thead>
+            <tbody>
+              {admins.map((a) => (
+                <tr key={a._id}>
+                  <td>{a.name || "—"}</td>
+                  <td>{a.email}</td>
+                  <td>{a.login_count || 0}</td>
+                  <td>{a.last_login ? new Date(a.last_login).toLocaleString() : "Never logged in"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Shell ─────────────────────────────────────────────────────────────────
+const AdminSettings = () => {
+  const [activeTab, setActiveTab] = useState("platform");
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "platform": return <PlatformTab />;
+      case "maintenance": return <MaintenanceTab />;
+      case "errors": return <ErrorLogsTab />;
+      case "tickets": return <TicketsTab />;
+      case "subusers": return <SubusersTab />;
+      case "security": return <SecurityTab />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div className={styles.settingsContainer}>
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <h1>SETTINGS</h1>
+          <h1>⚙️ SETTINGS</h1>
         </div>
         <div className={styles.nav}>
           <ul>
-            {tabs.map(tab => (
+            {TABS.map((tab) => (
               <li
-                key={tab}
-                className={activeTab === tab ? styles.active : ''}
-                onClick={() => setActiveTab(tab)}
+                key={tab.key}
+                className={activeTab === tab.key ? styles.active : ""}
+                onClick={() => setActiveTab(tab.key)}
               >
-                {tab}
+                <span style={{ marginRight: 8 }}>{tab.icon}</span>{tab.label}
               </li>
             ))}
           </ul>

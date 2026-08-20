@@ -1,41 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./FAQ.css";
+import { API_BASE } from "../config";
 
 export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const faqs = [
-    {
-      question: "🛍️ What is Citimart?",
-      answer:
-        "Citimart is your trusted online store for groceries, fashion, electronics, and household items — delivering quality and convenience right to your doorstep.",
-    },
-    {
-      question: "🚚 How can I track my order?",
-      answer:
-        "After your order is shipped, you'll receive an SMS or email with a tracking link. You can also check your order status anytime under 'My Orders' in your Citimart account.",
-    },
-    {
-      question: "💸 What are the delivery charges?",
-      answer:
-        "Delivery is free for orders above ₹499. For smaller orders, a small delivery fee is applied depending on your location.",
-    },
-    {
-      question: "🔁 How can I return or exchange a product?",
-      answer:
-        "You can request a return or exchange within 7 days of delivery if the product is unused and in its original packaging.",
-    },
-    {
-      question: "💳 What payment methods are accepted?",
-      answer:
-        "We accept all major debit/credit cards, UPI, wallets, net banking, and Cash on Delivery (for select areas).",
-    },
-    {
-      question: "☎️ How can I contact Citimart support?",
-      answer:
-        "You can email us at support@citimart.in or call +91-99999-99999 from 9 AM to 9 PM (Mon–Sat).",
-    },
-  ];
+  useEffect(() => {
+    fetch(`${API_BASE}/faq`)
+      .then((res) => res.json())
+      .then((data) => setFaqs(data.faqs || []))
+      .catch(() => setFaqs([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -49,6 +27,13 @@ export default function FAQ() {
           Need help? Here are some common questions about Citimart.
         </p>
 
+        {loading ? (
+          <p style={{ textAlign: "center", color: "#888" }}>Loading…</p>
+        ) : faqs.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#888" }}>
+            No FAQs published yet — check back soon.
+          </p>
+        ) : (
         <div className="faq-list">
           {faqs.map((faq, index) => (
             <div
@@ -74,6 +59,7 @@ export default function FAQ() {
             </div>
           ))}
         </div>
+        )}
 
         <div className="faq-footer">
           Still have questions?{" "}

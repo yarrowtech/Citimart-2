@@ -26,14 +26,17 @@ const rolePermissions = {
   ],
 };
 
+// Every role lands on the same dashboard shell (/subuser/dashboard), which
+// renders tabs from the subuser's actual granted permissions rather than a
+// fixed per-role page.
 const roleRedirects = {
-  Viewer: "/customer-subuser-dashboard",
-  "Order Manager": "/vendor-subuser-dashboard",
-  "Inventory Manager": "/vendor-subuser-dashboard",
-  "Merchandise Manager": "/merchandise-dashboard",
-  "Marketing Manager": "/marketing-dashboard",
-  "Support Staff": "/head-office-subuser",
-  Moderator: "/head-office-subuser",
+  Viewer: "/subuser/dashboard",
+  "Order Manager": "/subuser/dashboard",
+  "Inventory Manager": "/subuser/dashboard",
+  "Merchandise Manager": "/subuser/dashboard",
+  "Marketing Manager": "/subuser/dashboard",
+  "Support Staff": "/subuser/dashboard",
+  Moderator: "/subuser/dashboard",
 };
 
 const AdminSubusers = () => {

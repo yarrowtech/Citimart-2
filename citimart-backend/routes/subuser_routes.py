@@ -5,6 +5,7 @@ import jwt, bcrypt
 from config import JWT_SECRET_KEY, FRONTEND_URL
 from database import subusers_collection,vendors_collection
 from utils.email_utils import send_email
+from utils.auth_utils import subuser_token_required, require_permission
 
 subuser_bp = Blueprint("subuser", __name__)
 
@@ -223,9 +224,12 @@ def setup_subuser():
 # ---------------------------
 @subuser_bp.route("/login/subuser", methods=["POST"])
 def login_subuser():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     email = data.get("email")
     password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
 
     subuser = subusers_collection.find_one({"email": email})
     if not subuser or not subuser.get("passwordHash"):
@@ -243,24 +247,20 @@ def login_subuser():
     }
     login_token = jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
 
-    subuser["_id"] = str(subuser["_id"])
-
-    # Map roles to frontend dashboard URLs
-    role_redirects = {
-    "Viewer": "/subuser/customer",
-    "Order Manager": "/subuser/vendor",
-    "Inventory Manager": "/subuser/vendor",
-    "Merchandise Manager": "/subuser/merchandise",
-    "Marketing Manager": "/subuser/marketing",
-    "Support Staff": "/subuser/headoffice",
-    "Moderator": "/subuser/headoffice",
-     }
-
-    redirect_url = role_redirects.get(subuser["role"], "/")
+    # Every role lands on the one dashboard shell, which renders tabs from
+    # the subuser's actual granted permissions rather than a fixed-per-role
+    # page — permissions are customizable per-subuser, not fixed by role.
+    redirect_url = "/subuser/dashboard"
 
     return jsonify({
         "token": login_token,
-        "user": subuser,
+        "user": {
+            "id": str(subuser["_id"]),
+            "email": subuser.get("email"),
+            "role": subuser.get("role"),
+            "parentType": subuser.get("parentType"),
+            "permissions": subuser.get("permissions", {}),
+        },
         "redirectUrl": redirect_url
     }), 200
 
@@ -271,7 +271,9 @@ from database import users_collection
 
 
 @subuser_bp.route("/segment-requests/<user_id>/approve", methods=["POST"])
-def approve_request_subuser(user_id):
+@subuser_token_required
+@require_permission("segmentation")
+def approve_request_subuser(current_subuser, user_id):
     user = users_collection.find_one({"_id": ObjectId(user_id)})
     if not user or not user.get("segment_request"):
         return jsonify({"error": "No segment request found"}), 404
@@ -289,7 +291,9 @@ def approve_request_subuser(user_id):
 
 
 @subuser_bp.route("/segment-requests/<user_id>/reject", methods=["POST"])
-def reject_request_subuser(user_id):
+@subuser_token_required
+@require_permission("segmentation")
+def reject_request_subuser(current_subuser, user_id):
     user = users_collection.find_one({"_id": ObjectId(user_id)})
     if not user or not user.get("segment_request"):
         return jsonify({"error": "No segment request found"}), 404
@@ -306,7 +310,9 @@ def reject_request_subuser(user_id):
 
 
 @subuser_bp.route("/segment-requests", methods=["GET"])
-def get_segment_requests():
+@subuser_token_required
+@require_permission("segmentation")
+def get_segment_requests(current_subuser):
     try:
         # Find all users who have requested a segment and are pending
         pending_requests = list(users_collection.find(
@@ -326,18 +332,19 @@ def get_segment_requests():
 
 
 @subuser_bp.route("/vendors", methods=["GET"])
-def list_pending_vendors():
+@subuser_token_required
+def list_pending_vendors(current_subuser):
     vendors = list(vendors_collection.find({"status": "pending_subuser"}))
     for v in vendors:
         v["_id"] = str(v["_id"])
     return jsonify(vendors), 200
 
 @subuser_bp.route("/vendor/<vendor_id>/approve", methods=["PATCH"])
-def subuser_approve(vendor_id):
+@subuser_token_required
+def subuser_approve(current_subuser, vendor_id):
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         approve = data.get("approve")
-        subuser_id = data.get("subuserId")
 
         vendor = vendors_collection.find_one({"_id": ObjectId(vendor_id)})
         if not vendor:
@@ -345,7 +352,7 @@ def subuser_approve(vendor_id):
 
         update_data = {
             "status": "pending_admin" if approve else "rejected",
-            "subuserApprovedBy": subuser_id,
+            "subuserApprovedBy": current_subuser["_id"],
             "rejectionSource": None if approve else "subuser",
             "updatedAt": datetime.utcnow()
         }

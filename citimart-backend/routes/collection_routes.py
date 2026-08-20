@@ -73,7 +73,7 @@ def get_all_collections():
             c["products"] = [normalize_product(p) for p in product_objs]
         return jsonify({"collections": collections}), 200
     except Exception as e:
-        print("❌ ERROR in get_all_collections:", e)
+        print("ERROR in get_all_collections:", e)
         return jsonify({"error": str(e)}), 500
 
 # ------------------ Get Collection By Slug ------------------
@@ -105,7 +105,7 @@ def get_collection_by_slug(slug):
         return jsonify({"collection": collection}), 200
 
     except Exception as e:
-        print("❌ ERROR in get_collection_by_slug:", e)
+        print("ERROR in get_collection_by_slug:", e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -153,7 +153,7 @@ def add_collection():
         return jsonify({"message": "Collection added", "collection": collection_data}), 201
 
     except Exception as e:
-        print("❌ ERROR in add_collection:", e)
+        print("ERROR in add_collection:", e)
         return jsonify({"error": str(e)}), 500
 
 # ------------------ Update Collection ------------------
@@ -206,7 +206,7 @@ def update_collection(collection_id):
         return jsonify({"message": "Collection updated", "collection": collection}), 200
 
     except Exception as e:
-        print("❌ ERROR in update_collection:", e)
+        print("ERROR in update_collection:", e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -215,7 +215,7 @@ def update_collection(collection_id):
 def delete_collection(collection_id):
     try:
         role = request.args.get("role", "customer")
-        if role != "admin":
+        if role not in ["admin", "merchandise"]:
             return jsonify({"error": "Access denied"}), 403
 
         result = collections_collection.delete_one({"_id": ObjectId(collection_id)})
@@ -224,5 +224,5 @@ def delete_collection(collection_id):
 
         return jsonify({"message": "Collection deleted"}), 200
     except Exception as e:
-        print("❌ ERROR in delete_collection:", e)
+        print("ERROR in delete_collection:", e)
         return jsonify({"error": str(e)}), 500

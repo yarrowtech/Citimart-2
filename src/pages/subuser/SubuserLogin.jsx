@@ -196,9 +196,8 @@ const SubuserLogin = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("permissions", JSON.stringify(data.user.permissions));
-        navigate(data.redirectUrl || "/subuser-dashboard");
+        localStorage.setItem("subuserToken", data.token);
+        navigate(data.redirectUrl || "/subuser/dashboard");
       } else {
         alert(data.error || "Login failed");
       }

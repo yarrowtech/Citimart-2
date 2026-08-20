@@ -28,10 +28,10 @@ def send_email(to_email, subject, body):
         server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
         server.sendmail(EMAIL_HOST_USER, [to_email], msg.as_string())
         server.quit()
-        print("✅ Email sent successfully.")
+        print("Email sent successfully.")
         return True
     except Exception as e:
-        print("❌ Email send error:", e)
+        print("Email send error:", e)
         return False
 
 #----Vendor approval email ------
@@ -57,7 +57,7 @@ Citimart Team
 """
         return send_email(vendor_email, subject, body)
     except Exception as e:
-        print("❌ Vendor approval email error:", e)
+        print("Vendor approval email error:", e)
         return False
 '''
 
@@ -98,10 +98,10 @@ def send_email(to_email, subject, body, html=False):
         server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
         server.sendmail(EMAIL_HOST_USER, [to_email], msg.as_string())
         server.quit()
-        print("✅ Email sent successfully.")
+        print("Email sent successfully.")
         return True
     except Exception as e:
-        print("❌ Email send error:", e)
+        print("Email send error:", e)
         return False
 
 # ----------------------------
@@ -128,7 +128,7 @@ Citimart Team
 """
         return send_email(vendor_email, subject, body)  # plain text
     except Exception as e:
-        print("❌ Vendor approval email error:", e)
+        print("Vendor approval email error:", e)
         return False
 
 # ----------------------------
@@ -194,7 +194,7 @@ def send_subuser_invitation_email(subuser_email, parent_type, role, permissions,
 """
         return send_email(subuser_email, subject, html_body, html=True)
     except Exception as e:
-        print("❌ Subuser invitation email error:", e)
+        print("Subuser invitation email error:", e)
         return False
 
 # ----------------------------
@@ -250,5 +250,5 @@ def send_guest_invite_email(guest_email, register_link, product_name=None):
 """
         return send_email(guest_email, subject, html_body, html=True)
     except Exception as e:
-        print("❌ Guest invite email error:", e)
+        print("Guest invite email error:", e)
         return False

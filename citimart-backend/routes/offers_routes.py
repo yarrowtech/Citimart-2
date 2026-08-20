@@ -34,7 +34,7 @@ def serialize_offer(offer):
                     "image": product.get("images", [None])[0]
                 })
         except Exception as e:
-            print("⚠️ Product fetch error:", e)
+            print("Product fetch error:", e)
 
     offer["products"] = product_details
     return offer
@@ -91,7 +91,7 @@ def extract_offer_data():
         try:
             product_ids.append(ObjectId(pid))
         except Exception as e:
-            print("⚠️ Invalid product id:", e)
+            print("Invalid product id:", e)
 
     #  Handle image (JSON or File)
     image_url = data.get("image")  # <-- fallback if JSON already has a URL
@@ -103,7 +103,7 @@ def extract_offer_data():
             upload_result = cloudinary.uploader.upload(file, folder="offers")
             image_url = upload_result.get("secure_url")
         except Exception as e:
-            print("⚠️ Cloudinary upload failed:", e)
+            print("Cloudinary upload failed:", e)
 
 
     # Convert dates safely
@@ -227,7 +227,7 @@ def notify_users(current_user):
         users = list(users_collection.find({"role": "customer"}))
         for user in users:
             # TODO: Replace with real email service
-            print(f"📩 Email to {user['email']} → Big Sale: {offer['title']}")
+            print(f"Email to {user['email']} -> Big Sale: {offer['title']}")
 
     return jsonify({"message": "Users notified about upcoming sales"}), 200
 
@@ -241,7 +241,7 @@ def wishlist_price_drop():
     # Adjust depending on how wishlist is stored
     wishlists = list(users_collection.find({"wishlist": product_id}))
     for user in wishlists:
-        print(f"📩 Notify {user['email']} → Wishlist item price dropped to ₹{new_price}")
+        print(f"Notify {user['email']} -> Wishlist item price dropped to Rs.{new_price}")
 
     return jsonify({"message": "Wishlist users notified"}), 200
 
@@ -254,7 +254,7 @@ def referral_reward():
     referred = users_collection.find_one({"email": data["referred_email"]})
 
     if referrer and referred:
-        print(f"🎁 {referrer['name']} and {referred['name']} earned 200 super coins!")
+        print(f"{referrer['name']} and {referred['name']} earned 200 super coins!")
         return jsonify({"message": "Referral reward granted"}), 200
     return jsonify({"error": "Invalid referral"}), 400
 
@@ -444,7 +444,7 @@ def get_product_offers(product_id):
             if user_id:
                 current_user = users_collection.find_one({"_id": ObjectId(user_id)})
         except Exception as e:
-            print("⚠️ Token decode failed:", e)
+            print("Token decode failed:", e)
 
     # ✅ Continue logic (same as before)
     now = datetime.utcnow()

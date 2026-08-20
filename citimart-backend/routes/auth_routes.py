@@ -18,7 +18,7 @@ auth_bp = Blueprint('auth', __name__)
 # ------------------ REGISTER (Customer) ------------------
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
 
     if not data.get("email") or not data.get("password") or not data.get("name"):
         return jsonify({"error": "name, email, and password are required"}), 400
@@ -50,7 +50,7 @@ def register():
 
 @auth_bp.route('/login/customer', methods=['POST'])
 def login_customer():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     email = data.get("email")
     password = data.get("password")
 
@@ -133,6 +133,11 @@ def login_admin():
     user = users_collection.find_one({"email": email, "role": "admin"})
     if not user or not check_password_hash(user.get("password", ""), password):
         return jsonify({"error": "Invalid credentials"}), 401
+
+    users_collection.update_one(
+        {"_id": user["_id"]},
+        {"$inc": {"login_count": 1}, "$set": {"last_login": datetime.utcnow()}}
+    )
 
     token = generate_token(user["_id"], "admin")
 

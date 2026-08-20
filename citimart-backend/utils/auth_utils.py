@@ -71,6 +71,60 @@ def token_required(f):
     return decorated
 
 
+# ------------------ Subuser Token Required Decorator ------------------
+def subuser_token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'Authorization' in request.headers:
+            parts = request.headers['Authorization'].split()
+            if len(parts) == 2 and parts[0] == 'Bearer':
+                token = parts[1]
+
+        if not token:
+            return jsonify({'error': 'Token is missing'}), 401
+
+        try:
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
+            subuser_id = data.get("sub")
+
+            if not subuser_id:
+                return jsonify({'error': 'Invalid token data'}), 400
+
+            from database import subusers_collection
+            current_subuser = subusers_collection.find_one({"_id": ObjectId(subuser_id)})
+
+            if not current_subuser:
+                return jsonify({'error': 'Subuser not found'}), 404
+            if current_subuser.get("status") != "active":
+                return jsonify({'error': 'Subuser account is not active'}), 403
+
+            current_subuser["_id"] = str(current_subuser["_id"])
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
+
+        return f(current_subuser, *args, **kwargs)
+
+    return decorated
+
+
+def require_permission(permission_key):
+    """Stacks under @subuser_token_required — the decorated route's first
+    positional arg must be the current_subuser dict."""
+    def decorator(f):
+        @wraps(f)
+        def decorated(current_subuser, *args, **kwargs):
+            if not current_subuser.get("permissions", {}).get(permission_key):
+                return jsonify({'error': f'Missing required permission: {permission_key}'}), 403
+            return f(current_subuser, *args, **kwargs)
+        return decorated
+    return decorator
+
+
 def admin_token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):

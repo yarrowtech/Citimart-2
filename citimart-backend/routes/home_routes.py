@@ -97,7 +97,7 @@ def get_homepage():
                         "img": (product.get("images") or [None])[0],
                     }
             except Exception as e:
-                print(f"⚠️ Skipping invalid trending product_id {product_id}: {e}")
+                print(f"Skipping invalid trending product_id {product_id}: {e}")
         enriched_trending.append(enriched_item)
 
     data["trendingNow"] = enriched_trending
@@ -122,7 +122,7 @@ def get_homepage():
                         "rating": product.get("rating", 4.5),  # optional extra
                     }
             except Exception as e:
-                print(f"⚠️ Skipping invalid featured product_id {product_id}: {e}")
+                print(f"Skipping invalid featured product_id {product_id}: {e}")
         enriched_featured.append(enriched_item)
 
     data["featuredProducts"] = enriched_featured

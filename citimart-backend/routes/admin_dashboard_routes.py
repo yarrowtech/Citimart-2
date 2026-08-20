@@ -366,7 +366,7 @@ def dashboard_summary():
         return jsonify(summary), 200
 
     except Exception as e:
-        print("❌ Error in dashboard_summary:", e)
+        print("Error in dashboard_summary:", e)
         return jsonify({"error": str(e)}), 500
 # ---------- E-commerce operations overview ----------
 from collections import Counter, defaultdict

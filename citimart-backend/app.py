@@ -34,10 +34,39 @@ def create_app():
     # JSON instead of leaking a stack trace. Only takes effect when debug=False —
     # in debug mode Flask's interactive debugger takes over regardless, which
     # is what you want for local development.
+    from werkzeug.exceptions import HTTPException
+    from flask import request as _request
     @app.errorhandler(Exception)
     def handle_uncaught_exception(e):
+        # Let Flask's normal handling take proper HTTP errors (404, 405, 415, ...)
+        # — otherwise every one of those would get flattened into a 500 here too.
+        if isinstance(e, HTTPException):
+            return e
         app.logger.exception("Unhandled exception")
+        from routes.admin_settings_routes import log_error
+        log_error(method=_request.method, path=_request.path, error_message=e)
         return jsonify({"error": "Internal server error"}), 500
+
+    # Maintenance mode — actually enforced, not just a flag sitting unused in
+    # the DB. Admin/subuser/auth routes always stay reachable so the site can
+    # be un-maintenanced; everything else (storefront, vendor operations)
+    # gets a 503 while it's on.
+    _MAINTENANCE_ALLOWLIST = ("/admin", "/api/admin", "/subuser", "/auth")
+
+    @app.before_request
+    def _enforce_maintenance_mode():
+        if _request.method == "OPTIONS":
+            return None
+        if _request.path.startswith(_MAINTENANCE_ALLOWLIST):
+            return None
+        from routes.admin_settings_routes import is_maintenance_mode_active, _get_settings_doc
+        if is_maintenance_mode_active():
+            doc = _get_settings_doc()
+            return jsonify({
+                "error": "maintenance_mode",
+                "message": doc.get("maintenanceMessage") or "We're down for scheduled maintenance. Please check back soon.",
+            }), 503
+        return None
 
     # --- Register Blueprints ---
     from routes.auth_routes import auth_bp
@@ -62,6 +91,8 @@ def create_app():
     from routes.vendor_auth_routes import vendor_auth_bp
     from routes.guest_routes import guest_bp
     from routes.delivery_routes import delivery_bp
+    from routes.subuser_content_routes import subuser_content_bp
+    from routes.admin_settings_routes import admin_settings_bp
 
 
 
@@ -91,6 +122,8 @@ def create_app():
     app.register_blueprint(vendor_auth_bp)
     app.register_blueprint(guest_bp)
     app.register_blueprint(delivery_bp)
+    app.register_blueprint(subuser_content_bp)
+    app.register_blueprint(admin_settings_bp)
 
 
     return app

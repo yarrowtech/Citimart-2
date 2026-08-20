@@ -725,7 +725,7 @@ def checkout(current_user):
                 new_stock = max(0, current_stock - int(item.get("quantity", 1)))
                 v["stock"] = {"$numberInt": str(new_stock)}
 
-                print(f"✅ Updated {product['name']} {v_size}/{v_color} stock {current_stock} → {new_stock}")
+                print(f"Updated {product['name']} {v_size}/{v_color} stock {current_stock} -> {new_stock}")
 
             updated_variants.append(v)
 
@@ -999,7 +999,7 @@ def place_order(current_user):
                 current_stock = int(stock_val.get("$numberInt", 0))
                 new_stock = max(0, current_stock - int(item.get("quantity", 1)))
                 v["stock"] = {"$numberInt": str(new_stock)}  # 👈 keep same format
-                print(f"✅ Updated {product['name']} {v_size}/{v_color} stock {current_stock} → {new_stock}")
+                print(f"Updated {product['name']} {v_size}/{v_color} stock {current_stock} -> {new_stock}")
 
             updated_variants.append(v)
 
@@ -1113,7 +1113,7 @@ def place_order(current_user):
                 current_stock = int(stock_val.get("$numberInt", 0))
                 new_stock = max(0, current_stock - int(item.get("quantity", 1)))
                 v["stock"] = {"$numberInt": str(new_stock)}  # 👈 keep same format
-                print(f"✅ Updated {product['name']} {v_size}/{v_color} stock {current_stock} → {new_stock}")
+                print(f"Updated {product['name']} {v_size}/{v_color} stock {current_stock} -> {new_stock}")
 
             updated_variants.append(v)
 
@@ -1216,7 +1216,7 @@ def get_similar_products(customer_id):
         return jsonify({"similar_products": formatted})
 
     except Exception as e:
-        print("🔥 Similar products route error:", repr(e))
+        print("Similar products route error:", repr(e))
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -1270,7 +1270,7 @@ def get_paired_with_products(customer_id):
         return jsonify({"paired_products": formatted})
 
     except Exception as e:
-        print("🔥 Paired-with route error:", repr(e))
+        print("Paired-with route error:", repr(e))
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -1333,7 +1333,7 @@ def get_cart_offers(customer_id):
         return jsonify({"offers": matched_offers}), 200
 
     except Exception as e:
-        print("🔥 Error fetching cart offers:", e)
+        print("Error fetching cart offers:", e)
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -1862,7 +1862,7 @@ def verify_payment(current_user):
                     current_stock = int(stock_val.get("$numberInt", stock_val)) if isinstance(stock_val, dict) else int(stock_val)
                     new_stock = max(0, current_stock - int(item.get("quantity", 1)))
                     v["stock"] = {"$numberInt": str(new_stock)}
-                    print(f"✅ Updated {product['name']} {v_size}/{v_color} stock {current_stock} → {new_stock}")
+                    print(f"Updated {product['name']} {v_size}/{v_color} stock {current_stock} -> {new_stock}")
 
                 updated_variants.append(v)
 
@@ -1891,6 +1891,6 @@ def verify_payment(current_user):
         }), 201
 
     except Exception as e:
-        print("❌ Payment verification failed:", e)
+        print("Payment verification failed:", e)
         return jsonify({"success": False, "error": str(e)}), 500
 
