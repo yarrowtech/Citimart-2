@@ -9,6 +9,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaBars,
+  FaTags,
 } from 'react-icons/fa';
 
 const VendorLayout = () => {
@@ -33,6 +34,10 @@ const VendorLayout = () => {
     { path: '/vendor/products', icon: <FaBox />, label: 'My Products' },
     { path: '/vendor/orders', icon: <FaShoppingBag />, label: 'Orders' },
     { path: '/vendor/analytics', icon: <FaChartLine />, label: 'Analytics' },
+    { path: '/vendor/pricing', icon: <FaTags />, label: 'Pricing Advisor' },
+    { path: '/vendor/payouts', icon: <FaTags />, label: 'Payouts' },
+    { path: '/vendor/subscription', icon: <FaTags />, label: 'Subscription' },
+    { path: '/vendor/verify-business', icon: <FaTags />, label: 'Verify Your Business' },
   ];
 
   const handleLogout = () => {

@@ -1,0 +1,38 @@
+# systemd unit for the Flask backend on EC2/any Linux host.
+#
+# Install:
+#   sudo cp deploy/citimart-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now citimart-backend
+#
+# Adjust WorkingDirectory/User/paths to match your actual deploy location.
+# The service reads env vars from citimart-backend/.env via EnvironmentFile —
+# create that file from .env.example first (chmod 600 it, it holds secrets).
+
+[Unit]
+Description=Citimart Flask backend (gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=citimart
+Group=citimart
+WorkingDirectory=/home/citimart/citimartt/citimart-backend
+EnvironmentFile=/home/citimart/citimartt/citimart-backend/.env
+ExecStart=/home/citimart/citimartt/citimart-backend/.venv/bin/gunicorn \
+    --workers 4 \
+    --bind 127.0.0.1:5000 \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile - \
+    wsgi:app
+
+Restart=always
+RestartSec=5
+
+# Basic hardening — remove any that break your setup.
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

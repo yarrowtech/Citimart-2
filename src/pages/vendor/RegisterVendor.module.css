@@ -82,8 +82,11 @@
 
 .citiMartForm input[type="radio"],
 .citiMartForm input[type="checkbox"] {
-  width: auto;
-  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
   accent-color: #0a8894;
 }
 

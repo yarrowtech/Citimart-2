@@ -21,6 +21,11 @@ DEFAULT_PLATFORM_SETTINGS = {
     "currency": "INR",
     "timeZone": "Asia/Kolkata",
     "defaultLanguage": "English",
+    "commissionRate": 15.0,       # Standard tier — % of each delivered order's item value kept as platform revenue
+    "proCommissionRate": 10.0,    # Pro tier rate (vendor pays proSubscriptionFee/month for this)
+    "premiumCommissionRate": 5.0, # Premium tier rate
+    "proSubscriptionFee": 999.0,
+    "premiumSubscriptionFee": 2499.0,
 }
 
 _SETTINGS_DOC_ID = "platform"  # single fixed document holding all platform-wide settings
@@ -31,6 +36,14 @@ def _get_settings_doc():
     if not doc:
         doc = {"_id": _SETTINGS_DOC_ID, **DEFAULT_PLATFORM_SETTINGS, "maintenanceMode": False, "maintenanceMessage": ""}
         platform_settings_collection.insert_one(doc)
+        return doc
+
+    # Backfill any default keys added after this doc was first created (e.g.
+    # commission fields) so existing installs pick them up without a migration.
+    missing = {k: v for k, v in DEFAULT_PLATFORM_SETTINGS.items() if k not in doc}
+    if missing:
+        platform_settings_collection.update_one({"_id": _SETTINGS_DOC_ID}, {"$set": missing})
+        doc.update(missing)
     return doc
 
 

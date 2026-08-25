@@ -57,6 +57,9 @@ const AdminLayout = () => {
       items: [
         { path: '/admin/vendors', icon: <FaStore />, label: 'Vendors' },
         { path: '/admin/users', icon: <FaUsers />, label: 'Users' },
+        { path: '/admin/crm', icon: <FaUsers />, label: 'CRM' },
+        { path: '/admin/finance', icon: <FaTags />, label: 'Finance' },
+        { path: '/admin/vendor-kyb', icon: <FaUsers />, label: 'Vendor Verification' },
         { path: '/admin/subusers', icon: <FaUsers />, label: 'Subusers' },
       ],
     },

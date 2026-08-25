@@ -812,7 +812,7 @@
 //                   <span>+</span>
 //                   <div
 //                     style={{ cursor: "pointer" }}
-//                     onClick={() => navigate(`/product/${fbProduct._id}`)}
+//                     onClick={() => navigate(`/products/${fbProduct._id}`)}
 //                   >
 //                     <img
 //                       src={
@@ -1027,6 +1027,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [frequentlyBought, setFrequentlyBought] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [variantPopup, setVariantPopup] = useState(null);
   const [fbtQueue, setFbtQueue] = useState([]);
   const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
@@ -1083,6 +1084,14 @@ const ProductDetail = () => {
             .catch((err) =>
               console.error("Error fetching frequently bought products:", err)
             );
+
+          // ML-based "Recommended for you" — separate from the category-match
+          // Similar Products above. Best-effort: any failure just leaves the
+          // section empty, nothing else on the page depends on it.
+          fetch(`${API_BASE}/api/recommend/${id}`)
+            .then((res) => res.json())
+            .then((recData) => setRecommended(recData.recommendations || []))
+            .catch(() => setRecommended([]));
         }
       });
   }, [id]);
@@ -1798,7 +1807,7 @@ const ProductDetail = () => {
                   <span>+</span>
                   <div
                     style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/product/${fbProduct._id}`)}
+                    onClick={() => navigate(`/products/${fbProduct._id}`)}
                   >
                     <img
                       src={
@@ -1863,6 +1872,50 @@ const ProductDetail = () => {
             ))}
           </div>
         </div>
+
+        {/* Recommended For You (AI/ML similarity model) */}
+        {recommended.length > 0 && (
+          <div className={styles.similarProducts}>
+            <h3>Recommended For You</h3>
+            <div className={styles.similarGrid}>
+              {recommended.map((rp) => (
+                <div key={rp._id} className={styles.similarCard}>
+                  <img
+                    src={rp.image}
+                    alt={rp.name}
+                    onClick={() => navigate(`/products/${rp._id}`)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <p>{rp.name}</p>
+                  <strong>₹{rp.price}</strong>
+
+                  <div className={styles.similarActions}>
+                    <button
+                      className={styles.wishlistIcon}
+                      onClick={() => setVariantPopup({ product: rp, action: "wishlist" })}
+                    >
+                      <FaHeart />
+                    </button>
+
+                    <button
+                      className={styles.cartBtn}
+                      onClick={() => setVariantPopup({ product: rp, action: "cart" })}
+                    >
+                      <FaShoppingCart /> Cart
+                    </button>
+
+                    <button
+                      className={styles.buyBtn}
+                      onClick={() => setVariantPopup({ product: rp, action: "cart" })}
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* RIGHT SECTION */}

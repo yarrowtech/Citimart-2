@@ -402,52 +402,38 @@ def register_vendor():
 
 @auth_bp.route("/register-vendor", methods=["POST"])
 def register_vendor():
+    # Kept intentionally minimal — just enough to create the account and get
+    # a vendor into the approval queue fast. GST/PAN/business-registration
+    # numbers and their certificates are collected afterward through the
+    # "Verify Your Business" (KYB) flow (see routes/vendor_kyb_routes.py),
+    # not at signup. SKU count / inventory-readiness were self-reported
+    # promises nobody verified — dropped; real product count is read from
+    # products_collection once a vendor actually lists something.
     try:
-        # Basic fields
         fullName = request.form.get("fullName")
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
         businessName = request.form.get("businessName")
         businessType = request.form.get("businessType")
-        businessRegNo = request.form.get("businessRegNo")
-        gstNo = request.form.get("gstNo")
         businessAddress = request.form.get("businessAddress")
-        skuCount = request.form.get("skuCount")
-        priceRange = request.form.get("priceRange")
-        productType = request.form.get("productType")
-        website = request.form.get("website")
-        socialLinks = request.form.get("socialLinks")
-        inventoryReady = request.form.get("inventoryReady")
-        shipping = request.form.get("shipping")
-        appeal = request.form.get("appeal")
-        productDesc = request.form.get("productDesc")
         termsAgreed = request.form.get("termsAgreed") == "true"
 
         productCategories = json.loads(request.form.get("productCategories", "[]"))
         selectedSubcategories = json.loads(request.form.get("selectedSubcategories", "{}"))
 
-        # Upload docs
-        documents, productImages = [], []
-        if "documents" in request.files:
-            for f in request.files.getlist("documents"):
-                res = cloudinary.uploader.upload(f, folder="citimart/vendors/docs")
-                documents.append(res["secure_url"])
-        if "productImages" in request.files:
-            for f in request.files.getlist("productImages"):
-                res = cloudinary.uploader.upload(f, folder="citimart/vendors/products")
-                productImages.append(res["secure_url"])
+        if not all([fullName, email, phone, password, businessName, businessType, businessAddress]):
+            return jsonify({"error": "Missing required fields"}), 400
+        if not termsAgreed:
+            return jsonify({"error": "You must agree to the terms"}), 400
 
         if vendors_collection.find_one({"email": email}):
             return jsonify({"error": "Email already exists"}), 400
 
         hashed_pw = generate_password_hash(password)
         subuser_exists = subusers_collection.count_documents({
-    "$or": [
-        {"active": True},
-        {"status": "active"}
-    ]
-}) > 0
+            "$or": [{"active": True}, {"status": "active"}]
+        }) > 0
 
         initial_status = "pending_subuser" if subuser_exists else "pending_admin"
 
@@ -458,28 +444,17 @@ def register_vendor():
             "password": hashed_pw,
             "businessName": businessName,
             "businessType": businessType,
-            "businessRegNo": businessRegNo,
-            "gstNo": gstNo,
             "businessAddress": businessAddress,
             "productCategories": productCategories,
             "selectedSubcategories": selectedSubcategories,
-            "skuCount": skuCount,
-            "priceRange": priceRange,
-            "productType": productType,
-            "website": website,
-            "socialLinks": socialLinks,
-            "inventoryReady": inventoryReady,
-            "shipping": shipping,
-            "appeal": appeal,
-            "productDesc": productDesc,
-            "documents": documents,
-            "productImages": productImages,
             "termsAgreed": termsAgreed,
             "status": initial_status,
             "approvedCategories": [],
             "subuserApprovedBy": None,
             "adminApprovedBy": None,
             "rejectionSource": None,
+            # Business verification (KYB) is a separate, later step.
+            "kybStatus": "not_submitted",
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow()
         }

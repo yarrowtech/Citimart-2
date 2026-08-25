@@ -1006,29 +1006,61 @@ import json
 @product_bp.route('/api/products/frequently-bought/<product_id>', methods=['GET'])
 def get_frequently_bought(product_id):
     try:
-        # 🔒 Validate product_id
+        # Validate product_id
         if not ObjectId.is_valid(product_id):
             return jsonify({"error": "Invalid product ID"}), 400
 
-        # 🔎 Find the main product
+        # Find the main product
         product = products_collection.find_one({"_id": ObjectId(product_id)})
         if not product:
             return jsonify({"error": "Product not found"}), 404
 
-        # 🧾 Build query for related products
-        query = {
-            "category": product.get("category", ""),
-            "subCategory": product.get("subCategory", ""),
-            "_id": {"$ne": ObjectId(product_id)}
-        }
+        # Real "frequently bought together": count how often each other
+        # product shows up in the same order as this one (market-basket
+        # co-occurrence), ranked by how often that pairing happened.
+        from database import orders_collection
+        from collections import Counter
 
-        if product.get("childCategory"):
-            query["childCategory"] = product["childCategory"]
+        orders = orders_collection.find(
+            {"order_items.product_id": product_id},
+            {"order_items.product_id": 1}
+        )
+        co_purchase_counts = Counter()
+        for o in orders:
+            other_ids = {
+                it.get("product_id")
+                for it in (o.get("order_items") or [])
+                if it.get("product_id") and it.get("product_id") != product_id
+            }
+            co_purchase_counts.update(other_ids)
 
-        # 📦 Fetch related products
-        related = list(products_collection.find(query).limit(3))
+        ranked_ids = [pid for pid, _ in co_purchase_counts.most_common(3)]
 
-        # ✅ Convert BSON → JSON-safe
+        related = []
+        if ranked_ids:
+            valid_oids = [ObjectId(pid) for pid in ranked_ids if ObjectId.is_valid(pid)]
+            docs = list(products_collection.find({
+                "_id": {"$in": valid_oids},
+                "status": {"$in": ["active", "approved"]},
+            }))
+            docs_by_id = {str(d["_id"]): d for d in docs}
+            # keep co-purchase-frequency order, not Mongo's $in order
+            related = [docs_by_id[pid] for pid in ranked_ids if pid in docs_by_id]
+
+        # Fallback (and top-up) with same-category products when there isn't
+        # enough real co-purchase data yet — e.g. a new or rarely-ordered product.
+        if len(related) < 3:
+            exclude_ids = {product_id} | {str(d["_id"]) for d in related}
+            query = {
+                "category": product.get("category", ""),
+                "_id": {"$nin": [ObjectId(x) for x in exclude_ids if ObjectId.is_valid(x)]},
+                "status": {"$in": ["active", "approved"]},
+            }
+            if product.get("subCategory"):
+                query["subCategory"] = product["subCategory"]
+            fallback = list(products_collection.find(query).limit(3 - len(related)))
+            related.extend(fallback)
+
         return Response(
             response=json.dumps({"relatedProducts": related}, default=json_util.default),
             status=200,

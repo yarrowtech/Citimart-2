@@ -50,6 +50,9 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminAddProduct from './pages/admin/AdminAddProduct';
 import EditProduct from './pages/admin/EditProduct';
 import AdminOffers from './pages/admin/AdminOffers';
+import AdminCRM from './pages/admin/AdminCRM';
+import AdminFinance from './pages/admin/AdminFinance';
+import AdminVendorKYB from './pages/admin/AdminVendorKYB';
 import CategoryAdmin from './pages/admin/CategoryAdmin';
 import AdminCollections from './pages/admin/AdminCollections';
 import AdminInventory from './pages/admin/AdminInventory'; 
@@ -65,6 +68,10 @@ import VendorDashboard from './pages/vendor/Dashboard';
 import VendorProducts from './pages/vendor/Products';
 import VendorOrders from './pages/vendor/Orders';
 import VendorAnalytics from './pages/vendor/Analytics';
+import PricingAdvisor from './pages/vendor/PricingAdvisor';
+import VendorPayouts from './pages/vendor/Payouts';
+import VendorSubscription from './pages/vendor/Subscription';
+import VendorKYB from './pages/vendor/KYB';
 import RegisterVendor from './pages/vendor/RegisterVendor';
 import VendorAddProduct from './pages/vendor/AddProduct';
 import EditProducts from './pages/vendor/EditProducts';
@@ -178,6 +185,9 @@ function App() {
   <Route path="inventory" element={<AdminInventory />} />
   <Route path="vendors" element={<AdminVendors />} />
   <Route path="users" element={<AdminUsers />} />
+  <Route path="crm" element={<AdminCRM />} />
+  <Route path="finance" element={<AdminFinance />} />
+  <Route path="vendor-kyb" element={<AdminVendorKYB />} />
   <Route path="subusers" element={<AdminSubusers />} />
   <Route path="orders" element={<AdminOrders />} />
   <Route path="add-product" element={<AdminAddProduct />} />
@@ -200,6 +210,10 @@ function App() {
             <Route path="products" element={<VendorProducts />} />
             <Route path="orders" element={<VendorOrders />} />
             <Route path="analytics" element={<VendorAnalytics />} />
+            <Route path="pricing" element={<PricingAdvisor />} />
+            <Route path="payouts" element={<VendorPayouts />} />
+            <Route path="subscription" element={<VendorSubscription />} />
+            <Route path="verify-business" element={<VendorKYB />} />
             <Route path="add-product" element={<VendorAddProduct />} />
             <Route path="edit-product/:productId" element={<EditProducts />} />
           </Route>

@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import styles from "./RegisterVendor.module.css";
 import logo from "../../assets/logo.jpeg";
 
-
 import { API_BASE } from "../../config";
+
+// Kept intentionally minimal — just enough to create the account and get
+// into the approval queue fast. PAN/GST/business-registration details and
+// their certificates are collected afterward through the "Verify Your
+// Business" step in the vendor dashboard, not here.
 const initialState = {
   fullName: "",
   email: "",
@@ -11,22 +15,9 @@ const initialState = {
   password: "",
   businessName: "",
   businessType: "",
-  businessRegNo: "",
-  gstNo: "",
   businessAddress: "",
   productCategories: [],
   selectedSubcategories: {},
-  skuCount: "",
-  priceRange: "",
-  productType: "",
-  website: "",
-  socialLinks: "",
-  inventoryReady: "",
-  shipping: "",
-  appeal: "",
-  productDesc: "",
-  documents: null,
-  productImages: null,
   termsAgreed: false,
 };
 
@@ -45,7 +36,6 @@ export default function RegisterVendor() {
       try {
         const res = await fetch(`${API_BASE}/api/categories`);
         const data = await res.json();
-        // Expected format: [{ name: "Clothing", subCategories: [{ name: "Men", childCategories: ["Shirts", "Jeans"] }] }]
         if (Array.isArray(data.categories)) setCategoriesData(data.categories);
       } catch (err) {
         console.error("Failed to fetch categories:", err);
@@ -55,9 +45,8 @@ export default function RegisterVendor() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked } = e.target;
     if (type === "checkbox") setForm({ ...form, [name]: checked });
-    else if (type === "file") setForm({ ...form, [name]: files });
     else setForm({ ...form, [name]: value });
   };
 
@@ -112,16 +101,8 @@ export default function RegisterVendor() {
     if (!form.password) err.password = "Required";
     if (!form.businessName) err.businessName = "Required";
     if (!form.businessType) err.businessType = "Required";
-    if (!form.businessRegNo) err.businessRegNo = "Required";
     if (!form.businessAddress) err.businessAddress = "Required";
     if (!form.productCategories.length) err.productCategories = "Select at least one category";
-    if (!form.skuCount) err.skuCount = "Required";
-    if (!form.priceRange) err.priceRange = "Required";
-    if (!form.productType) err.productType = "Required";
-    if (!form.inventoryReady) err.inventoryReady = "Required";
-    if (!form.shipping) err.shipping = "Required";
-    if (!form.appeal) err.appeal = "Required";
-    if (!form.productDesc) err.productDesc = "Required";
     if (!form.termsAgreed) err.termsAgreed = "You must agree to the terms";
     return err;
   };
@@ -136,11 +117,8 @@ export default function RegisterVendor() {
     try {
       const formData = new FormData();
       for (const key in form) {
-        if (key === "documents" || key === "productImages") {
-          if (form[key]) for (let f of form[key]) formData.append(key, f);
-        } else if (typeof form[key] === "object") {
-          formData.append(key, JSON.stringify(form[key]));
-        } else formData.append(key, form[key]);
+        if (typeof form[key] === "object") formData.append(key, JSON.stringify(form[key]));
+        else formData.append(key, form[key]);
       }
 
       const res = await fetch(`${API_BASE}/auth/register-vendor`, {
@@ -167,7 +145,9 @@ export default function RegisterVendor() {
         <h1>🎉</h1>
         <h2>Application Submitted Successfully!</h2>
         <p>Thank you for registering 🛍️</p>
-        <p>We will review and contact you soon.</p>
+        <p>We will review and contact you soon. Once you're logged in, complete the
+          "Verify Your Business" step in your dashboard to submit your PAN, GST,
+          and business registration documents.</p>
       </div>
       </div>
     );
@@ -212,13 +192,13 @@ export default function RegisterVendor() {
         </label>
         {errors.businessType && <span className={styles.error}>{errors.businessType}</span>}
 
-        <label>Business Reg. No* <input name="businessRegNo" value={form.businessRegNo} onChange={handleChange} /></label>
-        {errors.businessRegNo && <span className={styles.error}>{errors.businessRegNo}</span>}
-
-        <label>GST No <input name="gstNo" value={form.gstNo} onChange={handleChange} /></label>
-
         <label>Business Address* <textarea name="businessAddress" value={form.businessAddress} onChange={handleChange} /></label>
         {errors.businessAddress && <span className={styles.error}>{errors.businessAddress}</span>}
+
+        <p className={styles.note}>
+          You'll submit your PAN, GST, and business registration documents for
+          verification after your account is created.
+        </p>
       </fieldset>
 
       {/* PRODUCT CATEGORIES */}
@@ -266,58 +246,6 @@ export default function RegisterVendor() {
           </div>
         ))}
         {errors.productCategories && <span className={styles.error}>{errors.productCategories}</span>}
-      </fieldset>
-
-      {/* SKU, PRICE, PRODUCT INFO */}
-      <label>SKU Count* <input type="number" name="skuCount" value={form.skuCount} onChange={handleChange} /></label>
-      {errors.skuCount && <span className={styles.error}>{errors.skuCount}</span>}
-
-      <label>Price Range* <input name="priceRange" value={form.priceRange} onChange={handleChange} placeholder="e.g. 200-2000 INR" /></label>
-      {errors.priceRange && <span className={styles.error}>{errors.priceRange}</span>}
-
-      <div>
-        <p>Product Type*</p>
-        {["Branded", "Handmade", "Both"].map((t) => (
-          <label key={t}><input type="radio" name="productType" value={t} checked={form.productType === t} onChange={handleChange} /> {t}</label>
-        ))}
-        {errors.productType && <span className={styles.error}>{errors.productType}</span>}
-      </div>
-
-      {/* INVENTORY, SHIPPING, APPEAL, DESC */}
-      <div>
-        <p>Inventory Ready?*</p>
-        {["Yes", "No"].map((t) => (
-          <label key={t}><input type="radio" name="inventoryReady" value={t} checked={form.inventoryReady === t} onChange={handleChange} /> {t}</label>
-        ))}
-        {errors.inventoryReady && <span className={styles.error}>{errors.inventoryReady}</span>}
-      </div>
-
-      <div>
-        <p>Shipping*</p>
-        {["Own", "Support"].map((t) => (
-          <label key={t}><input type="radio" name="shipping" value={t} checked={form.shipping === t} onChange={handleChange} /> {t}</label>
-        ))}
-        {errors.shipping && <span className={styles.error}>{errors.shipping}</span>}
-      </div>
-
-      <label>Why do you want to sell?* <textarea name="appeal" value={form.appeal} onChange={handleChange} /></label>
-      {errors.appeal && <span className={styles.error}>{errors.appeal}</span>}
-
-      <label>Describe Products* <textarea name="productDesc" value={form.productDesc} onChange={handleChange} /></label>
-      {errors.productDesc && <span className={styles.error}>{errors.productDesc}</span>}
-
-      <label>Website <input name="website" value={form.website} onChange={handleChange} /></label>
-      <label>Social Links <input name="socialLinks" value={form.socialLinks} onChange={handleChange} /></label>
-
-      {/* FILE UPLOADS */}
-      <fieldset>
-        <legend>Upload Product Images*</legend>
-        <input type="file" name="productImages" multiple accept="image/*" onChange={handleChange} />
-      </fieldset>
-
-      <fieldset>
-        <legend>Upload Business Documents (Optional)</legend>
-        <input type="file" name="documents" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={handleChange} />
       </fieldset>
 
       <div>

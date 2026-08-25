@@ -91,6 +91,36 @@ const PlatformTab = () => {
               onChange={(e) => setForm({ ...form, timeZone: e.target.value })} />
           </div>
           <div className={s.formGroup}>
+            <label>Standard Commission Rate (%)</label>
+            <input className={s.input} type="number" min="0" max="100" step="0.5"
+              value={form.commissionRate ?? ""}
+              onChange={(e) => setForm({ ...form, commissionRate: parseFloat(e.target.value) })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Pro Commission Rate (%)</label>
+            <input className={s.input} type="number" min="0" max="100" step="0.5"
+              value={form.proCommissionRate ?? ""}
+              onChange={(e) => setForm({ ...form, proCommissionRate: parseFloat(e.target.value) })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Pro Subscription Fee (₹/month)</label>
+            <input className={s.input} type="number" min="0" step="1"
+              value={form.proSubscriptionFee ?? ""}
+              onChange={(e) => setForm({ ...form, proSubscriptionFee: parseFloat(e.target.value) })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Premium Commission Rate (%)</label>
+            <input className={s.input} type="number" min="0" max="100" step="0.5"
+              value={form.premiumCommissionRate ?? ""}
+              onChange={(e) => setForm({ ...form, premiumCommissionRate: parseFloat(e.target.value) })} />
+          </div>
+          <div className={s.formGroup}>
+            <label>Premium Subscription Fee (₹/month)</label>
+            <input className={s.input} type="number" min="0" step="1"
+              value={form.premiumSubscriptionFee ?? ""}
+              onChange={(e) => setForm({ ...form, premiumSubscriptionFee: parseFloat(e.target.value) })} />
+          </div>
+          <div className={s.formGroup}>
             <label>Default Language</label>
             <select className={s.select} value={form.defaultLanguage || "English"}
               onChange={(e) => setForm({ ...form, defaultLanguage: e.target.value })}>

@@ -1,0 +1,42 @@
+# Example nginx config for hosting frontend + backend behind one domain
+# (works whether that's one combined box or you point this at the EC2
+# backend's private/internal address from the frontend VPS).
+#
+# Install: copy to /etc/nginx/sites-available/citimart, symlink into
+# sites-enabled, then `sudo nginx -t && sudo systemctl reload nginx`.
+# Run certbot afterward for real HTTPS — this file is HTTP-only as a starting point.
+
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # React production build (created by `npm run build` in the frontend repo,
+    # with REACT_APP_API_BASE set to this domain BEFORE building).
+    root /home/citimart/citimartt/build;
+    index index.html;
+
+    # --- Backend API routes — every top-level prefix the Flask app actually
+    # uses. If a new route file introduces a new top-level prefix, add it here
+    # too, or requests to it will fall through to the React app and 404. ---
+    location ~ ^/(api|auth|admin|customer|vendor|subuser|cart|guest|contact|faq)(/|$) {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # --- Everything else: serve the React app, let client-side routing
+    # (react-router) handle the path. Must come after the API block above. ---
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache hashed static assets aggressively; index.html itself must NOT be
+    # cached or you'll serve stale JS/CSS bundle references after a deploy.
+    location /static/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}

@@ -360,3 +360,26 @@ def subuser_approve(current_subuser, vendor_id):
         return jsonify({"message": "Vendor processed by subuser"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# Business verification (KYB) review — same underlying logic as the admin
+# routes in vendor_kyb_routes.py, reused rather than duplicated. Distinct
+# from the identity/category approval above: a vendor can already be
+# approved and selling while their KYB is still pending review.
+@subuser_bp.route("/kyb/pending", methods=["GET"])
+@subuser_token_required
+def subuser_list_pending_kyb(current_subuser):
+    from routes.vendor_kyb_routes import list_pending_kyb
+    return jsonify({"vendors": list_pending_kyb()}), 200
+
+
+@subuser_bp.route("/kyb/<vendor_id>", methods=["PUT"])
+@subuser_token_required
+def subuser_review_kyb(current_subuser, vendor_id):
+    from routes.vendor_kyb_routes import review_kyb
+    data = request.get_json(silent=True) or {}
+    body, status_code = review_kyb(
+        vendor_id, data.get("status"), data.get("reason"),
+        reviewer_id=current_subuser["_id"], reviewer_role="subuser",
+    )
+    return jsonify(body), status_code

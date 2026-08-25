@@ -814,6 +814,10 @@ def update_order(order_id):
     if result.matched_count == 0:
         return jsonify({"error": "Order not found"}), 404
 
+    if new_status.strip().lower() == "delivered":
+        from routes.finance_routes import settle_order_commission
+        settle_order_commission(order_id)
+
     return jsonify({"message": f"Order status updated to {new_status}"}), 200
 
 

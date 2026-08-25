@@ -93,7 +93,12 @@ def create_app():
     from routes.delivery_routes import delivery_bp
     from routes.subuser_content_routes import subuser_content_bp
     from routes.admin_settings_routes import admin_settings_bp
-
+    from routes.recommend_routes import recommend_bp
+    from routes.crm_routes import crm_bp
+    from routes.pricing_routes import pricing_bp
+    from routes.finance_routes import finance_bp
+    from routes.subscription_routes import subscription_bp
+    from routes.vendor_kyb_routes import vendor_kyb_bp
 
 
 
@@ -124,7 +129,12 @@ def create_app():
     app.register_blueprint(delivery_bp)
     app.register_blueprint(subuser_content_bp)
     app.register_blueprint(admin_settings_bp)
-
+    app.register_blueprint(recommend_bp)
+    app.register_blueprint(crm_bp)
+    app.register_blueprint(pricing_bp)
+    app.register_blueprint(finance_bp)
+    app.register_blueprint(subscription_bp)
+    app.register_blueprint(vendor_kyb_bp)
 
     return app
 
