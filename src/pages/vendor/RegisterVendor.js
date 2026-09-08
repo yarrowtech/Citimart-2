@@ -12,7 +12,6 @@ const initialState = {
   fullName: "",
   email: "",
   phone: "",
-  password: "",
   businessName: "",
   businessType: "",
   businessAddress: "",
@@ -29,6 +28,8 @@ export default function RegisterVendor() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [categoriesData, setCategoriesData] = useState([]);
+  const [inviteToken, setInviteToken] = useState(null);
+  const [inviteNotice, setInviteNotice] = useState("");
 
   // Fetch categories from backend
   useEffect(() => {
@@ -42,6 +43,31 @@ export default function RegisterVendor() {
       }
     };
     fetchCategories();
+  }, []);
+
+  // If this page was opened from a marketing invite link, prefill whatever
+  // details were already captured — the vendor only fills in the rest.
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("invite");
+    if (!token) return;
+
+    fetch(`${API_BASE}/vendor-invites/${token}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        setInviteToken(token);
+        setInviteNotice("We've prefilled what we already know — just fill in the rest.");
+        setForm((prev) => ({
+          ...prev,
+          fullName: data.name || prev.fullName,
+          email: data.email || prev.email,
+          phone: data.phone || prev.phone,
+          businessName: data.businessName || prev.businessName,
+          businessType: data.businessType || prev.businessType,
+        }));
+      })
+      .catch(() => {
+        // Invalid/expired invite — fall back to a normal blank registration.
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -98,7 +124,6 @@ export default function RegisterVendor() {
     if (!form.fullName) err.fullName = "Required";
     if (!form.email) err.email = "Required";
     if (!form.phone) err.phone = "Required";
-    if (!form.password) err.password = "Required";
     if (!form.businessName) err.businessName = "Required";
     if (!form.businessType) err.businessType = "Required";
     if (!form.businessAddress) err.businessAddress = "Required";
@@ -120,6 +145,7 @@ export default function RegisterVendor() {
         if (typeof form[key] === "object") formData.append(key, JSON.stringify(form[key]));
         else formData.append(key, form[key]);
       }
+      if (inviteToken) formData.append("inviteToken", inviteToken);
 
       const res = await fetch(`${API_BASE}/auth/register-vendor`, {
         method: "POST",
@@ -145,9 +171,10 @@ export default function RegisterVendor() {
         <h1>🎉</h1>
         <h2>Application Submitted Successfully!</h2>
         <p>Thank you for registering 🛍️</p>
-        <p>We will review and contact you soon. Once you're logged in, complete the
-          "Verify Your Business" step in your dashboard to submit your PAN, GST,
-          and business registration documents.</p>
+        <p>We will review your application and email you a link to set your
+          password once approved. After that, complete the "Verify Your
+          Business" step in your dashboard to submit your PAN, GST, and
+          business registration documents.</p>
       </div>
       </div>
     );
@@ -161,6 +188,8 @@ export default function RegisterVendor() {
   <h2>Vendor Registration</h2>
 </div>
 
+      {inviteNotice && <p className={styles.note}>{inviteNotice}</p>}
+
       {/* PERSONAL DETAILS */}
       <fieldset className={styles.fieldset}>
         <legend>Personal Details</legend>
@@ -173,8 +202,9 @@ export default function RegisterVendor() {
         <label>Phone* <input type="tel" name="phone" value={form.phone} onChange={handleChange} /></label>
         {errors.phone && <span className={styles.error}>{errors.phone}</span>}
 
-        <label>Password* <input type="password" name="password" value={form.password} onChange={handleChange} /></label>
-        {errors.password && <span className={styles.error}>{errors.password}</span>}
+        <p className={styles.note}>
+          You'll set your password once your application is approved — we'll email you a link.
+        </p>
       </fieldset>
 
       {/* BUSINESS INFORMATION */}

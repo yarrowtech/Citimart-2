@@ -409,11 +409,16 @@ def register_vendor():
     # not at signup. SKU count / inventory-readiness were self-reported
     # promises nobody verified — dropped; real product count is read from
     # products_collection once a vendor actually lists something.
+    #
+    # No password is collected here either — a vendor can't log in until
+    # approved anyway, so they set their password via the existing
+    # approval email link (sent from approve_vendor() in admin_routes.py,
+    # which is always the final approval step even when a subuser
+    # pre-screens the application first).
     try:
         fullName = request.form.get("fullName")
         email = request.form.get("email")
         phone = request.form.get("phone")
-        password = request.form.get("password")
         businessName = request.form.get("businessName")
         businessType = request.form.get("businessType")
         businessAddress = request.form.get("businessAddress")
@@ -422,7 +427,7 @@ def register_vendor():
         productCategories = json.loads(request.form.get("productCategories", "[]"))
         selectedSubcategories = json.loads(request.form.get("selectedSubcategories", "{}"))
 
-        if not all([fullName, email, phone, password, businessName, businessType, businessAddress]):
+        if not all([fullName, email, phone, businessName, businessType, businessAddress]):
             return jsonify({"error": "Missing required fields"}), 400
         if not termsAgreed:
             return jsonify({"error": "You must agree to the terms"}), 400
@@ -430,7 +435,6 @@ def register_vendor():
         if vendors_collection.find_one({"email": email}):
             return jsonify({"error": "Email already exists"}), 400
 
-        hashed_pw = generate_password_hash(password)
         subuser_exists = subusers_collection.count_documents({
             "$or": [{"active": True}, {"status": "active"}]
         }) > 0
@@ -441,7 +445,6 @@ def register_vendor():
             "fullName": fullName,
             "email": email,
             "phone": phone,
-            "password": hashed_pw,
             "businessName": businessName,
             "businessType": businessType,
             "businessAddress": businessAddress,
@@ -460,6 +463,12 @@ def register_vendor():
         }
 
         vendors_collection.insert_one(vendor_data)
+
+        invite_token = request.form.get("inviteToken")
+        if invite_token:
+            from routes.vendor_invite_routes import mark_invite_registered
+            mark_invite_registered(invite_token)
+
         return jsonify({"message": f"Vendor registered, status: {initial_status}"}), 201
 
     except Exception as e:

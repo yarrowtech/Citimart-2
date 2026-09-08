@@ -392,3 +392,25 @@ def subuser_update_collection(current_subuser, collection_id):
 def subuser_delete_collection(current_subuser, collection_id):
     from routes.collection_routes import delete_collection
     return delete_collection(collection_id)
+
+
+# ── Vendor business verification (KYB) review — no specific permission
+# gate, matching the existing vendor-approval review below (any active
+# subuser can review, same as /subuser/vendors) ───────────────────────────
+@subuser_content_bp.route("/kyb/pending", methods=["GET"])
+@subuser_token_required
+def subuser_list_pending_kyb(current_subuser):
+    from routes.vendor_kyb_routes import list_pending_kyb
+    return jsonify({"vendors": list_pending_kyb()}), 200
+
+
+@subuser_content_bp.route("/kyb/<vendor_id>", methods=["PUT"])
+@subuser_token_required
+def subuser_review_kyb(current_subuser, vendor_id):
+    from routes.vendor_kyb_routes import review_kyb
+    data = request.get_json(silent=True) or {}
+    body, status_code = review_kyb(
+        vendor_id, data.get("status"), data.get("reason"),
+        reviewer_id=current_subuser["_id"], reviewer_role="subuser",
+    )
+    return jsonify(body), status_code

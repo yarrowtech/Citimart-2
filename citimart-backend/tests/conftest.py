@@ -46,7 +46,8 @@ def clean_db():
         subusers_collection, faqs_collection, content_snippets_collection,
         media_library_collection, complaints_collection, categories_collection,
         collections_collection, platform_settings_collection, error_logs_collection,
-        contact_messages_collection,
+        contact_messages_collection, payouts_collection, expenses_collection,
+        vendor_invites_collection,
     )
     for coll in [users_collection, products_collection, orders_collection,
                  wishlist_collection, cart_collection, guest_leads_collection,
@@ -54,7 +55,8 @@ def clean_db():
                  subusers_collection, faqs_collection, content_snippets_collection,
                  media_library_collection, complaints_collection, categories_collection,
                  collections_collection, platform_settings_collection, error_logs_collection,
-                 contact_messages_collection]:
+                 contact_messages_collection, payouts_collection, expenses_collection,
+                 vendor_invites_collection]:
         coll.delete_many({})
 
 

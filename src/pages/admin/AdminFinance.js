@@ -6,7 +6,6 @@ const SUB_TABS = [
   { key: "overview", label: "Overview" },
   { key: "payouts", label: "Vendor Payouts" },
   { key: "expenses", label: "Expenses" },
-  { key: "subscriptions", label: "Vendor Subscriptions" },
 ];
 
 const AdminFinance = () => {
@@ -42,68 +41,6 @@ const AdminFinance = () => {
       {subTab === "overview" && <OverviewTab headers={headers} />}
       {subTab === "payouts" && <PayoutsTab headers={headers} />}
       {subTab === "expenses" && <ExpensesTab headers={headers} />}
-      {subTab === "subscriptions" && <SubscriptionsTab headers={headers} />}
-    </div>
-  );
-};
-
-const tierBadge = (tier) => {
-  if (tier === "premium") return `${s.badge} ${s.badgeGreen}`;
-  if (tier === "pro") return `${s.badge} ${s.badgeBlue}`;
-  return `${s.badge} ${s.badgeGray}`;
-};
-
-const SubscriptionsTab = ({ headers }) => {
-  const [vendors, setVendors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(`${API_BASE}/admin/finance/vendor-subscriptions`, { headers });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || "Failed to load");
-        setVendors(json.vendors || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [headers]);
-
-  if (loading) return <div className={s.loadingState}>Loading vendor subscriptions…</div>;
-
-  return (
-    <div className={s.panel}>
-      {error && <div className={s.errorState}>{error}</div>}
-      {vendors.length === 0 ? (
-        <div className={s.emptyState}>
-          <span className={s.emptyIcon}>🏷️</span>
-          No vendors found.
-        </div>
-      ) : (
-        <div className={s.tableWrap}>
-          <table className={s.table}>
-            <thead>
-              <tr><th>Vendor</th><th>Email</th><th>Tier</th><th>Expires</th></tr>
-            </thead>
-            <tbody>
-              {vendors.map((v) => (
-                <tr key={v._id}>
-                  <td>{v.name || "—"}</td>
-                  <td>{v.email}</td>
-                  <td><span className={tierBadge(v.tier)}>{v.tier}</span></td>
-                  <td>{v.expires_at ? new Date(v.expires_at).toLocaleDateString() : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 };

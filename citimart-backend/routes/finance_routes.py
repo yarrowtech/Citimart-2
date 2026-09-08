@@ -43,8 +43,6 @@ def settle_order_commission(order_id):
         if not order:
             return
 
-        from routes.subscription_routes import get_vendor_commission_rate
-
         by_vendor = {}
         for item in order.get("order_items") or []:
             vendor_id = item.get("vendor_id")  # None for admin-added products
@@ -52,12 +50,9 @@ def settle_order_commission(order_id):
             by_vendor[vendor_id] = by_vendor.get(vendor_id, 0) + line_total
 
         now = datetime.utcnow()
+        rate = get_commission_rate()
         entries = []
         for vendor_id, gross in by_vendor.items():
-            # Each vendor's own subscription tier decides their rate — a
-            # Pro/Premium vendor keeps more of their own sale than the
-            # platform default, which still applies to admin-sold items.
-            rate = get_vendor_commission_rate(vendor_id) if vendor_id else get_commission_rate()
             commission_amount = round(gross * rate / 100, 2)
             net_payout = round(gross - commission_amount, 2) if vendor_id else 0.0
             entries.append({

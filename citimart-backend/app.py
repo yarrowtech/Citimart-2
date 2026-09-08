@@ -97,8 +97,8 @@ def create_app():
     from routes.crm_routes import crm_bp
     from routes.pricing_routes import pricing_bp
     from routes.finance_routes import finance_bp
-    from routes.subscription_routes import subscription_bp
     from routes.vendor_kyb_routes import vendor_kyb_bp
+    from routes.vendor_invite_routes import vendor_invite_bp
 
 
 
@@ -133,8 +133,8 @@ def create_app():
     app.register_blueprint(crm_bp)
     app.register_blueprint(pricing_bp)
     app.register_blueprint(finance_bp)
-    app.register_blueprint(subscription_bp)
     app.register_blueprint(vendor_kyb_bp)
+    app.register_blueprint(vendor_invite_bp)
 
     return app
 

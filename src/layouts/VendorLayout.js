@@ -36,7 +36,6 @@ const VendorLayout = () => {
     { path: '/vendor/analytics', icon: <FaChartLine />, label: 'Analytics' },
     { path: '/vendor/pricing', icon: <FaTags />, label: 'Pricing Advisor' },
     { path: '/vendor/payouts', icon: <FaTags />, label: 'Payouts' },
-    { path: '/vendor/subscription', icon: <FaTags />, label: 'Subscription' },
     { path: '/vendor/verify-business', icon: <FaTags />, label: 'Verify Your Business' },
   ];
 

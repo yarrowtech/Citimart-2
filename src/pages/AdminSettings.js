@@ -10,8 +10,86 @@ const TABS = [
   { key: "errors", label: "Error Logs", icon: "🐞" },
   { key: "tickets", label: "Support Tickets", icon: "🎫" },
   { key: "subusers", label: "Subusers", icon: "👥" },
+  { key: "vendorInvite", label: "Vendor Invite Email", icon: "📧" },
   { key: "security", label: "Security", icon: "🔐" },
 ];
+
+// ── Vendor Invite Email tab ──────────────────────────────────────────────
+const VendorInviteTemplateTab = () => {
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const headers = { Authorization: `Bearer ${localStorage.getItem("adminToken")}` };
+
+  useEffect(() => {
+    fetch(`${API_BASE}/admin/settings/vendor-invite-template`, { headers })
+      .then((res) => res.json())
+      .then(setForm)
+      .catch(() => setError("Failed to load template"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    try {
+      const res = await fetch(`${API_BASE}/admin/settings/vendor-invite-template`, {
+        method: "PUT",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!form) return <div className={s.loadingState}>Loading template…</div>;
+
+  return (
+    <div className={s.panel}>
+      <div className={s.panelHeader}>
+        <div>
+          <h2 className={s.panelTitle}>Vendor Invite Email</h2>
+          <p className={s.panelSubtitle}>
+            This is the email marketing subusers send when inviting a prospective vendor.
+            One saved template, reused for every invite — their details get merged in automatically.
+          </p>
+        </div>
+      </div>
+      {error && <div className={s.errorState}>{error}</div>}
+      {saved && <div className={`${s.badge} ${s.badgeGreen}`} style={{ width: "fit-content" }}>✓ Saved</div>}
+
+      <form onSubmit={handleSave} className={s.card}>
+        <div className={s.formGroup}>
+          <label>Subject</label>
+          <input className={s.input} value={form.subject || ""}
+            onChange={(e) => setForm({ ...form, subject: e.target.value })} />
+        </div>
+        <div className={s.formGroup} style={{ marginTop: 14 }}>
+          <label>Body (HTML)</label>
+          <textarea className={s.textarea} rows={10} value={form.body || ""}
+            onChange={(e) => setForm({ ...form, body: e.target.value })} />
+        </div>
+        <p style={{ fontSize: 12.5, color: "#6b7280", marginTop: 8 }}>
+          Available placeholders: <code>{"{{name}}"}</code> <code>{"{{businessName}}"}</code>{" "}
+          <code>{"{{phone}}"}</code> <code>{"{{inviteLink}}"}</code>
+        </p>
+        <button className={s.btnPrimary} type="submit" disabled={saving} style={{ marginTop: 14, width: "fit-content" }}>
+          {saving ? "Saving…" : "Save Template"}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 // ── Platform tab ─────────────────────────────────────────────────────────
 const PlatformTab = () => {
@@ -91,34 +169,10 @@ const PlatformTab = () => {
               onChange={(e) => setForm({ ...form, timeZone: e.target.value })} />
           </div>
           <div className={s.formGroup}>
-            <label>Standard Commission Rate (%)</label>
+            <label>Commission Rate (%)</label>
             <input className={s.input} type="number" min="0" max="100" step="0.5"
               value={form.commissionRate ?? ""}
               onChange={(e) => setForm({ ...form, commissionRate: parseFloat(e.target.value) })} />
-          </div>
-          <div className={s.formGroup}>
-            <label>Pro Commission Rate (%)</label>
-            <input className={s.input} type="number" min="0" max="100" step="0.5"
-              value={form.proCommissionRate ?? ""}
-              onChange={(e) => setForm({ ...form, proCommissionRate: parseFloat(e.target.value) })} />
-          </div>
-          <div className={s.formGroup}>
-            <label>Pro Subscription Fee (₹/month)</label>
-            <input className={s.input} type="number" min="0" step="1"
-              value={form.proSubscriptionFee ?? ""}
-              onChange={(e) => setForm({ ...form, proSubscriptionFee: parseFloat(e.target.value) })} />
-          </div>
-          <div className={s.formGroup}>
-            <label>Premium Commission Rate (%)</label>
-            <input className={s.input} type="number" min="0" max="100" step="0.5"
-              value={form.premiumCommissionRate ?? ""}
-              onChange={(e) => setForm({ ...form, premiumCommissionRate: parseFloat(e.target.value) })} />
-          </div>
-          <div className={s.formGroup}>
-            <label>Premium Subscription Fee (₹/month)</label>
-            <input className={s.input} type="number" min="0" step="1"
-              value={form.premiumSubscriptionFee ?? ""}
-              onChange={(e) => setForm({ ...form, premiumSubscriptionFee: parseFloat(e.target.value) })} />
           </div>
           <div className={s.formGroup}>
             <label>Default Language</label>
@@ -461,6 +515,7 @@ const AdminSettings = () => {
       case "errors": return <ErrorLogsTab />;
       case "tickets": return <TicketsTab />;
       case "subusers": return <SubusersTab />;
+      case "vendorInvite": return <VendorInviteTemplateTab />;
       case "security": return <SecurityTab />;
       default: return null;
     }

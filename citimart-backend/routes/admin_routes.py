@@ -914,14 +914,15 @@ ROLE_DEFAULT_PERMISSIONS = {
     "Order Manager": ["promotions", "complaints", "campaigns", "reports"],
     "Inventory Manager": ["merchandise", "analytics", "reports"],
     "Merchandise Manager": ["merchandise", "promotions", "segmentation", "reports", "analytics"],
-    "Marketing Manager": ["media", "promotions", "campaigns"],
+    "Marketing Manager": ["media", "promotions", "campaigns", "vendor_invites"],
     "Support Staff": ["complaints", "faq", "content", "reports"],
     "Moderator": ["segmentation", "promotions", "content", "campaigns", "reports", "analytics"],
 }
 
 ALL_PERMISSIONS = [
     "segmentation", "promotions", "content", "reports",
-    "merchandise", "complaints", "analytics", "campaigns", "faq", "media"
+    "merchandise", "complaints", "analytics", "campaigns", "faq", "media",
+    "vendor_invites"
 ]
 
 import jwt

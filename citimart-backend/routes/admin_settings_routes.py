@@ -11,6 +11,7 @@ from database import (
     platform_settings_collection, error_logs_collection,
     contact_messages_collection, users_collection,
 )
+from utils.auth_utils import admin_token_required
 
 admin_settings_bp = Blueprint("admin_settings_bp", __name__, url_prefix="/admin/settings")
 
@@ -21,11 +22,7 @@ DEFAULT_PLATFORM_SETTINGS = {
     "currency": "INR",
     "timeZone": "Asia/Kolkata",
     "defaultLanguage": "English",
-    "commissionRate": 15.0,       # Standard tier — % of each delivered order's item value kept as platform revenue
-    "proCommissionRate": 10.0,    # Pro tier rate (vendor pays proSubscriptionFee/month for this)
-    "premiumCommissionRate": 5.0, # Premium tier rate
-    "proSubscriptionFee": 999.0,
-    "premiumSubscriptionFee": 2499.0,
+    "commissionRate": 15.0,  # % of each delivered order's item value kept as platform revenue
 }
 
 _SETTINGS_DOC_ID = "platform"  # single fixed document holding all platform-wide settings
@@ -159,6 +156,36 @@ def update_contact_message(message_id):
     if result.matched_count == 0:
         return jsonify({"error": "Message not found"}), 404
     return jsonify({"message": "Ticket status updated"}), 200
+
+
+# ── Vendor invite email template (Marketing subusers send with this; only
+#    admin edits the wording — see routes/vendor_invite_routes.py) ──────────
+from routes.vendor_invite_routes import DEFAULT_INVITE_TEMPLATE
+
+
+@admin_settings_bp.route("/vendor-invite-template", methods=["GET"])
+@admin_token_required
+def get_vendor_invite_template(current_admin):
+    doc = _get_settings_doc()
+    template = doc.get("vendorInviteTemplate") or DEFAULT_INVITE_TEMPLATE
+    return jsonify(template), 200
+
+
+@admin_settings_bp.route("/vendor-invite-template", methods=["PUT"])
+@admin_token_required
+def update_vendor_invite_template(current_admin):
+    data = request.get_json(silent=True) or {}
+    subject = (data.get("subject") or "").strip()
+    body = (data.get("body") or "").strip()
+    if not subject or not body:
+        return jsonify({"error": "subject and body are required"}), 400
+
+    platform_settings_collection.update_one(
+        {"_id": _SETTINGS_DOC_ID},
+        {"$set": {"vendorInviteTemplate": {"subject": subject, "body": body}}},
+        upsert=True,
+    )
+    return jsonify({"message": "Template updated"}), 200
 
 
 # ── Admin accounts (Security tab) ───────────────────────────────────────────
