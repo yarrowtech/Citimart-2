@@ -13,6 +13,7 @@ import ContentPanel from "./panels/ContentPanel";
 import MediaPanel from "./panels/MediaPanel";
 import VendorReviewPanel from "./panels/VendorReviewPanel";
 import VendorInvitePanel from "./panels/VendorInvitePanel";
+import CustomerCrmPanel from "./panels/CustomerCrmPanel";
 
 // Role → color theme + icon. Purely cosmetic — actual access is always
 // driven by the subuser's real granted permissions, not their role name.
@@ -41,6 +42,7 @@ const TAB_DEFS = [
   { key: "faq", label: "FAQ", icon: "❓", Component: FaqPanel },
   { key: "media", label: "Media", icon: "🖼️", Component: MediaPanel },
   { key: "vendor_invites", label: "Invite Vendors", icon: "📧", Component: VendorInvitePanel },
+  { key: "customer_crm", label: "Customer CRM", icon: "🤝", Component: CustomerCrmPanel },
 ];
 
 const SubuserDashboard = () => {

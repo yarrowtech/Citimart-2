@@ -100,6 +100,7 @@ def create_app():
     from routes.vendor_kyb_routes import vendor_kyb_bp
     from routes.vendor_invite_routes import vendor_invite_bp
     from routes.analytics_routes import analytics_bp
+    from routes.campaign_routes import campaign_bp
 
 
 
@@ -137,6 +138,7 @@ def create_app():
     app.register_blueprint(vendor_kyb_bp)
     app.register_blueprint(vendor_invite_bp)
     app.register_blueprint(analytics_bp)
+    app.register_blueprint(campaign_bp)
 
     return app
 

@@ -121,7 +121,8 @@ def create_subuser():
             "campaigns": False,
             "faq": False,
             "media": False,
-            "vendor_invites": False
+            "vendor_invites": False,
+            "customer_crm": False
         }
 
         # ✅ Merge incoming permissions safely

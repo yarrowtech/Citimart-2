@@ -828,6 +828,9 @@ def update_order(current_vendor, order_id):
         from routes.finance_routes import settle_order_commission
         settle_order_commission(order_id)
 
+    from routes.crm_routes import notify_order_status_email
+    notify_order_status_email(order_id, new_status)
+
     return jsonify({"message": "Order status updated to " + new_status})
 
 

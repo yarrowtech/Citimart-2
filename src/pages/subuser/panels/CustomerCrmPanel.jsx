@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { API_BASE } from "../../config";
-import s from "../subuser/SubuserShared.module.css";
+import { API_BASE } from "../../../config";
+import s from "../SubuserShared.module.css";
 
 const SUB_TABS = [
   { key: "customers", label: "Customers" },
@@ -8,46 +8,24 @@ const SUB_TABS = [
   { key: "campaigns", label: "Campaigns" },
 ];
 
-const segmentBadge = (segment) => {
-  if (segment === "vip" || segment === "loyal") return `${s.badge} ${s.badgeGreen}`;
-  if (segment === "new") return `${s.badge} ${s.badgeBlue}`;
-  return `${s.badge} ${s.badgeGray}`;
-};
-
-const orderStatusBadge = (status) => {
-  const norm = (status || "").trim().toLowerCase();
-  if (norm === "delivered" || norm === "paid") return `${s.badge} ${s.badgeGreen}`;
-  if (norm === "cancelled" || norm === "rejected") return `${s.badge} ${s.badgeRed}`;
-  if (norm === "shipped") return `${s.badge} ${s.badgeBlue}`;
-  return `${s.badge} ${s.badgeAmber}`;
-};
-
-const complaintStatusBadge = (status) => {
-  if (status === "Resolved") return `${s.badge} ${s.badgeGreen}`;
-  if (status === "Rejected") return `${s.badge} ${s.badgeRed}`;
-  return `${s.badge} ${s.badgeAmber}`;
-};
-
 const reasonBadge = (reason) => {
   if (reason === "win_back") return `${s.badge} ${s.badgeAmber}`;
   return `${s.badge} ${s.badgeBlue}`;
 };
 
-const AdminCRM = () => {
+const CustomerCrmPanel = ({ token }) => {
   const [subTab, setSubTab] = useState("customers");
   const headers = useMemo(
-    () => ({ Authorization: `Bearer ${localStorage.getItem("adminToken")}` }),
-    []
+    () => ({ Authorization: `Bearer ${token}`, "Content-Type": "application/json" }),
+    [token]
   );
 
   return (
     <div className={s.panel}>
       <div className={s.panelHeader}>
         <div>
-          <h2 className={s.panelTitle}>Customer Relationship (CRM)</h2>
-          <p className={s.panelSubtitle}>
-            Repeat-customer visibility, follow-up reminders, and promotional campaigns.
-          </p>
+          <h2 className={s.panelTitle}>Customer CRM</h2>
+          <p className={s.panelSubtitle}>Repeat customers, follow-up reminders, and promotional campaigns.</p>
         </div>
       </div>
 
@@ -75,22 +53,20 @@ const CustomersTab = ({ headers }) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [selectedId, setSelectedId] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(false);
 
-  const fetchCustomers = useCallback(async (searchTerm) => {
+  const fetchCustomers = useCallback(async (term) => {
     setLoading(true);
     setError("");
     try {
-      const qs = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : "";
-      const res = await fetch(`${API_BASE}/admin/crm/customers${qs}`, { headers: { Authorization: headers.Authorization } });
+      const qs = term ? `?search=${encodeURIComponent(term)}` : "";
+      const res = await fetch(`${API_BASE}/subuser/crm/customers${qs}`, { headers: { Authorization: headers.Authorization } });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load customers");
+      if (!res.ok) throw new Error(data.error || "Failed to load");
       setCustomers(data.customers || []);
     } catch (err) {
-      setError(err.message || "Failed to load customers");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -104,58 +80,29 @@ const CustomersTab = ({ headers }) => {
   const openProfile = async (id) => {
     setSelectedId(id);
     setProfile(null);
-    setProfileLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/crm/customers/${id}`, { headers: { Authorization: headers.Authorization } });
+      const res = await fetch(`${API_BASE}/subuser/crm/customers/${id}`, { headers: { Authorization: headers.Authorization } });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load profile");
-      setProfile(data);
-    } catch (err) {
-      setError(err.message || "Failed to load customer profile");
-    } finally {
-      setProfileLoading(false);
+      if (res.ok) setProfile(data);
+    } catch {
+      // handled by selectedId staying set with no profile -> shows loading state
     }
-  };
-
-  const backToList = () => {
-    setSelectedId(null);
-    setProfile(null);
   };
 
   if (selectedId) {
     return (
       <div className={s.panel}>
-        <button className={s.btnSecondary} onClick={backToList} style={{ width: "fit-content" }}>← Back to Customers</button>
-
-        {profileLoading || !profile ? (
-          <div className={s.loadingState}>Loading customer profile…</div>
+        <button className={s.btnSecondary} onClick={() => { setSelectedId(null); setProfile(null); }} style={{ width: "fit-content" }}>
+          ← Back to Customers
+        </button>
+        {!profile ? (
+          <div className={s.loadingState}>Loading profile…</div>
         ) : (
           <>
             <div className={s.card}>
-              <h2 className={s.panelTitle}>{profile.profile.name}</h2>
+              <h3 style={{ margin: 0 }}>{profile.profile.name}</h3>
               <p className={s.panelSubtitle}>{profile.profile.email}</p>
-              <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span className={segmentBadge(profile.profile.segment)}>
-                  Segment: {profile.profile.segment}
-                </span>
-                {profile.profile.segment_request && (
-                  <span className={`${s.badge} ${s.badgeAmber}`}>
-                    Requested: {profile.profile.segment_request.requested_segment} (
-                    {profile.profile.segment_request.status})
-                  </span>
-                )}
-                <span className={`${s.badge} ${s.badgeGray}`}>
-                  Joined {new Date(profile.profile.joined).toLocaleDateString()}
-                </span>
-                <span className={`${s.badge} ${s.badgeGray}`}>
-                  {profile.profile.login_count} logins
-                  {profile.profile.last_login
-                    ? ` · last ${new Date(profile.profile.last_login).toLocaleDateString()}`
-                    : ""}
-                </span>
-              </div>
             </div>
-
             <div className={s.statGrid}>
               <div className={s.statCard}>
                 <div className={s.statValue}>{profile.order_count}</div>
@@ -166,74 +113,9 @@ const CustomersTab = ({ headers }) => {
                 <div className={s.statLabel}>Lifetime Spent</div>
               </div>
               <div className={s.statCard}>
-                <div className={s.statValue}>{profile.cart_item_count}</div>
-                <div className={s.statLabel}>Items in Cart</div>
+                <div className={s.statValue}>{profile.complaints.length}</div>
+                <div className={s.statLabel}>Complaints</div>
               </div>
-              <div className={s.statCard}>
-                <div className={s.statValue}>{profile.wishlist_item_count}</div>
-                <div className={s.statLabel}>Wishlisted</div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className={s.panelTitle} style={{ fontSize: 16 }}>Order History</h3>
-              {profile.orders.length === 0 ? (
-                <div className={s.emptyState}>
-                  <span className={s.emptyIcon}>📦</span>
-                  No orders placed yet.
-                </div>
-              ) : (
-                <div className={s.tableWrap}>
-                  <table className={s.table}>
-                    <thead>
-                      <tr>
-                        <th>Order ID</th><th>Items</th><th>Amount</th><th>Status</th><th>Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {profile.orders.map((o) => (
-                        <tr key={o._id}>
-                          <td>{o._id}</td>
-                          <td>{o.item_count}</td>
-                          <td>₹{o.final_amount}</td>
-                          <td><span className={orderStatusBadge(o.status)}>{o.status}</span></td>
-                          <td>{o.created_at ? new Date(o.created_at).toLocaleDateString() : "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h3 className={s.panelTitle} style={{ fontSize: 16 }}>Complaints & Tickets</h3>
-              {profile.complaints.length === 0 ? (
-                <div className={s.emptyState}>
-                  <span className={s.emptyIcon}>💬</span>
-                  No complaints filed.
-                </div>
-              ) : (
-                <div className={s.tableWrap}>
-                  <table className={s.table}>
-                    <thead>
-                      <tr>
-                        <th>Category</th><th>Description</th><th>Date</th><th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {profile.complaints.map((c) => (
-                        <tr key={c._id}>
-                          <td>{c.category}</td>
-                          <td style={{ maxWidth: 320 }}>{c.description}</td>
-                          <td>{c.date}</td>
-                          <td><span className={complaintStatusBadge(c.status)}>{c.status}</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
             </div>
           </>
         )}
@@ -243,45 +125,26 @@ const CustomersTab = ({ headers }) => {
 
   return (
     <div className={s.panel}>
-      <div className={s.formGroup} style={{ maxWidth: 340 }}>
-        <label>Search by name or email</label>
-        <input
-          className={s.input}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search customers…"
-        />
+      <div className={s.formGroup} style={{ maxWidth: 320 }}>
+        <label>Search customers</label>
+        <input className={s.input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Name or email…" />
       </div>
-
       {error && <div className={s.errorState}>{error}</div>}
-
       {loading ? (
         <div className={s.loadingState}>Loading customers…</div>
       ) : customers.length === 0 ? (
-        <div className={s.emptyState}>
-          <span className={s.emptyIcon}>🧑‍🤝‍🧑</span>
-          No customers found.
-        </div>
+        <div className={s.emptyState}><span className={s.emptyIcon}>🧑‍🤝‍🧑</span>No customers found.</div>
       ) : (
         <div className={s.tableWrap}>
           <table className={s.table}>
-            <thead>
-              <tr>
-                <th>Name</th><th>Email</th><th>Segment</th><th>Orders</th><th></th>
-              </tr>
-            </thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Orders</th><th></th></tr></thead>
             <tbody>
               {customers.map((c) => (
                 <tr key={c._id}>
                   <td>{c.name}</td>
                   <td>{c.email}</td>
-                  <td><span className={segmentBadge(c.segment)}>{c.segment}</span></td>
                   <td>{c.order_count}</td>
-                  <td>
-                    <button className={s.btnSecondary} onClick={() => openProfile(c._id)}>
-                      View Profile
-                    </button>
-                  </td>
+                  <td><button className={s.btnSecondary} onClick={() => openProfile(c._id)}>View</button></td>
                 </tr>
               ))}
             </tbody>
@@ -303,7 +166,7 @@ const FollowupsTab = ({ headers }) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API_BASE}/admin/crm/followups`, { headers: { Authorization: headers.Authorization } });
+      const res = await fetch(`${API_BASE}/subuser/crm/followups`, { headers: { Authorization: headers.Authorization } });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load");
       setFollowups(data.followups || []);
@@ -327,8 +190,8 @@ const FollowupsTab = ({ headers }) => {
 
   const send = async () => {
     try {
-      const res = await fetch(`${API_BASE}/admin/crm/followups/send`, {
-        method: "POST", headers: { ...headers, "Content-Type": "application/json" },
+      const res = await fetch(`${API_BASE}/subuser/crm/followups/send`, {
+        method: "POST", headers,
         body: JSON.stringify({
           customer_id: sendingFor.customer_id, reason: sendingFor.reason,
           order_id: sendingFor.order_id, subject: draft.subject, body: draft.body,
@@ -402,7 +265,7 @@ const CampaignsTab = ({ headers }) => {
   const fetchCampaigns = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/campaigns`, { headers: { Authorization: headers.Authorization } });
+      const res = await fetch(`${API_BASE}/subuser/campaigns`, { headers: { Authorization: headers.Authorization } });
       const data = await res.json();
       if (res.ok) setCampaigns(data.campaigns || []);
     } finally {
@@ -424,8 +287,8 @@ const CampaignsTab = ({ headers }) => {
           ? { type: "custom", emails: form.emails.split(",").map((e) => e.trim()).filter(Boolean) }
           : { type: "all" };
 
-      const res = await fetch(`${API_BASE}/admin/campaigns`, {
-        method: "POST", headers: { ...headers, "Content-Type": "application/json" },
+      const res = await fetch(`${API_BASE}/subuser/campaigns`, {
+        method: "POST", headers,
         body: JSON.stringify({ subject: form.subject, body: form.body, audience }),
       });
       const data = await res.json();
@@ -504,4 +367,4 @@ const CampaignsTab = ({ headers }) => {
   );
 };
 
-export default AdminCRM;
+export default CustomerCrmPanel;

@@ -15,7 +15,7 @@ const rolePermissions = {
     "analytics",
   ],
   "Marketing Manager": ["media", "promotions", "campaigns", "vendor_invites"],
-  "Support Staff": ["complaints", "faq", "content", "reports"],
+  "Support Staff": ["complaints", "faq", "content", "reports", "customer_crm"],
   Moderator: [
     "segmentation",
     "promotions",
@@ -23,6 +23,7 @@ const rolePermissions = {
     "campaigns",
     "reports",
     "analytics",
+    "customer_crm",
   ],
 };
 
@@ -60,6 +61,7 @@ const AdminSubusers = () => {
       faq: false,
       media: false,
       vendor_invites: false,
+      customer_crm: false,
     },
   });
 

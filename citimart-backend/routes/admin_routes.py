@@ -818,6 +818,9 @@ def update_order(order_id):
         from routes.finance_routes import settle_order_commission
         settle_order_commission(order_id)
 
+    from routes.crm_routes import notify_order_status_email
+    notify_order_status_email(order_id, new_status)
+
     return jsonify({"message": f"Order status updated to {new_status}"}), 200
 
 
@@ -915,14 +918,14 @@ ROLE_DEFAULT_PERMISSIONS = {
     "Inventory Manager": ["merchandise", "analytics", "reports"],
     "Merchandise Manager": ["merchandise", "promotions", "segmentation", "reports", "analytics"],
     "Marketing Manager": ["media", "promotions", "campaigns", "vendor_invites"],
-    "Support Staff": ["complaints", "faq", "content", "reports"],
-    "Moderator": ["segmentation", "promotions", "content", "campaigns", "reports", "analytics"],
+    "Support Staff": ["complaints", "faq", "content", "reports", "customer_crm"],
+    "Moderator": ["segmentation", "promotions", "content", "campaigns", "reports", "analytics", "customer_crm"],
 }
 
 ALL_PERMISSIONS = [
     "segmentation", "promotions", "content", "reports",
     "merchandise", "complaints", "analytics", "campaigns", "faq", "media",
-    "vendor_invites"
+    "vendor_invites", "customer_crm"
 ]
 
 import jwt

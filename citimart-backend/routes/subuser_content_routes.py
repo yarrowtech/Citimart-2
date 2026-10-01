@@ -414,3 +414,66 @@ def subuser_review_kyb(current_subuser, vendor_id):
         reviewer_id=current_subuser["_id"], reviewer_role="subuser",
     )
     return jsonify(body), status_code
+
+
+# ── Customer CRM (repeat-customer view, promotional campaigns, and
+# rule-based follow-up surfacing) — gated by customer_crm permission ──────
+@subuser_content_bp.route("/crm/customers", methods=["GET"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_list_customers(current_subuser):
+    from routes.crm_routes import list_customers
+    search = (request.args.get("search") or "").strip()
+    return jsonify({"customers": list_customers(search)}), 200
+
+
+@subuser_content_bp.route("/crm/customers/<customer_id>", methods=["GET"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_get_customer_profile(current_subuser, customer_id):
+    from routes.crm_routes import get_customer_profile
+    body, status_code = get_customer_profile(customer_id)
+    return jsonify(body), status_code
+
+
+@subuser_content_bp.route("/campaigns", methods=["POST"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_send_campaign(current_subuser):
+    from routes.campaign_routes import send_campaign
+    data = request.get_json(silent=True) or {}
+    subject = (data.get("subject") or "").strip()
+    body = (data.get("body") or "").strip()
+    if not subject or not body:
+        return jsonify({"error": "subject and body are required"}), 400
+    result = send_campaign(subject, body, data.get("audience"), current_subuser["_id"], "subuser")
+    return jsonify(result), 201
+
+
+@subuser_content_bp.route("/campaigns", methods=["GET"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_list_campaigns(current_subuser):
+    from routes.campaign_routes import list_campaigns
+    return jsonify({"campaigns": list_campaigns()}), 200
+
+
+@subuser_content_bp.route("/crm/followups", methods=["GET"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_list_followups(current_subuser):
+    from routes.campaign_routes import list_followups
+    return jsonify({"followups": list_followups()}), 200
+
+
+@subuser_content_bp.route("/crm/followups/send", methods=["POST"])
+@subuser_token_required
+@require_permission("customer_crm")
+def subuser_send_followup(current_subuser):
+    from routes.campaign_routes import send_followup
+    data = request.get_json(silent=True) or {}
+    body, status_code = send_followup(
+        data.get("customer_id"), data.get("reason"),
+        data.get("subject"), data.get("body"), data.get("order_id"),
+    )
+    return jsonify(body), status_code

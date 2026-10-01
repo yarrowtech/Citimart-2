@@ -1,8 +1,10 @@
 # routes/crm_routes.py
-# Customer 360 view for admin — aggregates data that already exists across
+# Customer 360 view — aggregates data that already exists across
 # users/orders/complaints/carts/wishlists into one per-customer read view.
 # Read-only: does not touch segmentation approval, complaint handling, or
 # order processing logic, all of which keep working exactly as before.
+# Core logic lives in plain functions so both the admin routes below and
+# the subuser proxy routes (subuser_content_routes.py) reuse the same code.
 import re
 
 from bson import ObjectId
@@ -14,14 +16,36 @@ from database import (
     cart_collection, wishlist_collection,
 )
 from utils.auth_utils import admin_token_required
+from utils.email_utils import send_order_status_email
 
 crm_bp = Blueprint("crm_bp", __name__, url_prefix="/admin/crm")
 
 
-@crm_bp.route("/customers", methods=["GET"])
-@admin_token_required
-def list_customers(current_admin):
-    search = (request.args.get("search") or "").strip()
+def notify_order_status_email(order_id, new_status):
+    """Best-effort — called from the order-status-update routes in
+    admin_routes.py / vendor_routes.py, right alongside the commission
+    settlement hook. A failed/slow email must never break the status
+    update, so this never raises out to the caller."""
+    try:
+        order = orders_collection.find_one({"_id": ObjectId(order_id)})
+        if not order:
+            return
+        customer = users_collection.find_one({"_id": ObjectId(order["customer_id"])})
+        if not customer or not customer.get("email"):
+            return
+        send_order_status_email(
+            customer_email=customer["email"],
+            customer_name=customer.get("name"),
+            order_id=order_id,
+            status=new_status,
+            item_count=len(order.get("order_items") or []),
+            final_amount=order.get("final_amount"),
+        )
+    except Exception:
+        pass
+
+
+def list_customers(search=""):
     query = {"role": "customer"}
     if search:
         pattern = re.compile(re.escape(search), re.IGNORECASE)
@@ -42,21 +66,18 @@ def list_customers(current_admin):
             "segment": c.get("segment", "all"),
             "order_count": order_count,
         })
+    return results
 
-    return jsonify({"customers": results}), 200
 
-
-@crm_bp.route("/customers/<customer_id>", methods=["GET"])
-@admin_token_required
-def get_customer_profile(current_admin, customer_id):
+def get_customer_profile(customer_id):
     try:
         oid = ObjectId(customer_id)
     except InvalidId:
-        return jsonify({"error": "Invalid customer ID"}), 400
+        return {"error": "Invalid customer ID"}, 400
 
     customer = users_collection.find_one({"_id": oid, "role": "customer"})
     if not customer:
-        return jsonify({"error": "Customer not found"}), 404
+        return {"error": "Customer not found"}, 404
 
     orders = list(orders_collection.find({"customer_id": customer_id}).sort("created_at", -1))
     order_count = len(orders)
@@ -90,7 +111,7 @@ def get_customer_profile(current_admin, customer_id):
         "login_count": customer.get("login_count", 0),
     }
 
-    return jsonify({
+    return {
         "profile": profile,
         "orders": order_summaries,
         "order_count": order_count,
@@ -98,4 +119,18 @@ def get_customer_profile(current_admin, customer_id):
         "complaints": complaints,
         "cart_item_count": len(cart.get("items") or []) if cart else 0,
         "wishlist_item_count": len(wishlist.get("items") or []) if wishlist else 0,
-    }), 200
+    }, 200
+
+
+@crm_bp.route("/customers", methods=["GET"])
+@admin_token_required
+def admin_list_customers(current_admin):
+    search = (request.args.get("search") or "").strip()
+    return jsonify({"customers": list_customers(search)}), 200
+
+
+@crm_bp.route("/customers/<customer_id>", methods=["GET"])
+@admin_token_required
+def admin_get_customer_profile(current_admin, customer_id):
+    body, status_code = get_customer_profile(customer_id)
+    return jsonify(body), status_code

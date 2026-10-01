@@ -252,3 +252,41 @@ def send_guest_invite_email(guest_email, register_link, product_name=None):
     except Exception as e:
         print("Guest invite email error:", e)
         return False
+
+
+# ----------------------------
+# Order status update email (customer CRM: order lifecycle)
+# ----------------------------
+ORDER_STATUS_MESSAGES = {
+    "placed": "We've received your order and it's being prepared.",
+    "paid": "Your payment was received — your order is being prepared.",
+    "shipped": "Your order is on its way!",
+    "delivered": "Your order has been delivered. We hope you love it!",
+    "cancelled": "Your order has been cancelled.",
+}
+
+
+def send_order_status_email(customer_email, customer_name, order_id, status, item_count, final_amount):
+    try:
+        status_key = (status or "").strip().lower()
+        message = ORDER_STATUS_MESSAGES.get(status_key, f"Your order status is now: {status}.")
+
+        subject = f"Citimart Order Update — {status.title() if status else 'Updated'}"
+        html_body = f"""
+<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;">
+  <h2 style="color:#0a8894;">Order Update</h2>
+  <p>Hi {customer_name or 'there'},</p>
+  <p>{message}</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+    <tr><td style="padding:6px 0;color:#555;">Order ID</td><td style="padding:6px 0;"><b>{order_id}</b></td></tr>
+    <tr><td style="padding:6px 0;color:#555;">Items</td><td style="padding:6px 0;">{item_count}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;">Amount</td><td style="padding:6px 0;">&#8377;{final_amount}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;">Status</td><td style="padding:6px 0;"><b>{status}</b></td></tr>
+  </table>
+  <p>Thanks for shopping with Citimart!</p>
+</div>
+"""
+        return send_email(customer_email, subject, html_body, html=True)
+    except Exception as e:
+        print("Order status email error:", e)
+        return False
