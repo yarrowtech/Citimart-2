@@ -23,7 +23,7 @@ complaints_collection = db["complaints"]
 promotions_collection = db["promotions"]
 expenses_collection = db["expenses"]
 payouts_collection = db["payouts"]
-views_collection = db["views"]
+views_collection = db["views"]  # page-view log — see routes/analytics_routes.py
 subusers_collection = db["subusers"]
 
 notify_collection = db["notify"]

@@ -248,6 +248,11 @@ def login_subuser():
     }
     login_token = jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
 
+    subusers_collection.update_one(
+        {"_id": subuser["_id"]},
+        {"$inc": {"login_count": 1}, "$set": {"last_login": datetime.utcnow()}}
+    )
+
     # Every role lands on the one dashboard shell, which renders tabs from
     # the subuser's actual granted permissions rather than a fixed-per-role
     # page — permissions are customizable per-subuser, not fixed by role.

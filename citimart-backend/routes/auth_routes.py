@@ -100,7 +100,6 @@ def login_vendor():
 
     # Check vendor restrictions
     if user.get("restricted_until"):
-        from datetime import datetime
         restricted_date = datetime.strptime(user["restricted_until"], "%Y-%m-%d")
         if datetime.utcnow() < restricted_date:
             return jsonify({
@@ -108,6 +107,11 @@ def login_vendor():
             }), 403
 
     token = generate_token(user["_id"], "vendor")
+
+    vendors_collection.update_one(
+        {"_id": user["_id"]},
+        {"$inc": {"login_count": 1}, "$set": {"last_login": datetime.utcnow()}}
+    )
 
     return jsonify({
         "token": token,

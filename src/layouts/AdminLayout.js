@@ -14,6 +14,7 @@ import {
   FaTags,
   FaChevronDown,
   FaChevronRight,
+  FaChartLine,
 } from 'react-icons/fa';
 
 import logo from '../assets/logo.jpeg';
@@ -32,7 +33,10 @@ const AdminLayout = () => {
   const navSections = [
     {
       label: 'Dashboard',
-      items: [{ path: '/admin/dashboard', icon: <FaHome />, label: 'Dashboard' }],
+      items: [
+        { path: '/admin/dashboard', icon: <FaHome />, label: 'Dashboard' },
+        { path: '/admin/analytics', icon: <FaChartLine />, label: 'Analytics' },
+      ],
     },
     {
       label: 'Catalog',
