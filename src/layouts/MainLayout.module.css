@@ -79,7 +79,7 @@
 .logo {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   text-decoration: none;
 }
 
@@ -100,18 +100,14 @@
   font-weight: 600;
   color: #f0c400;
   position: relative;
+  display: inline-block;
+  animation: scrollText 10s linear infinite;
 }
 
 /* Keyframes for right-to-left scrolling */
 @keyframes scrollText {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
-}
-
-
-.logoText {
-  display: inline-block;
-  animation: scrollText 10s linear infinite;
 }
 
 

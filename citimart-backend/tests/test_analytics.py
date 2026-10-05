@@ -177,3 +177,58 @@ class TestLoginTracking:
         res = client.post("/auth/login/vendor", json={"email": "restricted@test.com", "password": "pass"})
         assert res.status_code == 403
         assert "restricted" in res.get_json()["error"]
+
+
+from database import clicks_collection
+
+
+class TestClickLogging:
+    def test_log_click_succeeds(self, client):
+        res = client.post("/analytics/click", json={
+            "label": "Shop Now", "kind": "button", "path": "/", "visitorId": "c1",
+        })
+        assert res.status_code == 200
+        assert res.get_json()["ok"] is True
+        doc = clicks_collection.find_one({"visitorId": "c1"})
+        assert doc["label"] == "Shop Now"
+        assert doc["kind"] == "button"
+        assert doc["role"] == "guest"
+
+    def test_missing_fields_rejected(self, client):
+        res = client.post("/analytics/click", json={"label": "Shop Now"})
+        assert res.get_json()["ok"] is False
+        assert clicks_collection.count_documents({}) == 0
+
+    def test_logged_in_customer_click_identified(self, client):
+        client.post("/auth/register", json={"name": "C", "email": "cc@test.com", "password": "custpass123"})
+        token = client.post("/auth/login/customer", json={"email": "cc@test.com", "password": "custpass123"}).get_json()["token"]
+        client.post("/analytics/click", json={"label": "Add to Cart", "path": "/products", "visitorId": "c2"},
+                    headers=_auth_headers(token))
+        assert clicks_collection.find_one({"visitorId": "c2"})["role"] == "customer"
+
+
+class TestClickOverview:
+    def test_overview_aggregates_clicks(self, client):
+        token = _admin_token(client)
+        now = datetime.utcnow()
+        clicks_collection.insert_many([
+            {"label": "Shop Now", "kind": "button", "path": "/", "visitorId": "a", "userId": None, "role": "guest", "timestamp": now},
+            {"label": "Shop Now", "kind": "button", "path": "/", "visitorId": "b", "userId": None, "role": "guest", "timestamp": now},
+            {"label": "Orders", "kind": "tab", "path": "/vendor/orders", "visitorId": "c", "userId": "x", "role": "vendor", "timestamp": now},
+        ])
+        data = client.get("/admin/analytics/overview?days=7", headers=_auth_headers(token)).get_json()
+
+        assert data["total_clicks"] == 3
+        assert data["top_clicks"][0] == {"label": "Shop Now", "kind": "button", "clicks": 2}
+        by_role = {r["role"]: r["clicks"] for r in data["clicks_by_role"]}
+        assert by_role == {"guest": 2, "customer": 0, "vendor": 1, "subuser": 0, "admin": 0}
+        assert data["clicks_by_day"][0]["clicks"] == 3
+        assert len(data["recent_clicks"]) == 3
+
+    def test_old_clicks_excluded_from_window(self, client):
+        token = _admin_token(client)
+        clicks_collection.insert_one({"label": "Old", "kind": "button", "path": "/", "visitorId": "z",
+                                      "userId": None, "role": "guest",
+                                      "timestamp": datetime.utcnow() - timedelta(days=30)})
+        data = client.get("/admin/analytics/overview?days=7", headers=_auth_headers(token)).get_json()
+        assert data["total_clicks"] == 0

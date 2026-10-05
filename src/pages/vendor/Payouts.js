@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { API_BASE } from "../../config";
 import s from "../subuser/SubuserShared.module.css";
+import LinkedThreadButton from "../../components/chat/LinkedThreadButton";
 
 const statusBadge = (status) => {
   if (status === "paid") return `${s.badge} ${s.badgeGreen}`;
@@ -81,7 +82,7 @@ const VendorPayouts = () => {
               <table className={s.table}>
                 <thead>
                   <tr>
-                    <th>Order ID</th><th>Gross</th><th>Commission</th><th>Net Payout</th><th>Status</th>
+                    <th>Order ID</th><th>Gross</th><th>Commission</th><th>Net Payout</th><th>Status</th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -92,6 +93,15 @@ const VendorPayouts = () => {
                       <td>₹{p.commission_amount} ({p.commission_rate}%)</td>
                       <td>₹{p.net_payout}</td>
                       <td><span className={statusBadge(p.status)}>{p.status}</span></td>
+                      <td>
+                        <LinkedThreadButton
+                          tokenKey="token"
+                          linkType="payout"
+                          linkId={p._id}
+                          subject={`Payout for order ${p.order_id}`}
+                          label="Message"
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>

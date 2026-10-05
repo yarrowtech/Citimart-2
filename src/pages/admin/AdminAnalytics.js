@@ -1,11 +1,25 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
+  Bar, BarChart, Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from "recharts";
 import { API_BASE } from "../../config";
 import s from "../subuser/SubuserShared.module.css";
+import c from "./AdminAnalytics.module.css";
 
 const LIVE_POLL_MS = 15000;
+
+const ROLE_COLORS = {
+  guest: { from: "#94a3b8", to: "#64748b" },
+  customer: { from: "#22d3ee", to: "#3b82f6" },
+  vendor: { from: "#f472b6", to: "#ec4899" },
+  subuser: { from: "#a78bfa", to: "#7c3aed" },
+  admin: { from: "#fbbf24", to: "#f97316" },
+};
+const roleGradient = (role) => {
+  const g = ROLE_COLORS[role] || ROLE_COLORS.guest;
+  return `linear-gradient(90deg, ${g.from}, ${g.to})`;
+};
+const KIND_CLASS = { tab: "kindTab", link: "kindLink", button: "" };
 
 const AdminAnalytics = () => {
   const [days, setDays] = useState(7);
@@ -113,6 +127,114 @@ const AdminAnalytics = () => {
               </div>
               <div className={s.statLabel}>Guest Leads Converted</div>
             </div>
+            <div className={s.statCard}>
+              <div className={s.statValue}>{overview.total_clicks}</div>
+              <div className={s.statLabel}>Button & Tab Clicks ({days}d)</div>
+            </div>
+          </div>
+
+          <div className={c.clickGrid}>
+            <div className={c.clickCard}>
+              <h3 className={c.clickCardTitle}>Clicks by Audience</h3>
+              <p className={c.clickCardSub}>Who is clicking — guest, customer, vendor, subuser, admin</p>
+              {overview.clicks_by_role.map((r) => {
+                const max = Math.max(1, ...overview.clicks_by_role.map((x) => x.clicks));
+                return (
+                  <div key={r.role} className={c.roleRow}>
+                    <span className={c.roleName} style={{ color: ROLE_COLORS[r.role]?.to }}>{r.role}</span>
+                    <div className={c.barTrack}>
+                      <div className={c.barFill} style={{ width: `${(r.clicks / max) * 100}%`, background: roleGradient(r.role) }} />
+                    </div>
+                    <span className={c.roleCount}>{r.clicks}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className={c.clickCard}>
+              <h3 className={c.clickCardTitle}>Clicks per Day</h3>
+              <p className={c.clickCardSub}>Daily click volume across the selected window</p>
+              {overview.clicks_by_day.length === 0 ? (
+                <div className={s.emptyState}>
+                  <span className={s.emptyIcon}>🖱️</span>
+                  No clicks recorded yet.
+                </div>
+              ) : (
+                <div style={{ width: "100%", height: 220 }}>
+                  <ResponsiveContainer>
+                    <BarChart data={overview.clicks_by_day}>
+                      <defs>
+                        <linearGradient id="clickBarGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#f472b6" />
+                          <stop offset="100%" stopColor="#6366f1" />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="date" tickLine={false} />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+                      <Tooltip cursor={{ fill: "#fdf2f8" }} />
+                      <Bar dataKey="clicks" fill="url(#clickBarGrad)" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={c.clickCard}>
+            <h3 className={c.clickCardTitle}>Top Clicked Elements</h3>
+            <p className={c.clickCardSub}>Buttons, tabs and links ranked by clicks</p>
+            {overview.top_clicks.length === 0 ? (
+              <div className={s.emptyState}>
+                <span className={s.emptyIcon}>🖱️</span>
+                No clicks recorded in this window.
+              </div>
+            ) : (
+              overview.top_clicks.map((t) => {
+                const max = Math.max(1, ...overview.top_clicks.map((x) => x.clicks));
+                const kindClass = c[KIND_CLASS[t.kind]] || "";
+                return (
+                  <div key={`${t.kind}-${t.label}`} className={c.elementRow}>
+                    <span className={c.elementLabel}>
+                      {t.label}
+                      <span className={`${c.kindChip} ${kindClass}`}>{t.kind}</span>
+                    </span>
+                    <span className={c.elementCount}>{t.clicks}</span>
+                    <div className={c.elementBar}>
+                      <div className={c.elementBarFill} style={{ width: `${(t.clicks / max) * 100}%` }} />
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          <div className={c.clickCard}>
+            <h3 className={c.clickCardTitle}>Recent Clicks</h3>
+            <p className={c.clickCardSub}>The latest 50 clicks, newest first</p>
+            {overview.recent_clicks.length === 0 ? (
+              <div className={s.emptyState}>
+                <span className={s.emptyIcon}>🖱️</span>
+                No clicks recorded yet.
+              </div>
+            ) : (
+              <div className={s.tableWrap}>
+                <table className={s.table}>
+                  <thead><tr><th>When</th><th>Who</th><th>Clicked</th><th>Type</th><th>Page</th></tr></thead>
+                  <tbody>
+                    {overview.recent_clicks.map((r, i) => (
+                      <tr key={i}>
+                        <td className={c.recentTime}>{new Date(r.timestamp).toLocaleString()}</td>
+                        <td><span className={`${s.badge} ${s.badgeBlue}`}>{r.role}</span></td>
+                        <td>{r.label}</td>
+                        <td>{r.kind}</td>
+                        <td>{r.path}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           <div className={s.card}>

@@ -822,7 +822,7 @@ def update_order(current_vendor, order_id):
     if not vendor_products:
         return jsonify({"error": "Unauthorized"}), 403
 
-    orders_collection.update_one({"_id": ObjectId(order_id)}, {"$set": {"status": new_status}})
+    orders_collection.update_one({"_id": ObjectId(order_id)}, {"$set": {"status": new_status, "status_updated_at": datetime.utcnow()}})
 
     if new_status.strip().lower() == "delivered":
         from routes.finance_routes import settle_order_commission

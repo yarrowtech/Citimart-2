@@ -101,6 +101,8 @@ def create_app():
     from routes.vendor_invite_routes import vendor_invite_bp
     from routes.analytics_routes import analytics_bp
     from routes.campaign_routes import campaign_bp
+    from routes.admin_ops_routes import admin_ops_bp
+    from routes.chat_routes import chat_bp
 
 
 
@@ -139,6 +141,8 @@ def create_app():
     app.register_blueprint(vendor_invite_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(campaign_bp)
+    app.register_blueprint(admin_ops_bp)
+    app.register_blueprint(chat_bp)
 
     @app.route('/')
     def index():

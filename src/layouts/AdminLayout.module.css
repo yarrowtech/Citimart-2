@@ -46,11 +46,11 @@
 .logo { display: flex; align-items: center; text-decoration: none; }
 .logoImage {
   display: block;
-  width: 170px;
+  width: auto;
+  max-width: 170px;
   height: 48px;
   object-fit: contain;
   border-radius: 10px;
-  background: white;
   transition: opacity 180ms ease, width 220ms ease;
 }
 
@@ -225,7 +225,7 @@
   .sidebar, .navItem, .logoutBtn, .toggleBtn, .userInfo a { transition: none; }
 }
 .userInfo { position: relative; }
-.notificationWrap { position: relative; }
+.notificationWrap { position: relative; overflow: visible; }
 .notificationBtn {
   position: relative;
   width: 40px;
@@ -324,9 +324,40 @@
 .notificationWrap,
 .notificationBtn,
 .userInfo > a { flex: 0 0 40px; }
+.header,
+.headerContent,
+.userInfo,
+.notificationWrap,
+.notificationBtn { overflow: visible; }
 .notificationBtn,
 .userInfo > a { margin: 0; padding: 0; box-sizing: border-box; }
 .notificationBadge { top: 2px; right: 2px; min-width: 15px; height: 15px; padding: 0 3px; border-width: 1px; font-size: 0.55rem; }
 .notificationList { scrollbar-width: none; -ms-overflow-style: none; }
 .notificationList::-webkit-scrollbar { display: none; }
 .main { overflow-x: hidden; }
+.notificationPanel a {
+  width: auto;
+  height: auto;
+  display: grid;
+  border-radius: 0;
+  background: transparent;
+  transform: none;
+}
+.notificationPanel a:hover { transform: none; }
+.notificationPanel a.notificationFooter { display: block; background: #f7f3fc; }
+.notificationPanel a.notificationItem { display: grid; }
+
+.navBadge {
+  margin-left: auto;
+  background: #ec4899;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 999px;
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}

@@ -47,7 +47,8 @@ def clean_db():
         media_library_collection, complaints_collection, categories_collection,
         collections_collection, platform_settings_collection, error_logs_collection,
         contact_messages_collection, payouts_collection, expenses_collection,
-        vendor_invites_collection, views_collection, db,
+        vendor_invites_collection, views_collection, clicks_collection,
+        chat_conversations_collection, chat_messages_collection, db,
     )
     campaigns_collection = db["campaigns"]
     for coll in [users_collection, products_collection, orders_collection,
@@ -57,7 +58,8 @@ def clean_db():
                  media_library_collection, complaints_collection, categories_collection,
                  collections_collection, platform_settings_collection, error_logs_collection,
                  contact_messages_collection, payouts_collection, expenses_collection,
-                 vendor_invites_collection, views_collection, campaigns_collection]:
+                 vendor_invites_collection, views_collection, clicks_collection, campaigns_collection,
+                 chat_conversations_collection, chat_messages_collection]:
         coll.delete_many({})
 
 

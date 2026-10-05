@@ -15,6 +15,8 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaChartLine,
+  FaBug,
+  FaHeadset,
 } from 'react-icons/fa';
 
 import logo from '../assets/logo.jpeg';
@@ -27,6 +29,7 @@ const AdminLayout = () => {
   const [openSections, setOpenSections] = React.useState({});
   const [notifications, setNotifications] = React.useState([]);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
+  const [chatUnread, setChatUnread] = React.useState(0);
   const notificationRef = React.useRef(null);
 
   
@@ -36,6 +39,7 @@ const AdminLayout = () => {
       items: [
         { path: '/admin/dashboard', icon: <FaHome />, label: 'Dashboard' },
         { path: '/admin/analytics', icon: <FaChartLine />, label: 'Analytics' },
+        { path: '/admin/errors', icon: <FaBug />, label: 'Error Center' },
       ],
     },
     {
@@ -71,6 +75,7 @@ const AdminLayout = () => {
   label: 'Support',
   items: [
     { path: '/admin/complaints', icon: <FaBox />, label: 'Complaints' },
+    { path: '/admin/support', icon: <FaHeadset />, label: 'Support Center' },
     { path: '/admin/feedback', icon: <FaTags />, label: 'Feedback' },
   ],
 },
@@ -102,18 +107,37 @@ const AdminLayout = () => {
     const loadNotifications = async () => {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
+      const headers = { Authorization: `Bearer ${token}` };
       try {
-        const response = await fetch(`${API_BASE}/api/dashboard/overview?period=daily`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const payload = await response.json();
-        if (response.ok) setNotifications(payload.alerts || []);
+        const [feedRes, dashRes] = await Promise.all([
+          fetch(`${API_BASE}/admin/notifications`, { headers }),
+          fetch(`${API_BASE}/api/dashboard/overview?period=daily`, { headers }),
+        ]);
+        const feed = feedRes.ok ? await feedRes.json() : { items: [] };
+        fetch(`${API_BASE}/chat/unread-summary`, { headers })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d) => { if (d) setChatUnread(d.total); })
+          .catch(() => {});
+        const dash = dashRes.ok ? await dashRes.json() : { alerts: [] };
+        const stockAndQueue = (dash.alerts || []).map((alert) => ({
+          id: `alert-${alert.text}`,
+          severity: alert.type,
+          title: alert.text,
+          detail: '',
+          path: alert.path,
+        }));
+        const merged = [...(feed.items || []), ...stockAndQueue].map((item) => ({
+          ...item,
+          type: item.severity,
+          text: item.title,
+        }));
+        setNotifications(merged);
       } catch (error) {
         console.error('Unable to load admin notifications:', error);
       }
     };
     loadNotifications();
-    const interval = window.setInterval(loadNotifications, 60000);
+    const interval = window.setInterval(loadNotifications, 30000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -198,6 +222,9 @@ const AdminLayout = () => {
                   >
                     {item.icon}
                     <span>{item.label}</span>
+                    {item.path === '/admin/support' && chatUnread > 0 && (
+                      <span className={styles.navBadge}>{chatUnread > 9 ? '9+' : chatUnread}</span>
+                    )}
                   </Link>
                 ))}
               </div>
@@ -229,16 +256,17 @@ const AdminLayout = () => {
                 {notificationsOpen && (
                   <div className={styles.notificationPanel}>
                     <div className={styles.notificationHeader}>
-                      <div><strong>Notifications</strong><small>Live operations alerts</small></div><span>{notifications.length}</span>
+                      <div><strong>Notifications</strong><small>Live alerts · refreshes every 30s</small></div><span>{notifications.length}</span>
                     </div>
                     <div className={styles.notificationList}>
                       {notifications.length ? notifications.map((notice, index) => (
-                        <Link key={`${notice.text}-${index}`} to={notice.path || '/admin/dashboard'} onClick={() => setNotificationsOpen(false)} className={styles.notificationItem}>
-                          <span className={`${styles.notificationDot} ${styles[notice.type]}`} /><span>{notice.text}</span><b>→</b>
+                        <Link key={`${notice.id || notice.text}-${index}`} to={notice.path || '/admin/dashboard'} onClick={() => setNotificationsOpen(false)} className={styles.notificationItem}>
+                          <span className={`${styles.notificationDot} ${styles[notice.type]}`} />
+                          <span>{notice.text}{notice.detail && <small style={{ display: 'block', color: '#86798f' }}>{notice.detail}</small>}</span><b>→</b>
                         </Link>
                       )) : <div className={styles.noNotifications}>✓ No alerts right now</div>}
                     </div>
-                    <Link to="/admin/dashboard" onClick={() => setNotificationsOpen(false)} className={styles.notificationFooter}>Open dashboard</Link>
+                    <Link to="/admin/errors" onClick={() => setNotificationsOpen(false)} className={styles.notificationFooter}>Open Error Center</Link>
                   </div>
                 )}
               </div>

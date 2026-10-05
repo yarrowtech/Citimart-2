@@ -14,6 +14,9 @@ import MediaPanel from "./panels/MediaPanel";
 import VendorReviewPanel from "./panels/VendorReviewPanel";
 import VendorInvitePanel from "./panels/VendorInvitePanel";
 import CustomerCrmPanel from "./panels/CustomerCrmPanel";
+import SupportInboxPanel from "./panels/SupportInboxPanel";
+
+const POLL_CHAT_MS = 20000;
 
 // Role → color theme + icon. Purely cosmetic — actual access is always
 // driven by the subuser's real granted permissions, not their role name.
@@ -43,6 +46,7 @@ const TAB_DEFS = [
   { key: "media", label: "Media", icon: "🖼️", Component: MediaPanel },
   { key: "vendor_invites", label: "Invite Vendors", icon: "📧", Component: VendorInvitePanel },
   { key: "customer_crm", label: "Customer CRM", icon: "🤝", Component: CustomerCrmPanel },
+  { key: "chat", label: "Support Inbox", icon: "💬", Component: SupportInboxPanel },
 ];
 
 const SubuserDashboard = () => {
@@ -53,6 +57,7 @@ const SubuserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [sessionError, setSessionError] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
+  const [chatUnread, setChatUnread] = useState(0);
 
   useEffect(() => {
     if (!token) { setLoading(false); return; }
@@ -68,6 +73,19 @@ const SubuserDashboard = () => {
       })
       .catch(() => setSessionError(true))
       .finally(() => setLoading(false));
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+    const poll = () => {
+      fetch(`${API_BASE}/chat/unread-summary`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => { if (data) setChatUnread(data.total); })
+        .catch(() => {});
+    };
+    poll();
+    const timer = setInterval(poll, POLL_CHAT_MS);
+    return () => clearInterval(timer);
   }, [token]);
 
   const handleLogout = () => {
@@ -136,6 +154,9 @@ const SubuserDashboard = () => {
               onClick={() => setActiveTab(t.key)}
             >
               <span className={styles.navIcon}>{t.icon}</span> {t.label}
+              {t.key === "chat" && chatUnread > 0 && (
+                <span className={styles.navBadge}>{chatUnread > 9 ? "9+" : chatUnread}</span>
+              )}
             </button>
           ))}
         </nav>

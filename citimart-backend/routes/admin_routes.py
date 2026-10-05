@@ -810,7 +810,7 @@ def update_order(order_id):
     if not new_status:
         return jsonify({"error": "Status is required"}), 400
 
-    result = orders_collection.update_one({"_id": ObjectId(order_id)}, {"$set": {"status": new_status}})
+    result = orders_collection.update_one({"_id": ObjectId(order_id)}, {"$set": {"status": new_status, "status_updated_at": datetime.utcnow()}})
     if result.matched_count == 0:
         return jsonify({"error": "Order not found"}), 404
 
@@ -918,14 +918,14 @@ ROLE_DEFAULT_PERMISSIONS = {
     "Inventory Manager": ["merchandise", "analytics", "reports"],
     "Merchandise Manager": ["merchandise", "promotions", "segmentation", "reports", "analytics"],
     "Marketing Manager": ["media", "promotions", "campaigns", "vendor_invites"],
-    "Support Staff": ["complaints", "faq", "content", "reports", "customer_crm"],
-    "Moderator": ["segmentation", "promotions", "content", "campaigns", "reports", "analytics", "customer_crm"],
+    "Support Staff": ["complaints", "faq", "content", "reports", "customer_crm", "chat"],
+    "Moderator": ["segmentation", "promotions", "content", "campaigns", "reports", "analytics", "customer_crm", "chat"],
 }
 
 ALL_PERMISSIONS = [
     "segmentation", "promotions", "content", "reports",
     "merchandise", "complaints", "analytics", "campaigns", "faq", "media",
-    "vendor_invites", "customer_crm"
+    "vendor_invites", "customer_crm", "chat"
 ]
 
 import jwt

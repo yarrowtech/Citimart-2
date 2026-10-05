@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { API_BASE } from "../../config";
 import s from "../subuser/SubuserShared.module.css";
+import LinkedThreadButton from "../../components/chat/LinkedThreadButton";
 
 const statusBadge = (status) => {
   if (status === "verified") return `${s.badge} ${s.badgeGreen}`;
@@ -102,7 +103,16 @@ const VendorKYB = () => {
       </div>
 
       <div className={s.card}>
-        <span className={statusBadge(data.kybStatus)}>{statusLabel(data.kybStatus)}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <span className={statusBadge(data.kybStatus)}>{statusLabel(data.kybStatus)}</span>
+          <LinkedThreadButton
+            tokenKey="token"
+            linkType="vendor_application"
+            linkId="kyb"
+            subject="Business verification"
+            label="Message admin about verification"
+          />
+        </div>
         {data.kybStatus === "rejected" && data.kybRejectionReason && (
           <p style={{ marginTop: 8, fontSize: 13, color: "#dc2626" }}>
             Reason: {data.kybRejectionReason}. Please correct and resubmit below.

@@ -57,3 +57,41 @@ export function trackPageview(path) {
     // never let analytics break navigation
   }
 }
+
+function describeClickTarget(el) {
+  const target = el.closest("button, a, [role='tab']");
+  if (!target) return null;
+  const label = (target.getAttribute("aria-label") || target.innerText || target.textContent || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80);
+  if (!label) return null;
+  const kind = target.tagName === "A" ? "link" : target.getAttribute("role") === "tab" ? "tab" : "button";
+  return { label, kind };
+}
+
+export function trackClick(label, kind, path) {
+  try {
+    const token = getAuthToken();
+    fetch(`${API_BASE}/analytics/click`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ label, kind, path, visitorId: getVisitorId() }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // never let analytics break the click
+  }
+}
+
+export function initClickTracking() {
+  if (window.__citimartClickTracking) return;
+  window.__citimartClickTracking = true;
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? describeClickTarget(event.target) : null;
+    if (target) trackClick(target.label, target.kind, window.location.pathname);
+  }, true);
+}

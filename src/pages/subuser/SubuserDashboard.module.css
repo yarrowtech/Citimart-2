@@ -93,3 +93,18 @@
   .shell { grid-template-columns: 1fr; }
   .sidebar { position: relative; height: auto; }
 }
+
+.navBadge {
+  margin-left: auto;
+  background: #ec4899;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 999px;
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}

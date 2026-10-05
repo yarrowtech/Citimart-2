@@ -1,0 +1,136 @@
+.clickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.clickCard {
+  background: #fff;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  padding: 20px;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(135deg, #f472b6, #8b5cf6, #22d3ee);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.12);
+}
+
+.clickCardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.clickCardSub {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 16px;
+}
+
+.roleRow {
+  display: grid;
+  grid-template-columns: 90px 1fr 56px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.roleName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+.barTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22d3ee, #3b82f6);
+  transition: width 0.6s ease;
+}
+
+.roleCount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  text-align: right;
+}
+
+.elementRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-top: 1px solid #f3f4f6;
+}
+
+.elementRow:first-child {
+  border-top: none;
+}
+
+.elementLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.elementCount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #db2777;
+}
+
+.kindChip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: linear-gradient(90deg, #dbeafe, #ede9fe);
+  color: #6d28d9;
+  vertical-align: middle;
+}
+
+.kindTab {
+  background: linear-gradient(90deg, #d1fae5, #a7f3d0);
+  color: #047857;
+}
+
+.kindLink {
+  background: linear-gradient(90deg, #ffedd5, #fed7aa);
+  color: #c2410c;
+}
+
+.elementBar {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.elementBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f472b6, #fb923c, #facc15);
+}
+
+.recentTime {
+  white-space: nowrap;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}

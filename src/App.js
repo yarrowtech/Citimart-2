@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { trackPageview } from './utils/analytics';
+import { trackPageview, initClickTracking } from './utils/analytics';
 import styles from './App.module.css';
 import { CartProvider } from './contexts/CartContext';
 import { ToastContainer } from 'react-toastify';
@@ -53,6 +53,8 @@ import EditProduct from './pages/admin/EditProduct';
 import AdminOffers from './pages/admin/AdminOffers';
 import AdminCRM from './pages/admin/AdminCRM';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminErrors from './pages/admin/AdminErrors';
+import AdminSupportCenter from './pages/admin/AdminSupportCenter';
 import AdminFinance from './pages/admin/AdminFinance';
 import AdminVendorKYB from './pages/admin/AdminVendorKYB';
 import CategoryAdmin from './pages/admin/CategoryAdmin';
@@ -103,6 +105,10 @@ function App() {
   useEffect(() => {
     trackPageview(location.pathname);
   }, [location.pathname]);
+
+  useEffect(() => {
+    initClickTracking();
+  }, []);
 
  const handleLogout = (role) => {
   try {
@@ -193,6 +199,8 @@ function App() {
   <Route path="users" element={<AdminUsers />} />
   <Route path="crm" element={<AdminCRM />} />
   <Route path="analytics" element={<AdminAnalytics />} />
+  <Route path="errors" element={<AdminErrors />} />
+  <Route path="support" element={<AdminSupportCenter />} />
   <Route path="finance" element={<AdminFinance />} />
   <Route path="vendor-kyb" element={<AdminVendorKYB />} />
   <Route path="subusers" element={<AdminSubusers />} />

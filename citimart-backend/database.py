@@ -24,6 +24,9 @@ promotions_collection = db["promotions"]
 expenses_collection = db["expenses"]
 payouts_collection = db["payouts"]
 views_collection = db["views"]  # page-view log — see routes/analytics_routes.py
+clicks_collection = db["clicks"]  # UI click log — see routes/analytics_routes.py
+chat_conversations_collection = db["chat_conversations"]  # see routes/chat_routes.py
+chat_messages_collection = db["chat_messages"]  # see routes/chat_routes.py
 subusers_collection = db["subusers"]
 
 notify_collection = db["notify"]

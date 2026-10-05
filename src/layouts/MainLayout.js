@@ -3,6 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./MainLayout.module.css";
 import { FaUser, FaShoppingCart, FaHeart, FaCog, FaTruck, FaLock, FaHeadset, FaTag } from "react-icons/fa";
 import logo from "../assets/log.JPG";
+import CustomerChatWidget from "../components/chat/CustomerChatWidget";
 
 import { API_BASE } from "../config";
 const brandsData = {
@@ -319,6 +320,8 @@ const MainLayout = () => {
       <main className={styles.main}>
         <Outlet />
       </main>
+
+      <CustomerChatWidget />
 
       {/* Footer */}
       <footer className={styles.footer}>

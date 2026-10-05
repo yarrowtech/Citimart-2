@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { API_BASE } from "../../config";
 import s from "../subuser/SubuserShared.module.css";
+import LinkedThreadButton from "../../components/chat/LinkedThreadButton";
 
 const AdminVendorKYB = () => {
   const [vendors, setVendors] = useState([]);
@@ -73,9 +74,19 @@ const AdminVendorKYB = () => {
       ) : (
         vendors.map((v) => (
           <div key={v._id} className={s.card} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div>
-              <strong>{v.businessName || v.fullName}</strong>
-              <div style={{ fontSize: 12.5, color: "#6b7280" }}>{v.email}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+              <div>
+                <strong>{v.businessName || v.fullName}</strong>
+                <div style={{ fontSize: 12.5, color: "#6b7280" }}>{v.email}</div>
+              </div>
+              <LinkedThreadButton
+                tokenKey="adminToken"
+                linkType="vendor_application"
+                linkId="kyb"
+                vendorId={v._id}
+                subject={`Business verification — ${v.businessName || v.fullName}`}
+                label="Message vendor"
+              />
             </div>
 
             <div className={s.formGrid}>
