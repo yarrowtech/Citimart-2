@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import styles from "./CustomerSettings.module.css";
 import Complaints from "./Complaints"; 
+import { API_BASE } from "../config";
 
 
 const CustomerSettings = () => {
@@ -59,7 +60,7 @@ const CustomerSettings = () => {
   const fetchProfile = async () => {
   if (!customerId || !token) return;
   try {
-    const res = await fetch(`http://127.0.0.1:5000/customer/${customerId}/profile`, {
+    const res = await fetch(`${API_BASE}/customer/${customerId}/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -79,7 +80,7 @@ const CustomerSettings = () => {
 
 const fetchEligibleOffers = async (token) => {
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/offers/eligible", {
+    const res = await fetch(`${API_BASE}/api/offers/eligible`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -102,7 +103,7 @@ useEffect(() => {
 
   const fetchOrders = async (token, id) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5000/customer/orders/${id}`, {
+      const res = await fetch(`${API_BASE}/customer/orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -115,7 +116,7 @@ useEffect(() => {
 
   const fetchWishlist = async (token, id) => {
   try {
-    const res = await fetch(`http://127.0.0.1:5000/customer/wishlist/${id}`, {
+    const res = await fetch(`${API_BASE}/customer/wishlist/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -138,7 +139,7 @@ useEffect(() => {
       formData.append("address", profile.address);
       if (profile.image instanceof File) formData.append("image", profile.image);
 
-      const res = await fetch("http://127.0.0.1:5000/customer/update-profile", {
+      const res = await fetch(`${API_BASE}/customer/update-profile`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -159,7 +160,7 @@ useEffect(() => {
 
   const handleChangePassword = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/customer/change-password", {
+      const res = await fetch(`${API_BASE}/customer/change-password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -193,7 +194,7 @@ useEffect(() => {
     formData.append("requested_segment", profile.segment);
     if (proofFile) formData.append("proof_image", proofFile);
 
-    const res = await fetch("http://127.0.0.1:5000/customer/request-segment", {
+    const res = await fetch(`${API_BASE}/customer/request-segment`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -219,7 +220,7 @@ useEffect(() => {
     if (!item.product?._id) return alert("Invalid product for reorder.");
 
     try {
-      const res = await fetch(`http://127.0.0.1:5000/customer/reorder`, {
+      const res = await fetch(`${API_BASE}/customer/reorder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -250,7 +251,7 @@ useEffect(() => {
     if (!item.product?._id) return alert("Invalid product for return.");
 
     try {
-      const res = await fetch(`http://127.0.0.1:5000/customer/return`, {
+      const res = await fetch(`${API_BASE}/customer/return`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

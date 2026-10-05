@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE } from "../../config";
 
 const SetPassword = () => {
   const { token } = useParams();
@@ -24,7 +25,7 @@ const SetPassword = () => {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/vendor/set-password/${token}`,
+        `${API_BASE}/vendor/set-password/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import styles from "./Login.module.css"; // reuse styles
+import { API_BASE } from "../config";
 
 const VendorForgotPassword = () => {
   const [step, setStep] = useState(1);
@@ -12,7 +13,7 @@ const VendorForgotPassword = () => {
   const handleRequestReset = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:5000/forgot-password/vendor", {
+      const response = await fetch(`${API_BASE}/forgot-password/vendor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -36,7 +37,7 @@ const VendorForgotPassword = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:5000/reset-password/vendor", {
+      const response = await fetch(`${API_BASE}/reset-password/vendor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, new_password: newPassword }),

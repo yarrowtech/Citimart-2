@@ -40,7 +40,7 @@
 //   const customer = JSON.parse(localStorage.getItem("customer"));
 
 //   useEffect(() => {
-//     fetch(`http://localhost:5000/api/products/${id}`)
+//     fetch(`${API_BASE}/api/products/${id}`)
 //       .then((res) => res.json())
 //       .then((data) => {
 //         if (data.product) {
@@ -49,11 +49,11 @@
 //           setMainImage(
 //             firstImage?.startsWith("http")
 //               ? firstImage
-//               : `http://localhost:5000/${firstImage}`
+//               : `${API_BASE}/${firstImage}`
 //           );
          
 //          /*Similar Products*/
-//           fetch("http://localhost:5000/api/products")
+//           fetch(`${API_BASE}/api/products`)
 //             .then((res) => res.json())
 //             .then((all) => {
 //               if (all.products) {
@@ -70,7 +70,7 @@
 
 //           // Fetch Frequently Bought Together products
 //           fetch(
-//             `http://localhost:5000/api/products/frequently-bought/${id}`
+//             `${API_BASE}/api/products/frequently-bought/${id}`
 //           )
 //             .then((res) => res.json())
 //             .then((fbData) => {
@@ -93,7 +93,7 @@
 //     const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
 //     try {
-//       const res = await fetch(`http://localhost:5000/api/products/${id}/offers`, { headers });
+//       const res = await fetch(`${API_BASE}/api/products/${id}/offers`, { headers });
 //       const data = await res.json();
 //       if (data.offers) {
 //         setOffers(data.offers);
@@ -111,7 +111,7 @@
 
 
 //      useEffect(() => {
-//   fetch(`http://localhost:5000/customer/reviews/${id}`)
+//   fetch(`${API_BASE}/customer/reviews/${id}`)
 //     .then((res) => res.json())
 //     .then((data) => {
 //       if (data.reviews) setReviews(data.reviews);
@@ -142,7 +142,7 @@
 //   }
 
 //   try {
-//     const res = await fetch("http://localhost:5000/customer/cart/add", {
+//     const res = await fetch(`${API_BASE}/customer/cart/add`, {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
@@ -198,7 +198,7 @@
 //   }
 
 //   try {
-//     const res = await fetch("http://localhost:5000/customer/wishlist/add", {
+//     const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
@@ -275,12 +275,12 @@
 // };
 // const fetchProductDetails = async () => {
 //   try {
-//     const res = await fetch(`http://localhost:5000/api/products/${id}`);
+//     const res = await fetch(`${API_BASE}/api/products/${id}`);
 //     const data = await res.json();
 //     if (data.product) {
 //       setProduct(data.product);
 //       const firstImage = data.product.images?.[0];
-//       setMainImage(firstImage?.startsWith("http") ? firstImage : `http://localhost:5000/${firstImage}`);
+//       setMainImage(firstImage?.startsWith("http") ? firstImage : `${API_BASE}/${firstImage}`);
 //     }
 //   } catch (err) {
 //     console.error("Error fetching product:", err);
@@ -356,7 +356,7 @@
 //   }
 
 //   try {
-//     const res = await fetch("http://localhost:5000/customer/notify-me", {
+//     const res = await fetch(`${API_BASE}/customer/notify-me`, {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
@@ -464,7 +464,7 @@
 //             {product.images?.map((img, i) => {
 //               const url = img.startsWith("http")
 //                 ? img
-//                 : `http://localhost:5000/${img}`;
+//                 : `${API_BASE}/${img}`;
 //               return (
 //                 <img
 //                   key={i}
@@ -818,7 +818,7 @@
 //                       src={
 //                         fbProduct.images?.[0]?.startsWith("http")
 //                           ? fbProduct.images[0]
-//                           : `http://localhost:5000/${fbProduct.images?.[0]}`
+//                           : `${API_BASE}/${fbProduct.images?.[0]}`
 //                       }
 //                       alt={fbProduct.name}
 //                     />
@@ -843,7 +843,7 @@
 //                   src={
 //                     sp.images?.[0]?.startsWith("http")
 //                       ? sp.images[0]
-//                       : `http://localhost:5000/${sp.images?.[0]}`
+//                       : `${API_BASE}/${sp.images?.[0]}`
 //                   }
 //                   alt={sp.name}
 //                   onClick={() => navigate(`/products/${sp._id}`)}

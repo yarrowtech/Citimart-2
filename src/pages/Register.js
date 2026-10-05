@@ -31,7 +31,7 @@
 //     }
 
 //     try {
-//       const response = await fetch('http://127.0.0.1:5000/auth/register', {
+//       const response = await fetch(`${API_BASE}/auth/register`, {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify({
@@ -153,6 +153,7 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Register.module.css';
+import { API_BASE } from "../config";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
@@ -187,7 +188,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/auth/register', {
+      const response = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

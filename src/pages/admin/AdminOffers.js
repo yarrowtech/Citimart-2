@@ -133,8 +133,8 @@ const AdminOffers = () => {
     try {
       const method = editingOffer ? "PUT" : "POST";
       const url = editingOffer
-        ? `http://localhost:5000/api/offers/${editingOffer._id}`
-        : "http://localhost:5000/api/offers";
+        ? `${API_BASE}/api/offers/${editingOffer._id}`
+        : `${API_BASE}/api/offers`;
 
       const res = await fetch(url, {
         method,

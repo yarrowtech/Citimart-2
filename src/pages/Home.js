@@ -4,7 +4,7 @@
 // import { FaHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 // import styles from "./Home.module.css";
 
-// const API_BASE = "http://localhost:5000";
+// const API_BASE = `${API_BASE}`;
 // const PLACEHOLDER_IMG = "https://via.placeholder.com/500x500?text=Image+Unavailable";
 
 // // Static fallback data
@@ -372,7 +372,7 @@
 // import { FaHeart, FaShoppingCart, FaChevronLeft, FaChevronRight, FaStar, FaTag } from "react-icons/fa";
 // import styles from "./Home.module.css";
 
-// const API_BASE = "http://localhost:5000";
+// const API_BASE = `${API_BASE}`;
 // const PLACEHOLDER_IMG = "https://via.placeholder.com/500x500?text=No+Image";
 
 // const STATIC_HOME = {

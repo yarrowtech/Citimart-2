@@ -16,7 +16,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/auth/forgot-password", {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,6 +86,7 @@ export default ForgotPassword;
 import React, { useState } from "react";
 import styles from "./ForgotPassword.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { API_BASE } from "../config";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -96,8 +97,8 @@ const ForgotPassword = () => {
   // 👇 Auto-detect role based on the current URL
   const isVendorPage = location.pathname.includes("/vendor");
   const endpoint = isVendorPage
-    ? "http://127.0.0.1:5000/auth/vendor/forgot-password"
-    : "http://127.0.0.1:5000/auth/customer/forgot-password";
+    ? `${API_BASE}/auth/vendor/forgot-password`
+    : `${API_BASE}/auth/customer/forgot-password`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

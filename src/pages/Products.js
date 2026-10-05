@@ -43,12 +43,12 @@
 //   const getImageUrl = (image) => {
 //     if (!image) return "/images/default-placeholder.png";
 //     if (image.startsWith("http")) return image;
-//     return `http://localhost:5000${image}`;
+//     return `${API_BASE}${image}`;
 //   };
 
 //   // Fetch products
 //  useEffect(() => {
-//   fetch("http://localhost:5000/api/products/all")
+//   fetch(`${API_BASE}/api/products/all`)
 //     .then((res) => res.json())
 //     .then((data) => {
 //       const normalized = (data.products || []).map((p) => ({
@@ -65,7 +65,7 @@
 //   useEffect(() => {
 //     const fetchCategories = async () => {
 //       try {
-//         const res = await fetch("http://localhost:5000/api/categories");
+//         const res = await fetch(`${API_BASE}/api/categories`);
 //         const data = await res.json();
 
 //         if (Array.isArray(data.categories)) {

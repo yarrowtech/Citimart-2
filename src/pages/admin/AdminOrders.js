@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './AdminOrders.module.css';
+import { API_BASE } from "../../config";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -8,7 +9,7 @@ const AdminOrders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const backendURL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendURL = process.env.REACT_APP_BACKEND_URL || `${API_BASE}`;
    
   // Helper: fetch vendor's business name by ID
 const fetchVendorName = async (vendorId) => {

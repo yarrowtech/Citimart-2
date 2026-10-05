@@ -58,7 +58,7 @@
 //  useEffect(() => {
 //   const fetchCategories = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:5000/api/categories");
+//       const res = await axios.get(`${API_BASE}/api/categories`);
 //       if (res.data.categories) {
 //         setCategories(res.data.categories);
 //       }
@@ -200,7 +200,7 @@
 //       backendFormData.append("status", "active");
 //       backendFormData.append("images", JSON.stringify(uploadedImageUrls));
 
-//       const response = await axios.post("http://localhost:5000/api/products/add", backendFormData);
+//       const response = await axios.post(`${API_BASE}/api/products/add`, backendFormData);
 //       if (response.data.product_id) {
 //         alert("✅ Product added successfully!");
 //         handleReset();
@@ -360,7 +360,7 @@
 //       fd.append("added_by", "admin");
 //       fd.append("status", "active");
 
-//       await axios.post("http://localhost:5000/api/products/add", fd);
+//       await axios.post(`${API_BASE}/api/products/add`, fd);
 //     }
 
 //     alert("✅ Bulk upload completed successfully!");
@@ -1007,7 +1007,7 @@
 //   const [uploading,         setUploading]         = useState(false);
 
 //   useEffect(() => {
-//     axios.get("http://localhost:5000/api/categories")
+//     axios.get(`${API_BASE}/api/categories`)
 //       .then(r => { if (r.data.categories) setCategories(r.data.categories); })
 //       .catch(e => console.error("Failed to fetch categories:", e));
 //   }, []);
@@ -1146,7 +1146,7 @@
 //       backendFormData.append("status",     "active");
 //       backendFormData.append("images",     JSON.stringify(uploadedImageUrls));
 
-//       const response = await axios.post("http://localhost:5000/api/products/add", backendFormData);
+//       const response = await axios.post(`${API_BASE}/api/products/add`, backendFormData);
 //       if (response.data.product_id) {
 //         alert("✅ Product added successfully!");
 //         handleReset();
@@ -1284,7 +1284,7 @@
 //         fd.append("added_by",      "admin");
 //         fd.append("status",        "active");
 
-//         await axios.post("http://localhost:5000/api/products/add", fd);
+//         await axios.post(`${API_BASE}/api/products/add`, fd);
 //       }
 
 //       alert("✅ Bulk upload completed successfully!");

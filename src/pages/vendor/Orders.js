@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Orders.module.css';
+import { API_BASE } from "../../config";
 
 const VendorOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const backendURL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendURL = process.env.REACT_APP_BACKEND_URL || `${API_BASE}`;
 
   useEffect(() => {
     fetch(`${backendURL}/vendor/my-orders`, {
@@ -30,10 +31,10 @@ const VendorOrders = () => {
     if (!image) return '/images/default-placeholder.png';
     if (typeof image !== 'string') return '/images/default-placeholder.png';
     if (image.startsWith('/uploads/') || image.startsWith('static/uploads')) {
-      return `http://localhost:5000/${image.replace(/\\/g, '/')}`;
+      return `${API_BASE}/${image.replace(/\\/g, '/')}`;
     }
     if (image.startsWith('http')) return image;
-    return `http://localhost:5000/${image}`;
+    return `${API_BASE}/${image}`;
   };
 
   const handleView = (order) => {

@@ -58,7 +58,7 @@
 //       }
 
 //       // Fetch only approved categories for this vendor
-//       const res = await fetch(`http://localhost:5000/api/categories/vendor/${vendorId}`);
+//       const res = await fetch(`${API_BASE}/api/categories/vendor/${vendorId}`);
 //       const data = await res.json();
 
 //       if (res.ok && data.categories) {
@@ -88,7 +88,7 @@
 //   useEffect(() => {
 //     const fetchProduct = async () => {
 //       try {
-//         const res = await fetch(`http://localhost:5000/api/products/${productId}`);
+//         const res = await fetch(`${API_BASE}/api/products/${productId}`);
 //         const data = await res.json();
 
 //         if (!res.ok || !data.product) {
@@ -215,7 +215,7 @@
 
 //       newImages.forEach((file) => form.append("images", file));
 
-//       const res = await fetch(`http://localhost:5000/vendor/update-product/${productId}`, {
+//       const res = await fetch(`${API_BASE}/vendor/update-product/${productId}`, {
 //         method: "PUT",
 //         headers: {
 //           Authorization: `Bearer ${token}`,
@@ -412,7 +412,7 @@
 //         <h4>Existing Images</h4>
 //         {formData.images.map((img, i) => (
 //           <div key={i}>
-//             <img src={img.startsWith("http") ? img : `http://localhost:5000/${img}`} alt={`Product ${i}`} width={80} />
+//             <img src={img.startsWith("http") ? img : `${API_BASE}/${img}`} alt={`Product ${i}`} width={80} />
 //             <button type="button" onClick={() => handleRemoveExistingImage(i)}>❌</button>
 //           </div>
 //         ))}

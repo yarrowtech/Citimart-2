@@ -73,7 +73,7 @@
 
 //   // Fetch product data
 //   useEffect(() => {
-//     fetch(`http://localhost:5000/api/products/${id}`)
+//     fetch(`${API_BASE}/api/products/${id}`)
 //       .then(res => res.json())
 //       .then(data => {
 //         if (data.product) {
@@ -187,7 +187,7 @@
 //       productData.images.forEach((img) => formData.append("images", img));
 //       uploadedUrls.forEach((url) => formData.append("images", url));
 
-//       const res = await axios.put(`http://localhost:5000/api/products/${id}?is_admin=true`, formData);
+//       const res = await axios.put(`${API_BASE}/api/products/${id}?is_admin=true`, formData);
 //       if (res.status === 200) {
 //         alert("✅ Product updated successfully!");
 //         navigate("/admin/products");
@@ -348,7 +348,7 @@
 //       {productData.images.map((img, i) => (
 //         <div key={i} className={styles.previewImgWrapper}>
 //           <img
-//             src={img.startsWith("http") ? img : `http://localhost:5000/${img}`}
+//             src={img.startsWith("http") ? img : `${API_BASE}/${img}`}
 //             alt={`Existing ${i}`}
 //             className={styles.previewImg}
 //           />

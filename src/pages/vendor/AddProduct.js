@@ -66,7 +66,7 @@
 //     const fetchVendorProfile = async () => {
 //       try {
 //         const token = localStorage.getItem("token");
-//         const res = await fetch("http://localhost:5000/vendor/profile", {
+//         const res = await fetch(`${API_BASE}/vendor/profile`, {
 //           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
 //           credentials: "include",
 //         });
@@ -94,7 +94,7 @@
 //      useEffect(() => {
 //   const fetchAllCategories = async () => {
 //     try {
-//       const res = await fetch("http://localhost:5000/api/categories");
+//       const res = await fetch(`${API_BASE}/api/categories`);
 //       if (!res.ok) throw new Error("Failed to fetch categories");
 //       const data = await res.json();
 //       const obj = {};
@@ -239,7 +239,7 @@
 
 //   try {
 //     const token = localStorage.getItem("token");
-//     const res = await fetch("http://localhost:5000/vendor/request-category", {
+//     const res = await fetch(`${API_BASE}/vendor/request-category`, {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
@@ -315,7 +315,7 @@
 
 //     try {
 //       const token = localStorage.getItem("token");
-//       const response = await fetch("http://localhost:5000/vendor/add-product", {
+//       const response = await fetch(`${API_BASE}/vendor/add-product`, {
 //         method: "POST",
 //         credentials: "include",
 //         headers: { Authorization: `Bearer ${token}` },
@@ -352,7 +352,7 @@
 
 //       try {
 //         const token = localStorage.getItem("token");
-//         const response = await fetch("http://localhost:5000/vendor/add-product", {
+//         const response = await fetch(`${API_BASE}/vendor/add-product`, {
 //           method: "POST",
 //           credentials: "include",
 //           headers: { Authorization: `Bearer ${token}` },
@@ -1326,7 +1326,7 @@
 //     const fetchVendorProfile = async () => {
 //       try {
 //         const token = localStorage.getItem("token");
-//         const res = await fetch("http://localhost:5000/vendor/profile", {
+//         const res = await fetch(`${API_BASE}/vendor/profile`, {
 //           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
 //           credentials: "include",
 //         });
@@ -1348,7 +1348,7 @@
 //   useEffect(() => {
 //     const fetchAllCategories = async () => {
 //       try {
-//         const res = await fetch("http://localhost:5000/api/categories");
+//         const res = await fetch(`${API_BASE}/api/categories`);
 //         if (!res.ok) throw new Error();
 //         const data = await res.json();
 //         const obj = {};
@@ -1454,7 +1454,7 @@
 //     form.images.forEach(f => formData.append("images", f));
 //     try {
 //       const token = localStorage.getItem("token");
-//       const res = await fetch("http://localhost:5000/vendor/add-product", {
+//       const res = await fetch(`${API_BASE}/vendor/add-product`, {
 //         method: "POST", credentials: "include",
 //         headers: { Authorization: `Bearer ${token}` },
 //         body: formData,
@@ -1483,7 +1483,7 @@
 //     if (!requestSelections.length && !requestInput.trim()) { alert("Please add a selection or write a request"); return; }
 //     try {
 //       const token = localStorage.getItem("token");
-//       const res = await fetch("http://localhost:5000/vendor/request-category", {
+//       const res = await fetch(`${API_BASE}/vendor/request-category`, {
 //         method: "POST", credentials: "include",
 //         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
 //         body: JSON.stringify({ selections: requestSelections, note: requestInput }),
@@ -1521,7 +1521,7 @@
 //       (product.images || []).forEach(f => formData.append("images", f));
 //       try {
 //         const token = localStorage.getItem("token");
-//         const res = await fetch("http://localhost:5000/vendor/add-product", {
+//         const res = await fetch(`${API_BASE}/vendor/add-product`, {
 //           method: "POST", credentials: "include",
 //           headers: { Authorization: `Bearer ${token}` },
 //           body: formData,

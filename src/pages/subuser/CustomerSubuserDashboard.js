@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./CustomerSubuserDashboard.module.css";
+import { API_BASE } from "../../config";
 
 // 🧩 Cloudinary config (replace with your own)
 const CLOUDINARY_CLOUD_NAME = "your_cloud_name";
@@ -47,7 +48,7 @@ const CustomerDashboard = () => {
   const fetchSegmentRequests = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://127.0.0.1:5000/subuser/segment-requests", {
+      const res = await fetch(`${API_BASE}/subuser/segment-requests`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -61,7 +62,7 @@ const CustomerDashboard = () => {
   const fetchPromotions = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://127.0.0.1:5000/subuser/promotions", {
+      const res = await fetch(`${API_BASE}/subuser/promotions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -82,7 +83,7 @@ const CustomerDashboard = () => {
   const handleApprove = async (userId) => {
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/subuser/segment-requests/${userId}/approve`,
+        `${API_BASE}/subuser/segment-requests/${userId}/approve`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -101,7 +102,7 @@ const CustomerDashboard = () => {
   const handleReject = async (userId) => {
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/subuser/segment-requests/${userId}/reject`,
+        `${API_BASE}/subuser/segment-requests/${userId}/reject`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +150,7 @@ const CustomerDashboard = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/subuser/promotions/propose", {
+      const res = await fetch(`${API_BASE}/subuser/promotions/propose`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

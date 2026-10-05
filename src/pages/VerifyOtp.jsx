@@ -17,7 +17,7 @@ const VerifyOtp = () => {
     setMessage("");
 
     try {
-      const res = await axios.post("http://127.0.0.1:5000/auth/verify-otp", {
+      const res = await axios.post(`${API_BASE}/auth/verify-otp`, {
         email,
         otp,
       });
@@ -71,6 +71,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import styles from "./VerifyOtp.module.css";
+import { API_BASE } from "../config";
 
 const VerifyOtp = () => {
   const [email, setEmail] = useState(localStorage.getItem("resetEmail") || "");
@@ -87,8 +88,8 @@ const VerifyOtp = () => {
   // 👇 Select correct endpoint
   const endpoint =
     role === "vendor"
-      ? "http://127.0.0.1:5000/auth/vendor/verify-otp"
-      : "http://127.0.0.1:5000/auth/customer/verify-otp";
+      ? `${API_BASE}/auth/vendor/verify-otp`
+      : `${API_BASE}/auth/customer/verify-otp`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

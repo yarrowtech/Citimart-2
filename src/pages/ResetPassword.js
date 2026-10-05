@@ -27,7 +27,7 @@ const ResetPassword = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:5000/auth/set-password", {
+      const res = await axios.post(`${API_BASE}/auth/set-password`, {
         token,
         password,
       });
@@ -125,6 +125,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import styles from "./ResetPassword.module.css";
+import { API_BASE } from "../config";
 
 const ResetPassword = () => {
   const { token } = useParams(); // token from verify-otp response
@@ -145,8 +146,8 @@ const ResetPassword = () => {
   // 🧭 Select correct endpoint
   const endpoint =
     role === "vendor"
-      ? "http://127.0.0.1:5000/auth/vendor/set-password"
-      : "http://127.0.0.1:5000/auth/customer/set-password";
+      ? `${API_BASE}/auth/vendor/set-password`
+      : `${API_BASE}/auth/customer/set-password`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
