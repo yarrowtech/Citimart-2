@@ -140,6 +140,10 @@ def create_app():
     app.register_blueprint(analytics_bp)
     app.register_blueprint(campaign_bp)
 
+    @app.route('/')
+    def index():
+        return jsonify({"message": "Citimart API is running"}), 200
+
     return app
 
 
