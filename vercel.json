@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "app": {
+      "root": ".",
+      "framework": "create-react-app"
+    },
+    "citimart-backend": {
+      "root": "citimart-backend",
+      "framework": "flask"
+    },
+    "citimart-recommender": {
+      "root": "citimart-recommender",
+      "runtime": "python"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "app"
+      }
+    }
+  ]
+}
