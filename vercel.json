@@ -3,7 +3,8 @@
   "services": {
     "app": {
       "root": ".",
-      "framework": "create-react-app"
+      "framework": "create-react-app",
+      "buildCommand": "CI=false npm run build"
     },
     "citimart-backend": {
       "root": "citimart-backend",
