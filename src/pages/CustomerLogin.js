@@ -67,7 +67,7 @@
 //           </form>
 //           <div className={styles.links}>
 //             <Link to="/forgot-password">Forgot Password?</Link>
-//             <p>Don`t have an account? <Link to="/register">Register</Link></p>
+//             <p>Don't have an account? <Link to="/register">Register</Link></p>
 //           </div>
 //         </div>
 //       </div>
@@ -96,7 +96,7 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("${API_BASE}/auth/login/customer", {
+      const response = await fetch(`${API_BASE}/auth/login/customer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, role: "customer" }),
@@ -183,7 +183,7 @@ const CustomerLogin = () => {
 
           <div className={styles.links}>
             <Link to="/forgot-password">Forgot Password?</Link>
-            <p>Don`t have an account? <Link to="/register">Register</Link></p>
+            <p>Don't have an account? <Link to="/register">Register</Link></p>
           </div>
         </div>
       </div>
