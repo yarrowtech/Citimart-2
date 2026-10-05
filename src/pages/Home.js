@@ -612,8 +612,6 @@
 //   const featured  = homeData?.featuredProducts || [];
 //   const brands    = homeData?.brands           || STATIC_HOME.brands;
 //   const reviews   = homeData?.reviews          || STATIC_HOME.reviews;
-//   const slide     = HERO_SLIDES[index % HERO_SLIDES.length];
-
 //   return (
 //     <div className={styles.home}>
 
@@ -835,7 +833,7 @@
 // export default Home;
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaHeart, FaShoppingCart, FaStar, FaTag } from "react-icons/fa";
+import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
 import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Home.module.css";
 import { API_BASE } from "../config";
@@ -860,12 +858,6 @@ const STATIC_HOME = {
     { name: "Ananya K.", text: "Great prices and genuine products. Highly recommended.",              rating: 4, image: "https://randomuser.me/api/portraits/women/68.jpg" },
   ],
 };
-
-const HERO_SLIDES = [
-  { tag: "New Season", headline: "Style That Speaks", sub: "Fresh arrivals for every occasion" },
-  { tag: "Best Sellers", headline: "Loved by Thousands", sub: "Shop what everyone's wearing" },
-  { tag: "Exclusive Deals", headline: "Up to 50% Off", sub: "Limited time offers on top brands" },
-];
 
 const safeImg = (url) => (url && url.startsWith("http") ? url : url ? `${API_BASE}/${url}` : PLACEHOLDER_IMG);
 
@@ -1183,8 +1175,6 @@ const Home = () => {
   const featured  = homeData?.featuredProducts || [];
   const brands    = homeData?.brands           || STATIC_HOME.brands;
   const reviews   = homeData?.reviews          || STATIC_HOME.reviews;
-  const slide     = HERO_SLIDES[index % HERO_SLIDES.length];
-
   return (
     <div className={styles.home}>
 
@@ -1222,37 +1212,17 @@ const Home = () => {
         </div>
         <div className={styles.heroGradient} />
         <div className={styles.heroContent}>
-          <span className={styles.heroTag}>{slide.tag}</span>
-          <h1 className={styles.heroHeadline}>{slide.headline}</h1>
-          <p className={styles.heroSub}>{slide.sub}</p>
-          <div className={styles.heroBtns}>
-            <Link to="/products" className={styles.heroBtnPrimary}>Shop Now</Link>
-            <Link to="/offers"   className={styles.heroBtnSecondary}>View Offers</Link>
-          </div>
+          <Link to="/products" className={styles.heroBtnPrimary}>
+            Shop Now <span aria-hidden="true">&rarr;</span>
+          </Link>
         </div>
-
 
       </section>
 
       {/* ════════════════════════════════════════
           TRUST STRIP
       ════════════════════════════════════════ */}
-      <section className={styles.trustStrip}>
-        {[
-          { icon: "🚚", title: "Free Delivery",   sub: "On orders above ₹500" },
-          { icon: "🔒", title: "Secure Payments", sub: "100% safe & encrypted" },
-          { icon: "🎧", title: "24/7 Support",    sub: "We're always here" },
-          { icon: <FaTag />, title: "Best Prices", sub: "Guaranteed lowest" },
-        ].map((t, i) => (
-          <div key={i} className={styles.trustItem}>
-            <span className={styles.trustIcon}>{t.icon}</span>
-            <div>
-              <strong>{t.title}</strong>
-              <p>{t.sub}</p>
-            </div>
-          </div>
-        ))}
-      </section>
+
 
       {/* ════════════════════════════════════════
           OFFERS BANNER STRIP

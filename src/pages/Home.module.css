@@ -109,76 +109,88 @@
   height: 520px;
   overflow: hidden;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   margin: 0;
   padding: 0;
-}
-.heroSlides {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-.heroSlide {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-size: cover;
-  background-position: center center;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-.heroSlideActive { opacity: 1; z-index: 1; }
-.heroGradient {
-  position: absolute; inset: 0; z-index: 2;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.65) 0%,
-    rgba(0,0,0,0.3)  60%,
-    transparent      100%
-  );
-}
-.heroContent {
-  position: absolute; left: 6%; bottom: 0; top: 0;
-  z-index: 3; display: flex; flex-direction: column;
-  justify-content: center; max-width: 520px;
-  /* Keep browser caret-browsing/selection marks out of the hero copy. */
+  box-sizing: border-box;
+  /* Browser caret-browsing (F7) shows a blinking text caret over any
+     clicked point, including images — suppress it across the whole
+     hero, not just the text block, so it never appears over the photo. */
   user-select: none;
   -webkit-user-select: none;
   caret-color: transparent;
 }
-.heroTag {
-  display: inline-block; background: #ff3f6c;
-  color: #fff; font-size: 11px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
-  width: fit-content;
+.heroSlides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
-.heroHeadline {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 800; color: #fff;
-  line-height: 1.15; margin: 0 0 12px;
+.heroSlide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 1.1s ease, transform 8s ease-out;
 }
-.heroSub {
-  font-size: 16px; color: rgba(255,255,255,0.85);
-  margin: 0 0 24px; line-height: 1.5;
+.heroSlideActive { opacity: 1; z-index: 1; transform: scale(1); }
+.heroGradient {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.38) 0%,
+    rgba(0,0,0,0.08) 30%,
+    transparent 58%
+  );
 }
-.heroBtns { display: flex; gap: 12px; flex-wrap: wrap; }
+.heroContent {
+  position: absolute;
+  left: 6%;
+  bottom: 42px;
+  z-index: 3;
+}
 .heroBtnPrimary {
-  background: #ff3f6c; color: #fff;
-  padding: 14px 28px; border-radius: 10px;
-  font-weight: 700; font-size: 15px;
-  text-decoration: none; transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #ff3f6c, #e91e63);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(233,30,99,0.34);
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
-.heroBtnPrimary:hover { background: #e7335b; transform: translateY(-2px); }
-.heroBtnSecondary {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  color: #fff; border: 1.5px solid rgba(255,255,255,0.4);
-  padding: 14px 28px; border-radius: 10px;
-  font-weight: 600; font-size: 15px;
-  text-decoration: none; transition: 0.2s;
+.heroBtnPrimary span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  font-size: 18px;
+  line-height: 0;
+  transition: transform 0.2s ease;
 }
-.heroBtnSecondary:hover { background: rgba(255,255,255,0.25); }
+.heroBtnPrimary:hover {
+  background: linear-gradient(135deg, #f73565, #d9195b);
+  box-shadow: 0 14px 34px rgba(233,30,99,0.42);
+  transform: translateY(-2px);
+}
+.heroBtnPrimary:hover span { transform: translateX(3px); }
+.heroBtnPrimary:active { transform: scale(0.98); }
+.heroBtnPrimary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 /* hero nav arrows removed */
 .heroDots {
   position: absolute; bottom: 20px; left: 50%;
@@ -404,9 +416,28 @@
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .hero { height: 420px; }
-  .heroContent { left: 5%; max-width: 90%; }
-  .heroHeadline { font-size: 1.8rem; }
+  .hero {
+    width: auto;
+    height: clamp(360px, 58vh, 460px);
+    margin: 12px;
+    border-radius: 22px;
+    box-shadow: 0 8px 28px rgba(15,23,42,0.12);
+  }
+  .heroSlide { background-position: center center; }
+  .heroGradient {
+    background: linear-gradient(to top, rgba(9,14,28,0.58) 0%, rgba(9,14,28,0.08) 42%, transparent 68%);
+  }
+  .heroContent {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+  .heroBtnPrimary {
+    width: 100%;
+    min-height: 56px;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(233,30,99,0.32);
+  }
   .trustItem { padding: 16px 20px; min-width: 160px; }
   .section { padding: 32px 4%; }
   .productCard { flex: 0 0 180px; }
@@ -416,14 +447,15 @@
 }
 
 @media (max-width: 480px) {
-  .hero { height: 340px; }
-  .heroBtns { flex-direction: column; }
-  .heroBtnPrimary, .heroBtnSecondary { text-align: center; }
+  .hero {
+    height: clamp(350px, 54vh, 420px);
+    margin: 10px;
+    border-radius: 20px;
+  }
   .offerStrip { grid-template-columns: 1fr; }
   .trustStrip { flex-direction: column; }
   .trustItem { border-right: none; border-bottom: 1px solid #f0f0f0; }
 }
-
 /* ── Smart Variant Popup extras ────────────────────────────────────────────── */
 .modalPrice {
   font-size: 18px; font-weight: 800; color: #ff3f6c; margin: 4px 0 0;

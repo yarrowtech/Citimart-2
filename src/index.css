@@ -22,9 +22,15 @@
   --border-color: #e2e8f0;
 }
 
-body {
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
 
+body {
   margin: 0;
+  width: 100%;
+  overflow-x: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
     'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;

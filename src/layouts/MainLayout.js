@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./MainLayout.module.css";
-import { FaUser, FaShoppingCart, FaHeart, FaCog } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaHeart, FaCog, FaTruck, FaLock, FaHeadset, FaTag } from "react-icons/fa";
 import logo from "../assets/log.JPG";
 
 import { API_BASE } from "../config";
@@ -322,6 +322,22 @@ const MainLayout = () => {
 
       {/* Footer */}
       <footer className={styles.footer}>
+        <div className={styles.footerBenefits} aria-label="Shopping benefits">
+          {[
+            { icon: <FaTruck />, title: "Free Delivery", sub: "On orders above ₹500" },
+            { icon: <FaLock />, title: "Secure Payments", sub: "100% safe & encrypted" },
+            { icon: <FaHeadset />, title: "24/7 Support", sub: "We're always here" },
+            { icon: <FaTag />, title: "Best Prices", sub: "Guaranteed value" },
+          ].map((benefit) => (
+            <div className={styles.footerBenefit} key={benefit.title}>
+              <span className={styles.footerBenefitIcon}>{benefit.icon}</span>
+              <div>
+                <strong>{benefit.title}</strong>
+                <p>{benefit.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className={styles.container}>
           <div className={styles.footerContent}>
             <div className={styles.footerSection}>
