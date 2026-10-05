@@ -7,11 +7,15 @@
     },
     "citimart-backend": {
       "root": "citimart-backend",
-      "framework": "flask"
+      "framework": "flask",
+      "bindings": [
+        { "type": "service", "service": "citimart-recommender", "format": "url", "env": "RECOMMENDER_URL" }
+      ]
     },
     "citimart-recommender": {
       "root": "citimart-recommender",
-      "runtime": "python"
+      "runtime": "python",
+      "entrypoint": "app.py"
     }
   },
   "rewrites": [
