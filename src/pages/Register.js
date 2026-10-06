@@ -203,8 +203,29 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message || 'Registration successful!');
-        window.location.href = '/login';
+        try {
+          const loginRes = await fetch(`${API_BASE}/auth/login/customer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: formData.email, password: formData.password, role: 'customer' }),
+          });
+          const loginData = await loginRes.json();
+          if (!loginRes.ok) throw new Error(loginData.error || 'Auto-login failed');
+          const user = loginData.user;
+          localStorage.setItem('customer', JSON.stringify({
+            name: user.fullName || user.name,
+            email: user.email,
+            token: loginData.token,
+            id: user.id,
+          }));
+          localStorage.setItem('token', loginData.token);
+          localStorage.setItem('customer_id', user.id);
+          localStorage.setItem('role', 'customer');
+          window.location.href = '/';
+        } catch {
+          alert(data.message || 'Registration successful! Please log in.');
+          window.location.href = '/login';
+        }
       } else {
         alert(data.error || 'Registration failed!');
       }
