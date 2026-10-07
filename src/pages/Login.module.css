@@ -347,6 +347,10 @@ background: linear-gradient(135deg, #93c5fd 0%, #96c2f8 50%, #3b82f6 100%);
   vertical-align: baseline;
 }
 
+.links .registerPrompt a:hover {
+  transform: none;
+}
+
 /* Divider with "OR" */
 .divider {
   display: flex;
