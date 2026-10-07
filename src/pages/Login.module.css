@@ -332,9 +332,19 @@ background: linear-gradient(135deg, #93c5fd 0%, #96c2f8 50%, #3b82f6 100%);
   font-weight: 500;
 }
 
+.links .registerPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 .links p a {
   font-size: 0.875rem;
   margin-top: 0;
+  line-height: inherit;
+  vertical-align: baseline;
 }
 
 /* Divider with "OR" */

@@ -183,7 +183,10 @@ const CustomerLogin = () => {
 
           <div className={styles.links}>
             <Link to="/forgot-password">Forgot Password?</Link>
-            <p>Don't have an account? <Link to="/register">Register</Link></p>
+            <p className={styles.registerPrompt}>
+              <span>Don't have an account?</span>
+              <Link to="/register">Register</Link>
+            </p>
           </div>
         </div>
       </div>
