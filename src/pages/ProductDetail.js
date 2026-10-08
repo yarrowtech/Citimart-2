@@ -1001,9 +1001,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VariantSelector from "../pages/Variantselector";
-import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./ProductDetail.module.css";
 import { API_BASE } from "../config";
+import { addGuestCartItem, addGuestWishlistItem } from "../utils/guestCommerce";
 import {
   FaHeart,
   FaShoppingCart,
@@ -1030,7 +1030,6 @@ const ProductDetail = () => {
   const [recommended, setRecommended] = useState([]);
   const [variantPopup, setVariantPopup] = useState(null);
   const [fbtQueue, setFbtQueue] = useState([]);
-  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
   const [offers, setOffers] = useState([]);
   // For popup variant selections (do NOT touch main product selection)
   const [popupSelectedColor, setPopupSelectedColor] = useState("");
@@ -1136,11 +1135,6 @@ const ProductDetail = () => {
 
   // ✅ Add to Cart API
   const addToCartAPI = async (productId, size, color) => {
-    if (!customer) {
-      setGuestCapture({ productName: product?.name || "" });
-      return false;
-    }
-
     // CHANGE 6 — addToCartAPI validation
     const productToCheck = productId === product._id ? product : variantPopup?.product;
 
@@ -1158,6 +1152,12 @@ const ProductDetail = () => {
         alert("This size and color combination is not available");
         return false;
       }
+    }
+
+    if (!customer) {
+      addGuestCartItem(productToCheck, isSizeCategory(productToCheck) ? size : "N/A", color || "N/A", quantity);
+      alert("✅ Added to Cart!");
+      return true;
     }
 
     try {
@@ -1197,11 +1197,6 @@ const ProductDetail = () => {
 
   // ✅ Add to Wishlist API
   const addToWishlistAPI = async (productId, size, color) => {
-    if (!customer) {
-      setGuestCapture({ productName: product?.name || "" });
-      return false;
-    }
-
     const productToCheck = productId === product._id ? product : variantPopup?.product;
 
     // Validation
@@ -1211,6 +1206,12 @@ const ProductDetail = () => {
     ) {
       alert("Please select required options");
       return false;
+    }
+
+    if (!customer) {
+      addGuestWishlistItem(productToCheck, isSizeCategory(productToCheck) ? size : "N/A", color || "N/A");
+      alert("✅ Added to Wishlist!");
+      return true;
     }
 
     try {
@@ -1344,8 +1345,6 @@ const ProductDetail = () => {
   };
 
   const addBothToCart = async () => {
-    if (!customer) return setGuestCapture({ productName: product?.name || "" });
-
     const requiresSize = 
       product.category?.toLowerCase() === "clothing" ||
       (product.category?.toLowerCase() === "handmade" && 
@@ -1517,13 +1516,6 @@ const ProductDetail = () => {
 
   return (
     <div className={styles.amazonLayout}>
-      {guestCapture && (
-        <GuestCaptureModal
-          productName={guestCapture.productName}
-          onClose={() => setGuestCapture(null)}
-          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
-        />
-      )}
       {/* LEFT SECTION */}
       <div className={styles.leftSection}>
         <div className={styles.imageGallery}>

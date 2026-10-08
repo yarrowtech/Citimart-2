@@ -342,11 +342,11 @@
 
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaRupeeSign, FaShoppingBag, FaSort, FaClock, FaHeart, FaShoppingCart, FaFilter, FaTimes } from "react-icons/fa";
-import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Products.module.css";
 import { API_BASE } from "../config";
+import { addGuestCartItem, addGuestWishlistItem } from "../utils/guestCommerce";
 const PLACEHOLDER = "/images/default-placeholder.png";
 
 function useQuery() { return new URLSearchParams(useLocation().search); }
@@ -529,7 +529,6 @@ const ProductCard = ({ product, onCart, onWishlist }) => {
 // ── Main ──────────────────────────────────────────────────────────────────────
 const Products = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const query    = useQuery();
 
   const [products,      setProducts]      = useState([]);
@@ -548,7 +547,6 @@ const Products = () => {
 
   const [popup,  setPopup]  = useState(null); // { product, mode }
   const [toast,  setToast]  = useState("");
-  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
 
   const customer = (() => { try { return JSON.parse(localStorage.getItem("customer")); } catch { return null; } })();
 
@@ -627,7 +625,7 @@ const Products = () => {
 
   // ── Cart / Wishlist ──
   const addToCart = async (product, size, color) => {
-    if (!customer) { setGuestCapture({ productName: product?.name || "" }); return; }
+    if (!customer) { addGuestCartItem(product, size, color); showToast("✅ Added to Cart!"); setPopup(null); return; }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: "POST",
@@ -642,7 +640,7 @@ const Products = () => {
   };
 
   const addToWishlist = async (product, size, color) => {
-    if (!customer) { setGuestCapture({ productName: product?.name || "" }); return; }
+    if (!customer) { addGuestWishlistItem(product, size, color); showToast("❤️ Added to Wishlist!"); setPopup(null); return; }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
         method: "POST",
@@ -687,13 +685,6 @@ const Products = () => {
       {popup && (
         <VariantPopup product={popup.product} mode={popup.mode}
           onClose={() => setPopup(null)} onConfirm={handleConfirm} />
-      )}
-      {guestCapture && (
-        <GuestCaptureModal
-          productName={guestCapture.productName}
-          onClose={() => setGuestCapture(null)}
-          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
-        />
       )}
 
       <div className={styles.container}>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./MainLayout.module.css";
-import { FaUser, FaShoppingCart, FaHeart, FaCog, FaTruck, FaLock, FaHeadset, FaTag } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaHeart, FaCog, FaTruck, FaLock, FaHeadset, FaTag, FaSignOutAlt } from "react-icons/fa";
 import logo from "../assets/log.JPG";
 import CustomerChatWidget from "../components/chat/CustomerChatWidget";
 
 import { API_BASE } from "../config";
+import { getGuestCart, getGuestWishlist } from "../utils/guestCommerce";
 const brandsData = {
   "Popular Brands": ["Nike", "Adidas", "Levi's", "Zara"],
   "Luxury Brands": ["Gucci", "Prada", "Louis Vuitton"]
@@ -57,7 +58,7 @@ const MainLayout = () => {
       }
     };
     const protectCustomerPages = () => {
-      if (!localStorage.getItem("customer") && ["/cart", "/wishlist", "/customer-settings"].includes(window.location.pathname)) {
+      if (!localStorage.getItem("customer") && window.location.pathname === "/customer-settings") {
         navigate("/login", { replace: true });
       }
     };
@@ -82,9 +83,20 @@ const MainLayout = () => {
     const token = customer?.token;
     const controller = new AbortController();
 
-    setCartCount(0);
-    setWishlistCount(0);
-    if (!customerId || !token) return () => controller.abort();
+    if (!customerId || !token) {
+      const refreshGuestCounts = () => {
+        setCartCount(getGuestCart().reduce((total, item) => total + Number(item.quantity || 1), 0));
+        setWishlistCount(getGuestWishlist().length);
+      };
+      refreshGuestCounts();
+      window.addEventListener("citimart:counts-changed", refreshGuestCounts);
+      window.addEventListener("storage", refreshGuestCounts);
+      return () => {
+        controller.abort();
+        window.removeEventListener("citimart:counts-changed", refreshGuestCounts);
+        window.removeEventListener("storage", refreshGuestCounts);
+      };
+    }
 
     const refreshHeaderCounts = async () => {
       const headers = { Authorization: `Bearer ${token}` };
@@ -136,8 +148,7 @@ const MainLayout = () => {
   };
 
   const handleProtectedClick = (path) => {
-    if (!customer) navigate("/login");
-    else navigate(path);
+    navigate(path);
   };
 
   const handleCategoryClick = (category) => {
@@ -180,11 +191,15 @@ const MainLayout = () => {
                 </span>
               )}
 
-              <button className={styles.iconLink} onClick={() => handleProtectedClick("/wishlist")}>
-                <span className={styles.actionIcon}><FaHeart /></span> Wishlist{wishlistCount > 0 && <span className={styles.countBadge}>{wishlistCount > 99 ? "99+" : wishlistCount}</span>}
+              <button className={styles.iconLink} onClick={() => handleProtectedClick("/wishlist")} aria-label="Wishlist">
+                <span className={styles.actionIcon}><FaHeart /></span>
+                <span className={styles.btnLabel}>Wishlist</span>
+                {wishlistCount > 0 && <span className={styles.countBadge}>{wishlistCount > 99 ? "99+" : wishlistCount}</span>}
               </button>
-              <button className={styles.iconLink} onClick={() => handleProtectedClick("/cart")}>
-                <span className={styles.actionIcon}><FaShoppingCart /></span> Cart{cartCount > 0 && <span className={styles.countBadge}>{cartCount > 99 ? "99+" : cartCount}</span>}
+              <button className={styles.iconLink} onClick={() => handleProtectedClick("/cart")} aria-label="Cart">
+                <span className={styles.actionIcon}><FaShoppingCart /></span>
+                <span className={styles.btnLabel}>Cart</span>
+                {cartCount > 0 && <span className={styles.countBadge}>{cartCount > 99 ? "99+" : cartCount}</span>}
               </button>
 
               {customer ? (
@@ -192,13 +207,15 @@ const MainLayout = () => {
                   <Link to="/customer-settings" className={styles.settingsIcon} aria-label="Account settings">
                     <FaCog />
                   </Link>
-                  <button onClick={handleLogout} className={styles.logoutBtn}>
-                    Logout
+                  <button onClick={handleLogout} className={styles.logoutBtn} aria-label="Logout">
+                    <span className={styles.btnLabel}>Logout</span>
+                    <span className={styles.btnIconOnly}><FaSignOutAlt /></span>
                   </button>
                 </>
               ) : (
-                <Link to="/login" className={styles.iconLink}>
-                  <FaUser /> Login
+                <Link to={`/login?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`} state={{ returnTo: `${location.pathname}${location.search}` }} className={styles.iconLink} aria-label="Login">
+                  <span className={styles.actionIcon}><FaUser /></span>
+                  <span className={styles.btnLabel}>Login</span>
                 </Link>
               )}
             </div>

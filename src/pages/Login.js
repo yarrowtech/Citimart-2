@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 import { toast } from 'react-toastify';
 import { API_BASE } from "../config";
+import { mergeGuestCommerce } from "../utils/guestCommerce";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '', role: 'customer' });
   const navigate = useNavigate();
+  const location = useLocation();
+  const requestedReturnTo = new URLSearchParams(location.search).get("returnTo") || location.state?.returnTo || "/";
+  const returnTo = requestedReturnTo.startsWith("/") && !requestedReturnTo.startsWith("//") ? requestedReturnTo : "/";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,7 +19,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE}/auth/login`, {
+      const response = await fetch(`${API_BASE}/auth/login/${formData.role}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -28,14 +32,17 @@ const Login = () => {
 
         //  Store customer data properly
         if (user.role === 'customer') {
-          localStorage.setItem('customer', JSON.stringify({
+          const customer = {
             name: user.fullName || user.name,
             email: user.email,
             token: data.token,
             id: user.id,
-          }));
+          };
+          localStorage.setItem('customer', JSON.stringify(customer));
           localStorage.setItem('token', data.token);
           localStorage.setItem('customer_id', user.id);
+          await mergeGuestCommerce(customer).catch(error => toast.warn(error.message));
+          window.dispatchEvent(new Event("citimart:auth-changed"));
         } else {
           localStorage.setItem('token', data.token);
           localStorage.setItem('role', user.role);
@@ -52,7 +59,7 @@ const Login = () => {
         //  Redirect by role
         if (user.role === 'admin') navigate('/admin/dashboard');
         else if (user.role === 'vendor') navigate('/vendor');
-        else navigate('/');
+        else navigate(returnTo);
       } else {
         alert(data.error || 'Login failed!');
       }
@@ -114,7 +121,7 @@ const Login = () => {
 
           <div className={styles.links}>
             <Link to="/forgotpassword">Forgot Password?</Link>
-            <p>Don't have an account? <Link to="/register">Register</Link></p>
+            <p>Don't have an account? <Link to={`/register?returnTo=${encodeURIComponent(returnTo)}`} state={{ returnTo }}>Register</Link></p>
           </div>
         </div>
       </div>

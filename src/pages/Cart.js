@@ -4,6 +4,7 @@ import styles from './Cart.module.css';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 import { API_BASE } from "../config";
+import { addGuestCartItem, addGuestWishlistItem, clearGuestCart, getGuestCart, getGuestWishlist, removeGuestCartItem, removeGuestWishlistItem, updateGuestCartItem, mergeGuestCommerce } from "../utils/guestCommerce";
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [coupon, setCoupon] = useState('');
@@ -32,6 +33,12 @@ const Cart = () => {
 
   //  FETCH CART ========
   const fetchCart = async () => {
+  if (!customerId || !token) {
+    const items = getGuestCart();
+    setCartItems(items);
+    calculateTotal(items);
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/customer/cart/${customerId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -51,6 +58,7 @@ const Cart = () => {
 
 
   const fetchOffersOrSimilar = async () => {
+  if (!customerId || !token) { setOffers([]); setSimilarProducts([]); return; }
   try {
     // Fetch offers
     const res = await fetch(`${API_BASE}/customer/cart/offers/${customerId}`, {
@@ -72,6 +80,10 @@ const Cart = () => {
 };
 
   const fetchWishlist = async () => {
+    if (!customerId || !token) {
+      setWishlist(getGuestWishlist().map(item => item.product?._id || item.product_id).filter(Boolean));
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/${customerId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -99,6 +111,11 @@ const Cart = () => {
   // ======== CART ACTIONS ========
   const updateQuantity = async (productId, size, color, newQuantity) => {
     if (newQuantity < 1) return;
+    if (!customerId || !token) {
+      updateGuestCartItem(productId, size, color, newQuantity);
+      await fetchCart();
+      return true;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/update_quantity`, {
         method: 'POST',
@@ -114,6 +131,11 @@ const Cart = () => {
   };
 
   const removeFromCart = async (productId, size, color) => {
+    if (!customerId || !token) {
+      removeGuestCartItem(productId, size, color);
+      await fetchCart();
+      return true;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/remove_item`, {
         method: 'DELETE',
@@ -130,6 +152,11 @@ const Cart = () => {
   };
 
   const clearCart = async () => {
+    if (!customerId || !token) {
+      clearGuestCart();
+      setCartItems([]); setTotal(0); setTotalItems(0);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/clear/${customerId}`, {
         method: 'DELETE',
@@ -147,6 +174,12 @@ const Cart = () => {
   };
 
   const addToCart = async (productId, size = null, color = null) => {
+    if (!customerId || !token) {
+      const product = similarProducts.find(item => item._id === productId) || cartItems.find(item => item.product?._id === productId)?.product;
+      if (product) addGuestCartItem(product, size, color);
+      await fetchCart();
+      return Boolean(product);
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: 'POST',
@@ -162,6 +195,12 @@ const Cart = () => {
   };
 
   const addToWishlist = async (productId, size = null, color = null) => {
+  if (!customerId || !token) {
+    const product = similarProducts.find(item => item._id === productId) || cartItems.find(item => item.product?._id === productId)?.product;
+    if (product) addGuestWishlistItem(product, size, color);
+    await fetchWishlist();
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
       method: 'POST',
@@ -177,6 +216,11 @@ const Cart = () => {
 
 
   const removeFromWishlist = async (productId) => {
+  if (!customerId || !token) {
+    getGuestWishlist().filter(item => (item.product?._id || item.product_id) === productId).forEach(item => removeGuestWishlistItem(productId, item.size, item.color));
+    await fetchWishlist();
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/customer/wishlist/remove`, {
       method: 'DELETE',
@@ -196,11 +240,19 @@ const Cart = () => {
 
 
   useEffect(() => {
-    if (!customerId || !token) { navigate("/login"); return; }
-    fetchCart();
-    fetchOffersOrSimilar();
-    fetchWishlist();
-  }, []);
+    const initializeCart = async () => {
+      if (customerId && token && (getGuestCart().length || getGuestWishlist().length)) {
+        try {
+          await mergeGuestCommerce({ id: customerId, token });
+        } catch (error) {
+          console.error("Unable to restore guest items:", error);
+          alert(error.message);
+        }
+      }
+      await Promise.all([fetchCart(), fetchOffersOrSimilar(), fetchWishlist()]);
+    };
+    initializeCart();
+  }, [customerId, token]);
 
   const getImage = (item) => {
     const img = item.product?.images?.[0];
@@ -208,6 +260,10 @@ const Cart = () => {
   };
 
  const handleBuy = () => {
+  if (!customerId || !token) {
+    navigate("/login?returnTo=%2Fcart", { state: { returnTo: "/cart" } });
+    return;
+  }
   const cartWithGiftInfo = cartItems.map(item => ({
     ...item,
     isGift: item.isGift || false,
@@ -277,6 +333,13 @@ const handleRemoveItem = async () => {
 
 const handleMoveToWishlist = async () => {
   if (!removeModal.product) return;
+  if (!customerId || !token) {
+    const item = cartItems.find(entry => entry.product?._id === removeModal.product && entry.size === removeModal.size && entry.color === removeModal.color);
+    if (item?.product) addGuestWishlistItem(item.product, removeModal.size, removeModal.color);
+    await removeFromCart(removeModal.product, removeModal.size, removeModal.color);
+    setRemoveModal({ visible: false, product: null, size: null, color: null });
+    return;
+  }
   try {
     const addResponse = await fetch(`${API_BASE}/customer/wishlist/add`, {
       method: 'POST',

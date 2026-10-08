@@ -93,8 +93,13 @@ def get_homepage():
                     enriched_item = {
                         "_id": product["_id"],
                         "name": product.get("name"),
+                        "brand": product.get("brand"),
                         "price": product.get("price"),
-                        "img": (product.get("images") or [None])[0],
+                        "discount": product.get("discount", 0),
+                        "images": product.get("images", []),
+                        "category": product.get("category"),
+                        "subcategory": product.get("subcategory"),
+                        "variants": product.get("variants", []),
                     }
             except Exception as e:
                 print(f"Skipping invalid trending product_id {product_id}: {e}")
@@ -117,10 +122,15 @@ def get_homepage():
                     enriched_item = {
                         "_id": product["_id"],
                         "name": product.get("name"),
+                        "brand": product.get("brand"),
                         "price": product.get("price"),
-                        "img": (product.get("images") or [None])[0],
-                        "rating": product.get("rating", 4.5),  # optional extra
+                        "discount": product.get("discount", 0),
+                        "images": product.get("images", []),
+                        "category": product.get("category"),
+                        "subcategory": product.get("subcategory"),
+                        "variants": product.get("variants", []),
                     }
+                    enriched_item["rating"] = product.get("rating", 4.5)
             except Exception as e:
                 print(f"Skipping invalid featured product_id {product_id}: {e}")
         enriched_featured.append(enriched_item)

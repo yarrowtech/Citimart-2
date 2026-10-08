@@ -1,6 +1,6 @@
 // // src/pages/Home.js
 // import React, { useEffect, useRef, useState } from "react";
-// import { Link } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
 // import { FaHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 // import styles from "./Home.module.css";
 
@@ -832,11 +832,11 @@
 
 // export default Home;
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
-import GuestCaptureModal from "../components/GuestCaptureModal";
 import styles from "./Home.module.css";
 import { API_BASE } from "../config";
+import { addGuestCartItem, addGuestWishlistItem } from "../utils/guestCommerce";
 const PLACEHOLDER_IMG = "https://via.placeholder.com/500x500?text=No+Image";
 
 const STATIC_HOME = {
@@ -1078,7 +1078,6 @@ const VariantPopup = ({ product, mode, onClose, onConfirm }) => {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Home = () => {
-  const navigate   = useNavigate();
   const [homeData,     setHomeData]     = useState(null);
   const [offers,       setOffers]       = useState([]);
   const [newArrivals,  setNewArrivals]  = useState([]);
@@ -1086,7 +1085,6 @@ const Home = () => {
   const [index,        setIndex]        = useState(0);
   const [popup,        setPopup]        = useState(null); // { product, mode }
   const [toast,        setToast]        = useState("");
-  const [guestCapture, setGuestCapture] = useState(null); // { productName } | null
   const autoplayRef = useRef(null);
   const AUTOPLAY_MS = 5000;
 
@@ -1134,10 +1132,13 @@ const Home = () => {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2500); };
 
   // ── Cart / Wishlist ──
-  const requireLogin = (product) => { setGuestCapture({ productName: product?.name || "" }); return false; };
-
   const addToCart = async (product, size, color) => {
-    if (!customer) return requireLogin(product);
+    if (!customer) {
+      addGuestCartItem(product, size, color);
+      showToast("✅ Added to Cart!");
+      setPopup(null);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/cart/add`, {
         method: "POST",
@@ -1152,7 +1153,12 @@ const Home = () => {
   };
 
   const addToWishlist = async (product, size, color) => {
-    if (!customer) return requireLogin(product);
+    if (!customer) {
+      addGuestWishlistItem(product, size, color);
+      showToast("❤️ Added to Wishlist!");
+      setPopup(null);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/add`, {
         method: "POST",
@@ -1188,15 +1194,6 @@ const Home = () => {
           mode={popup.mode}
           onClose={() => setPopup(null)}
           onConfirm={handlePopupConfirm}
-        />
-      )}
-
-      {/* ── GUEST CAPTURE (shown instead of a blind redirect when not logged in) ── */}
-      {guestCapture && (
-        <GuestCaptureModal
-          productName={guestCapture.productName}
-          onClose={() => setGuestCapture(null)}
-          onLoginInstead={() => { setGuestCapture(null); navigate("/login"); }}
         />
       )}
 
@@ -1317,7 +1314,7 @@ const Home = () => {
           <div className={styles.productRow}>
             {trending.map((item, i) => (
               <ProductCard key={item._id || i}
-                product={{ ...item, images: [item.img || item.image], _id: item._id || item.id }}
+                product={{ ...item, images: item.images?.length ? item.images : [item.img || item.image], _id: item._id || item.id }}
                 onAddToCart={handleAddToCart} onWishlist={handleWishlist} />
             ))}
           </div>
@@ -1336,7 +1333,7 @@ const Home = () => {
           <div className={styles.productGrid4}>
             {featured.map((p, i) => (
               <ProductCard key={p._id || i}
-                product={{ ...p, images: [p.img || p.image] }}
+                product={{ ...p, images: p.images?.length ? p.images : [p.img || p.image] }}
                 onAddToCart={handleAddToCart} onWishlist={handleWishlist} />
             ))}
           </div>

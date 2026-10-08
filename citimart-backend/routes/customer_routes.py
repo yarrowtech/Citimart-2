@@ -20,6 +20,56 @@ from database import (
 
 customer_bp = Blueprint("customer", __name__)
 
+@customer_bp.route("/guest/merge", methods=["POST"])
+@token_required
+def merge_guest_commerce(current_user):
+    """Merge browser guest items into the authenticated customer account."""
+    data = request.get_json(silent=True) or {}
+    customer_id = str(current_user["_id"])
+    if data.get("customer_id") != customer_id:
+        return jsonify({"error": "Unauthorized access"}), 403
+
+    guest_cart = data.get("cart") if isinstance(data.get("cart"), list) else []
+    guest_wishlist = data.get("wishlist") if isinstance(data.get("wishlist"), list) else []
+    cart = cart_collection.find_one({"customer_id": customer_id}) or {"items": []}
+    wishlist = wishlist_collection.find_one({"customer_id": customer_id}) or {"items": []}
+
+    def product_id_from(item):
+        product_id = item.get("product_id") or (item.get("product") or {}).get("_id")
+        if isinstance(product_id, dict):
+            product_id = product_id.get("$oid")
+        return str(product_id) if product_id and ObjectId.is_valid(str(product_id)) else None
+
+    for guest_item in guest_cart:
+        product_id = product_id_from(guest_item)
+        if not product_id or not products_collection.find_one({"_id": ObjectId(product_id)}):
+            continue
+        size = guest_item.get("size") or "N/A"
+        color = guest_item.get("color") or "N/A"
+        quantity = max(1, int(guest_item.get("quantity") or 1))
+        existing = next((item for item in cart["items"] if item.get("product_id") == product_id and item.get("size") == size and item.get("color") == color), None)
+        if existing:
+            existing["quantity"] = int(existing.get("quantity") or 1) + quantity
+        else:
+            cart["items"].append({"product_id": product_id, "size": size, "color": color, "quantity": quantity, "gift_option": False, "gift_message": ""})
+
+    for guest_item in guest_wishlist:
+        product_id = product_id_from(guest_item)
+        if not product_id or not products_collection.find_one({"_id": ObjectId(product_id)}):
+            continue
+        size = guest_item.get("size") or "N/A"
+        color = guest_item.get("color") or "N/A"
+        if not any(item.get("product_id") == product_id and item.get("size") == size and item.get("color") == color for item in wishlist["items"]):
+            wishlist["items"].append({"product_id": product_id, "size": size, "color": color})
+
+    cart_collection.update_one({"customer_id": customer_id}, {"$set": {"items": cart["items"]}}, upsert=True)
+    wishlist_collection.update_one({"customer_id": customer_id}, {"$set": {"items": wishlist["items"]}}, upsert=True)
+    return jsonify({
+        "message": "Guest items merged",
+        "cart_count": sum(int(item.get("quantity") or 1) for item in cart["items"]),
+        "wishlist_count": len(wishlist["items"]),
+    }), 200
+
 # --------------------- CART ---------------------
 
 def normalize_product_id(pid):

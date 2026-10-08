@@ -150,13 +150,18 @@
 // export default Register;
 
 import React, { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Register.module.css';
 import { API_BASE } from "../config";
+import { mergeGuestCommerce } from "../utils/guestCommerce";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const requestedReturnTo = searchParams.get("returnTo") || location.state?.returnTo || "/";
+  const returnTo = requestedReturnTo.startsWith("/") && !requestedReturnTo.startsWith("//") ? requestedReturnTo : "/";
 
   const [formData, setFormData] = useState({
     name: '',
@@ -212,19 +217,22 @@ const Register = () => {
           const loginData = await loginRes.json();
           if (!loginRes.ok) throw new Error(loginData.error || 'Auto-login failed');
           const user = loginData.user;
-          localStorage.setItem('customer', JSON.stringify({
+          const customer = {
             name: user.fullName || user.name,
             email: user.email,
             token: loginData.token,
             id: user.id,
-          }));
+          };
+          localStorage.setItem('customer', JSON.stringify(customer));
           localStorage.setItem('token', loginData.token);
           localStorage.setItem('customer_id', user.id);
           localStorage.setItem('role', 'customer');
-          window.location.href = '/';
+          await mergeGuestCommerce(customer).catch(error => console.error("Guest basket merge failed:", error));
+          window.dispatchEvent(new Event("citimart:auth-changed"));
+          navigate(returnTo, { replace: true });
         } catch {
           alert(data.message || 'Registration successful! Please log in.');
-          window.location.href = '/login';
+          navigate(`/login?returnTo=${encodeURIComponent(returnTo)}`, { replace: true, state: { returnTo } });
         }
       } else {
         alert(data.error || 'Registration failed!');
@@ -351,7 +359,7 @@ const Register = () => {
 
           <div className={styles.links}>
             <p>
-              Already have an account? <Link to="/login">Login</Link>
+              Already have an account? <Link to={`/login?returnTo=${encodeURIComponent(returnTo)}`} state={{ returnTo }}>Login</Link>
             </p>
           </div>
         </div>

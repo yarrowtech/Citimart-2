@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styles from './Wishlist.module.css';
 
 import { API_BASE } from "../config";
+import { addGuestCartItem, getGuestCart, getGuestWishlist, mergeGuestCommerce, removeGuestWishlistItem } from "../utils/guestCommerce";
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,14 +13,12 @@ const Wishlist = () => {
   const customerId = localStorage.getItem('customer_id');
   const token = localStorage.getItem('token');
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!customerId || !token) {
-      navigate('/login');
-    }
-  }, [customerId, token, navigate]);
-
   const fetchWishlist = async () => {
+    if (!customerId || !token) {
+      setWishlist(getGuestWishlist());
+      setLoading(false);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/${customerId}`, {
         headers: {
@@ -52,6 +51,12 @@ const Wishlist = () => {
   const removeFromWishlist = async (productId, size, color) => {
     const key = `remove-${productId}-${size}-${color}`;
     setBusyItem(key);
+    if (!customerId || !token) {
+      removeGuestWishlistItem(productId, size, color);
+      await fetchWishlist();
+      setBusyItem(null);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/remove`, {
         method: 'DELETE',
@@ -71,6 +76,14 @@ const Wishlist = () => {
   const moveToCart = async (productId, size, color) => {
     const key = `move-${productId}-${size}-${color}`;
     setBusyItem(key);
+    if (!customerId || !token) {
+      const item = getGuestWishlist().find(entry => (entry.product?._id || entry.product_id) === productId && entry.size === size && entry.color === color);
+      if (item?.product) addGuestCartItem(item.product, size, color);
+      removeGuestWishlistItem(productId, size, color);
+      await fetchWishlist();
+      setBusyItem(null);
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/customer/wishlist/move_to_cart`, {
         method: 'POST',
@@ -89,12 +102,19 @@ const Wishlist = () => {
   };
 
   useEffect(() => {
-    if (customerId && token) {
-      fetchWishlist();
-    }
+    const initializeWishlist = async () => {
+      if (customerId && token && (getGuestCart().length || getGuestWishlist().length)) {
+        try {
+          await mergeGuestCommerce({ id: customerId, token });
+        } catch (error) {
+          console.error("Unable to restore guest items:", error);
+          alert(error.message);
+        }
+      }
+      await fetchWishlist();
+    };
+    initializeWishlist();
   }, [customerId, token]);
-
-  if (!customerId || !token) return null;
 
   if (loading) {
     return <div className={styles.emptyWishlistContainer}>Loading your wishlist...</div>;

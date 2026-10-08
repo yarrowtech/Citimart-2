@@ -39,7 +39,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (!customerId || !token) {
-      navigate('/login', { replace: true });
+      navigate('/login', { replace: true, state: { returnTo: '/cart' } });
       return;
     }
 

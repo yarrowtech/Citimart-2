@@ -239,7 +239,7 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      <main className={styles.main}>
+      <main className={`${styles.main} ${isSidebarOpen ? '' : styles.mainCollapsed}` }>
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <button className={styles.mobileMenuBtn} onClick={() => setIsSidebarOpen(true)} aria-label="Open navigation">
