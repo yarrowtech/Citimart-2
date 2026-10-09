@@ -1001,13 +1001,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VariantSelector from "../pages/Variantselector";
+import ProductGallery from "../components/ProductGallery/ProductGallery";
 import styles from "./ProductDetail.module.css";
 import { API_BASE } from "../config";
 import { addGuestCartItem, addGuestWishlistItem } from "../utils/guestCommerce";
 import {
   FaHeart,
   FaShoppingCart,
-  FaShareAlt,
   FaStar,
   FaTag,
   FaPercent,
@@ -1518,36 +1518,16 @@ const ProductDetail = () => {
     <div className={styles.amazonLayout}>
       {/* LEFT SECTION */}
       <div className={styles.leftSection}>
-        <div className={styles.imageGallery}>
-          <div className={styles.thumbnails}>
-            {product.images?.map((img, i) => {
-              const url = img.startsWith("http")
-                ? img
-                : `${API_BASE}/${img}`;
-              return (
-                <img
-                  key={i}
-                  src={url}
-                  onClick={() => setMainImage(url)}
-                  className={mainImage === url ? styles.activeThumb : ""}
-                  alt=""
-                />
-              );
-            })}
-          </div>
-          <div className={styles.mainImage}>
-            <img src={mainImage} alt={product.name} />
-            <button
-              className={styles.shareIcon}
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Product link copied!");
-              }}
-            >
-              <FaShareAlt />
-            </button>
-          </div>
-        </div>
+        <ProductGallery
+          images={(product.images || []).map((img) =>
+            img.startsWith("http") ? img : `${API_BASE}/${img}`
+          )}
+          alt={product.name}
+          onShare={() => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Product link copied!");
+          }}
+        />
       </div>
 
       {/* MIDDLE SECTION */}

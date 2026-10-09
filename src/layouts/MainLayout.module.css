@@ -232,6 +232,114 @@
   font-size: 16px;
 }
 
+/* ── Brands mega menu ── */
+.brandDropdown {
+  flex-direction: column;
+  gap: 0;
+  min-width: 480px;
+  max-width: 620px;
+  padding: 0;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 48px rgba(17, 24, 39, 0.18);
+}
+
+.brandHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  background: linear-gradient(120deg, #008080 0%, #004080 55%, #002147 100%);
+  color: #fff;
+}
+
+.brandHeaderTitle {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brandHeaderCount {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.brandGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 18px 22px 22px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.brandChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f7f8fc;
+  border: 1px solid #edeff5;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.brandChip:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  border-color: #ffd1e0;
+  box-shadow: 0 10px 22px rgba(233, 30, 99, 0.14);
+  color: #e91e63;
+}
+
+.brandChipInitial {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+}
+
+.brandChip:hover .brandChipInitial {
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+}
+
+.brandChipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brandEmpty {
+  padding: 28px 22px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13.5px;
+}
+
+@media (max-width: 560px) {
+  .brandDropdown {
+    min-width: 0;
+    width: calc(100vw - 1.3rem);
+  }
+  .brandGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /*  Each subcategory block */
 .subCategoryBlock {
   margin-bottom: 8px;
@@ -727,7 +835,8 @@
   }
 
   .logoText {
-    display: none;
+    display: inline-block;
+    font-size: 0.7rem;
   }
 
   .navLinks {

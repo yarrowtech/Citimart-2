@@ -1,8 +1,21 @@
 from flask import Blueprint, request, jsonify
-from database import categories_collection
+from database import categories_collection, products_collection
 from bson import ObjectId
 
 category_bp = Blueprint("category_bp", __name__)
+
+
+# -----------------------------
+# GET distinct real brands (from actual product listings, not a static list)
+# -----------------------------
+@category_bp.route("/brands", methods=["GET"])
+def get_brands():
+    try:
+        raw = products_collection.distinct("brand")
+        brands = sorted({b.strip() for b in raw if isinstance(b, str) and b.strip()})
+        return jsonify({"brands": brands}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # -----------------------------
 # GET all categories (for frontend dropdowns)

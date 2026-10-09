@@ -589,6 +589,7 @@ const Products = () => {
     setCategory(     (query.get("category")     || "").replace(/-/g, " "));
     setSubCategory(  (query.get("subcategory")   || "").replace(/-/g, " "));
     setChildCategory((query.get("childcategory") || "").replace(/-/g, " "));
+    setSelectedBrand(query.get("brand") || "");
   }, [location.search]);
 
   // ── Filter logic ──

@@ -7,19 +7,15 @@ import CustomerChatWidget from "../components/chat/CustomerChatWidget";
 
 import { API_BASE } from "../config";
 import { getGuestCart, getGuestWishlist } from "../utils/guestCommerce";
-const brandsData = {
-  "Popular Brands": ["Nike", "Adidas", "Levi's", "Zara"],
-  "Luxury Brands": ["Gucci", "Prada", "Louis Vuitton"]
-};
 
 const MainLayout = () => {
   const [customer, setCustomer] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [activeMenu, setActiveMenu] = useState("");
   const [hoveredCategory, setHoveredCategory] = useState("");
-  const [hoveredBrandGroup, setHoveredBrandGroup] = useState("Popular Brands");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,6 +42,22 @@ const MainLayout = () => {
       }
     };
     fetchCategories();
+  }, []);
+
+  // Fetch real brands from products already listed in the catalog —
+  // no hardcoded/dummy brand list.
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/brands`);
+        const data = await res.json();
+        setBrands(Array.isArray(data.brands) ? data.brands : []);
+      } catch (err) {
+        console.error("Error fetching brands:", err);
+        setBrands([]);
+      }
+    };
+    fetchBrands();
   }, []);
 
   // Keep the displayed customer synchronized with login/logout and other tabs.
@@ -302,26 +314,27 @@ const MainLayout = () => {
               >
                 <span className={styles.menuTitle}>Brands &#9662;</span>
                 {activeMenu === "brands" && (
-                  <div className={`${styles.dropdownMenu} ${styles.show}`}>
-                    <div className={styles.categoryList}>
-                      {Object.keys(brandsData).map((group) => (
-                        <div
-                          key={group}
-                          className={`${styles.categoryItem} ${hoveredBrandGroup === group ? styles.active : ""}`}
-                          onMouseEnter={() => setHoveredBrandGroup(group)}
-                        >
-                          {group}
-                        </div>
-                      ))}
+                  <div className={`${styles.dropdownMenu} ${styles.show} ${styles.brandDropdown}`}>
+                    <div className={styles.brandHeader}>
+                      <span className={styles.brandHeaderTitle}>Shop by Brand</span>
+                      <span className={styles.brandHeaderCount}>{brands.length} brand{brands.length !== 1 ? "s" : ""}</span>
                     </div>
-                    <div className={styles.subcategoryList}>
-                      <h4>{hoveredBrandGroup}</h4>
-                      {brandsData[hoveredBrandGroup].map((brand) => (
-                        <Link key={brand} to={`/brands/${brand.toLowerCase()}`}>
-                          {brand}
-                        </Link>
-                      ))}
-                    </div>
+                    {brands.length === 0 ? (
+                      <p className={styles.brandEmpty}>No brands listed yet.</p>
+                    ) : (
+                      <div className={styles.brandGrid}>
+                        {brands.map((brand) => (
+                          <Link
+                            key={brand}
+                            to={`/products?brand=${encodeURIComponent(brand)}`}
+                            className={styles.brandChip}
+                          >
+                            <span className={styles.brandChipInitial}>{brand.charAt(0).toUpperCase()}</span>
+                            <span className={styles.brandChipName}>{brand}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
