@@ -95,6 +95,7 @@ def create_app():
     from routes.admin_settings_routes import admin_settings_bp
     from routes.recommend_routes import recommend_bp
     from routes.crm_routes import crm_bp
+    from routes.vendor_integration_routes import vendor_integration_bp
     from routes.pricing_routes import pricing_bp
     from routes.finance_routes import finance_bp
     from routes.vendor_kyb_routes import vendor_kyb_bp
@@ -143,6 +144,7 @@ def create_app():
     app.register_blueprint(campaign_bp)
     app.register_blueprint(admin_ops_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(vendor_integration_bp)
 
     @app.route('/')
     def index():

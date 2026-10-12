@@ -44,7 +44,7 @@ const VendorOrders = () => {
   const handleUpdate = (orderId) => {
     const newStatus = prompt("Enter new status (Placed, Shipped, Delivered, Cancelled):");
     if (newStatus) {
-      fetch(`${backendURL}/vendor/update-order/${orderId}`, {
+      fetch(`${backendURL}/vendor/update-fulfillment/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

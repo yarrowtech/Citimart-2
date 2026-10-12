@@ -17,6 +17,7 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import CollectionPage from "./pages/CollectionPage";
 import CollectionsListPage from "./pages/CollectionsListPage";  
+import VendorStorefront from './pages/VendorStorefront';
 import CustomerLogin from './pages/CustomerLogin';
 import VendorLogin from './pages/VendorLogin';
 import AdminLogin from './pages/AdminLogin';
@@ -77,6 +78,7 @@ import VendorPayouts from './pages/vendor/Payouts';
 import VendorKYB from './pages/vendor/KYB';
 import RegisterVendor from './pages/vendor/RegisterVendor';
 import VendorAddProduct from './pages/vendor/AddProduct';
+import VendorStorefrontManager from './pages/vendor/Storefront';
 import EditProducts from './pages/vendor/EditProducts';
 import VendorForgotPassword from './pages/VendorForgotPassword';
 
@@ -154,6 +156,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="products" element={<Products />} />
             <Route path="products/:id" element={<ProductDetail />} />
+            <Route path="store/:vendorId" element={<VendorStorefront />} />
             <Route path="collections" element={<CollectionsListPage />} />  
             <Route path="collections/:collectionSlug" element={<CollectionPage />} />
             <Route path="/login" element={<CustomerLogin />} />
@@ -228,6 +231,7 @@ function App() {
             <Route path="pricing" element={<PricingAdvisor />} />
             <Route path="payouts" element={<VendorPayouts />} />
             <Route path="verify-business" element={<VendorKYB />} />
+            <Route path="storefront" element={<VendorStorefrontManager />} />
             <Route path="add-product" element={<VendorAddProduct />} />
             <Route path="edit-product/:productId" element={<EditProducts />} />
           </Route>

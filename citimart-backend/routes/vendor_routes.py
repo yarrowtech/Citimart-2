@@ -1490,3 +1490,29 @@ def get_vendor_status(vendor_id):
     return jsonify(vendor), 200
 
 
+
+@vendor_bp.route('/update-fulfillment/<order_id>', methods=['PUT'])
+@token_required
+def update_vendor_fulfillment(current_vendor, order_id):
+    data = request.get_json(silent=True) or {}
+    new_status = str(data.get("status") or "").strip()
+    if not new_status:
+        return jsonify({"error": "Status is required"}), 400
+    order = orders_collection.find_one({"_id": ObjectId(order_id)})
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+    vendor_id = str(current_vendor["_id"])
+    items, changed = order.get("order_items", []), False
+    for item in items:
+        if str(item.get("vendor_id")) == vendor_id:
+            item["fulfillment_status"] = new_status
+            item["fulfillment_updated_at"] = datetime.utcnow()
+            changed = True
+    if not changed:
+        return jsonify({"error": "Unauthorized"}), 403
+    statuses = {item.get("fulfillment_status") for item in items if item.get("fulfillment_status")}
+    update = {"order_items": items, "status_updated_at": datetime.utcnow()}
+    if len(items) and len(statuses) == 1 and len(statuses) == len(items):
+        update["status"] = statuses.pop()
+    orders_collection.update_one({"_id": order["_id"]}, {"$set": update})
+    return jsonify({"message": "Your order items were updated", "vendor_status": new_status})

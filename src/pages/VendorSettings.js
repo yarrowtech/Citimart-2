@@ -1,518 +1,285 @@
-import React, { useState, useEffect } from "react";
-import styles from "./VendorSettings.module.css";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { API_BASE } from "../config";
+import s from "./VendorSettings.module.css";
 
-const tabs = [
-  "Profile",
-  "Account",
-  "Payments",
-  "Shipping",
-  "Catalog",
-  "Notifications",
-  "Compliance",
-  "Reports",
-  "Support",
+const STATUS_BADGE = {
+  approved: { label: "Approved", cls: "badgeGreen" },
+  pending_admin: { label: "Pending admin review", cls: "badgeAmber" },
+  pending_subuser: { label: "Pending review", cls: "badgeAmber" },
+  rejected: { label: "Rejected", cls: "badgeRed" },
+};
+
+const KYB_BADGE = {
+  verified: { label: "Verified", cls: "badgeGreen" },
+  pending_review: { label: "Pending review", cls: "badgeAmber" },
+  rejected: { label: "Rejected", cls: "badgeRed" },
+  not_submitted: { label: "Not submitted", cls: "badgeGray" },
+};
+
+const TABS = [
+  { key: "profile", label: "Business Profile", icon: "🏢" },
+  { key: "security", label: "Security", icon: "🔒" },
+  { key: "payments", label: "Payout Details", icon: "💳" },
 ];
 
-const VendorSettings = () => {
-  const [activeTab, setActiveTab] = useState("Profile");
-  const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [token] = useState(localStorage.getItem("vendorToken")); // Auth token
+const authHeaders = () => ({
+  Authorization: `Bearer ${localStorage.getItem("vendorToken") || localStorage.getItem("token")}`,
+  "Content-Type": "application/json",
+});
 
-  // ---------------- FETCH DATA ----------------
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `/api/vendor/settings/${activeTab.toLowerCase()}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setFormData(data || {});
-      } catch (err) {
-        console.error("Error fetching:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [activeTab, token]);
+const ProfileTab = () => {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  // ---------------- HANDLE INPUT CHANGE ----------------
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    if (type === "file") {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  const load = useCallback(async () => {
+    const res = await fetch(`${API_BASE}/api/vendor/settings/profile`, { headers: authHeaders() });
+    const body = await res.json();
+    if (res.ok) { setData(body); setForm(body); }
+  }, []);
 
-  // ---------------- HANDLE SUBMIT ----------------
-  const handleSubmit = async (e) => {
+  useEffect(() => { load(); }, [load]);
+
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const save = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
+    setSaving(true);
+    setMessage(null);
     try {
-      let url = `/api/vendor/settings/${activeTab.toLowerCase()}`;
-      let options = {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      };
-
-      if (activeTab === "Compliance") {
-        // FormData for file uploads
-        const form = new FormData();
-        Object.keys(formData).forEach((key) => form.append(key, formData[key]));
-        options.body = form;
-      } else {
-        options.headers["Content-Type"] = "application/json";
-        options.body = JSON.stringify(formData);
-      }
-
-      const res = await fetch(url, options);
-      const data = await res.json();
-
-      alert(data.message || "Saved successfully!");
+      const { businessName, fullName, phone, businessType, businessAddress } = form;
+      const res = await fetch(`${API_BASE}/api/vendor/settings/profile`, {
+        method: "PUT", headers: authHeaders(),
+        body: JSON.stringify({ businessName, fullName, phone, businessType, businessAddress }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Could not save profile");
+      setMessage({ type: "ok", text: "Profile updated." });
+      load();
     } catch (err) {
-      console.error("Save failed:", err);
-      alert("Failed to save data");
+      setMessage({ type: "err", text: err.message });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  // ---------------- RENDER FIELD ----------------
-  const renderInput = (label, name, type = "text", placeholder = "") => (
-    <>
-      <label>{label}</label>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={formData[name] || ""}
-        onChange={handleChange}
-      />
-    </>
-  );
+  if (!data || !form) return <div className={s.loading}>Loading…</div>;
 
-  // ---------------- TAB CONTENT ----------------
-  const renderContent = () => {
-    if (loading) return <p>Loading...</p>;
+  const statusInfo = STATUS_BADGE[data.status] || { label: data.status || "Unknown", cls: "badgeGray" };
+  const kybInfo = KYB_BADGE[data.kybStatus] || KYB_BADGE.not_submitted;
 
-    switch (activeTab) {
-      // 🏢 PROFILE
-      case "Profile":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Business Profile</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              {renderInput("Business Name", "business_name")}
-              {renderInput("Contact Person", "contact_person")}
-              {renderInput("Email", "email", "email")}
-              {renderInput("Phone Number", "phone", "tel")}
-              <label>Business Type</label>
-              <select
-                name="business_type"
-                value={formData.business_type || ""}
-                onChange={handleChange}
-              >
-                <option>Individual</option>
-                <option>Company</option>
-              </select>
-
-              {renderInput("GST/VAT Number", "gst_number")}
-              <label>Business Logo</label>
-              <input
-                type="file"
-                name="logo"
-                accept="image/*"
-                onChange={handleChange}
-              />
-
-              <label>Store Description</label>
-              <textarea
-                name="description"
-                placeholder="Tell customers about your store"
-                value={formData.description || ""}
-                onChange={handleChange}
-              />
-
-              <label>Business Address</label>
-              <textarea
-                name="address"
-                placeholder="Enter full business address"
-                value={formData.address || ""}
-                onChange={handleChange}
-              />
-
-              {renderInput("Social Links", "social_link", "url")}
-
-              <button type="submit">Save Profile</button>
-            </form>
-          </div>
-        );
-
-      // 🔐 ACCOUNT
-      case "Account":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Account & Security</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              {renderInput("Username", "username")}
-              {renderInput("Change Email", "new_email", "email")}
-              {renderInput("Change Password", "password", "password")}
-
-              <label>Two-Factor Authentication</label>
-              <select
-                name="two_factor"
-                value={formData.two_factor || ""}
-                onChange={handleChange}
-              >
-                <option>Enabled</option>
-                <option>Disabled</option>
-              </select>
-
-              <label>Account Status</label>
-              <select
-                name="status"
-                value={formData.status || ""}
-                onChange={handleChange}
-              >
-                <option>Active</option>
-                <option>Deactivated</option>
-              </select>
-
-              <button type="submit">Update Account</button>
-            </form>
-          </div>
-        );
-
-      // 💳 PAYMENTS
-      case "Payments":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Bank & Payment Info</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              {renderInput("Account Holder Name", "holder_name")}
-              {renderInput("Bank Name", "bank_name")}
-              {renderInput("Bank Account Number", "account_number")}
-              {renderInput("IFSC/SWIFT Code", "ifsc")}
-              {renderInput("PAN / Tax ID", "tax_id")}
-              {renderInput("UPI ID", "upi")}
-              <label>Settlement Cycle</label>
-              <select
-                name="settlement_cycle"
-                value={formData.settlement_cycle || ""}
-                onChange={handleChange}
-              >
-                <option>Weekly</option>
-                <option>Bi-weekly</option>
-                <option>Monthly</option>
-              </select>
-
-              <button type="submit">Save Payment Info</button>
-            </form>
-          </div>
-        );
-
-      // 🚚 SHIPPING
-      case "Shipping":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Shipping & Logistics</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <label>Default Warehouse Address</label>
-              <textarea
-                name="warehouse_address"
-                value={formData.warehouse_address || ""}
-                onChange={handleChange}
-              />
-
-              {renderInput("Preferred Courier", "courier")}
-              {renderInput("Pickup Time Slot", "pickup_slot")}
-              <label>Return Pickup Address</label>
-              <textarea
-                name="return_address"
-                value={formData.return_address || ""}
-                onChange={handleChange}
-              />
-              {renderInput("Handling Time (Days)", "handling_time", "number")}
-              <label>Shipping Responsibility</label>
-              <select
-                name="responsibility"
-                value={formData.responsibility || ""}
-                onChange={handleChange}
-              >
-                <option>Vendor</option>
-                <option>Platform</option>
-              </select>
-              {renderInput("Supported Regions", "regions")}
-              <button type="submit">Update Shipping Info</button>
-            </form>
-          </div>
-        );
-
-      // 🏷️ CATALOG
-      case "Catalog":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Catalog Settings</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              {renderInput("Brand Name", "brand")}
-              {renderInput("Default Category", "category")}
-              <label>Enable Auto SKU Generation</label>
-              <select
-                name="auto_sku"
-                value={formData.auto_sku || ""}
-                onChange={handleChange}
-              >
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-
-              <label>Allow Auto Listing Approval</label>
-              <select
-                name="auto_approval"
-                value={formData.auto_approval || ""}
-                onChange={handleChange}
-              >
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-
-              <label>Enable Inventory Integration</label>
-              <select
-                name="inventory_mode"
-                value={formData.inventory_mode || ""}
-                onChange={handleChange}
-              >
-                <option>Manual</option>
-                <option>API</option>
-              </select>
-
-              {renderInput("Default Tax Rate (%)", "tax_rate", "number")}
-              <button type="submit">Save Catalog Settings</button>
-            </form>
-          </div>
-        );
-
-      // 🔔 NOTIFICATIONS
-      case "Notifications":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Notifications & Alerts</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <label>Order Alerts</label>
-              <select
-                name="order_alert"
-                value={formData.order_alert || ""}
-                onChange={handleChange}
-              >
-                <option>Email</option>
-                <option>SMS</option>
-                <option>In-App</option>
-              </select>
-
-              <label>Low Stock Alert</label>
-              <select
-                name="low_stock"
-                value={formData.low_stock || ""}
-                onChange={handleChange}
-              >
-                <option>Enabled</option>
-                <option>Disabled</option>
-              </select>
-
-              <label>Payment Notifications</label>
-              <select
-                name="payment_notify"
-                value={formData.payment_notify || ""}
-                onChange={handleChange}
-              >
-                <option>Email</option>
-                <option>In-App</option>
-              </select>
-
-              <label>Notification Frequency</label>
-              <select
-                name="frequency"
-                value={formData.frequency || ""}
-                onChange={handleChange}
-              >
-                <option>Immediate</option>
-                <option>Daily Digest</option>
-              </select>
-
-              <button type="submit">Update Notifications</button>
-            </form>
-          </div>
-        );
-
-      // 📄 COMPLIANCE
-      case "Compliance":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Compliance Documents</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <label>Upload GST Certificate</label>
-              <input
-                type="file"
-                name="gst_cert"
-                onChange={handleChange}
-              />
-
-              <label>Upload Trade License</label>
-              <input
-                type="file"
-                name="trade_license"
-                onChange={handleChange}
-              />
-
-              <label>Upload Business Registration Certificate</label>
-              <input
-                type="file"
-                name="registration_cert"
-                onChange={handleChange}
-              />
-
-              <label>Document Status</label>
-              <select
-                name="status"
-                value={formData.status || ""}
-                onChange={handleChange}
-              >
-                <option>Pending Verification</option>
-                <option>Verified</option>
-              </select>
-
-              <label>Accept Terms</label>
-              <select
-                name="terms"
-                value={formData.terms || ""}
-                onChange={handleChange}
-              >
-                <option>Accepted</option>
-                <option>Not Accepted</option>
-              </select>
-
-              <button type="submit">Save Compliance Info</button>
-            </form>
-          </div>
-        );
-
-      // 📊 REPORTS
-      case "Reports":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Reports & Analytics</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <label>Report Type</label>
-              <select
-                name="report_type"
-                value={formData.report_type || ""}
-                onChange={handleChange}
-              >
-                <option>Sales</option>
-                <option>Orders</option>
-                <option>Inventory</option>
-                <option>Returns</option>
-              </select>
-
-              <label>Report Frequency</label>
-              <select
-                name="report_frequency"
-                value={formData.report_frequency || ""}
-                onChange={handleChange}
-              >
-                <option>Daily</option>
-                <option>Weekly</option>
-                <option>Monthly</option>
-              </select>
-
-              <label>Report Format</label>
-              <select
-                name="report_format"
-                value={formData.report_format || ""}
-                onChange={handleChange}
-              >
-                <option>PDF</option>
-                <option>XLS</option>
-                <option>CSV</option>
-              </select>
-
-              {renderInput("Email for Report Delivery", "report_email", "email")}
-              <button type="submit">Save Report Settings</button>
-            </form>
-          </div>
-        );
-
-      // 🆘 SUPPORT
-      case "Support":
-        return (
-          <div className={styles.tabContent}>
-            <h2>Support Preferences</h2>
-            <form className={styles.form} onSubmit={handleSubmit}>
-              {renderInput("Support Email", "support_email", "email")}
-              {renderInput("Escalation Contact", "escalation_contact")}
-              <label>Preferred Support Language</label>
-              <select
-                name="language"
-                value={formData.language || ""}
-                onChange={handleChange}
-              >
-                <option>English</option>
-                <option>Hindi</option>
-              </select>
-
-              <label>Enable WhatsApp Support</label>
-              <select
-                name="whatsapp_support"
-                value={formData.whatsapp_support || ""}
-                onChange={handleChange}
-              >
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-
-              <button type="submit">Update Support Info</button>
-            </form>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  // ---------------- LAYOUT ----------------
   return (
-    <div className={styles.settingsContainer}>
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
-          <h1>SETTINGS</h1>
+    <div className={s.card}>
+      <div className={s.statusRow}>
+        <div>
+          <span className={s.statusLabel}>Account status</span>
+          <span className={`${s.badge} ${s[statusInfo.cls]}`}>{statusInfo.label}</span>
         </div>
-        <div className={styles.nav}>
-          <ul>
-            {tabs.map((tab) => (
-              <li
-                key={tab}
-                className={activeTab === tab ? styles.active : ""}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </li>
-            ))}
-          </ul>
+        <div>
+          <span className={s.statusLabel}>Business verification</span>
+          <span className={`${s.badge} ${s[kybInfo.cls]}`}>{kybInfo.label}</span>
+          <Link to="/vendor/verify-business" className={s.inlineLink}>
+            {data.kybStatus === "verified" ? "View" : "Complete verification"} →
+          </Link>
         </div>
-      </aside>
-      <main className={styles.mainContent}>{renderContent()}</main>
+      </div>
+
+      <form onSubmit={save} className={s.form}>
+        <div className={s.formRow}>
+          <label>Business name
+            <input name="businessName" value={form.businessName} onChange={change} required />
+          </label>
+          <label>Contact person
+            <input name="fullName" value={form.fullName} onChange={change} required />
+          </label>
+        </div>
+        <div className={s.formRow}>
+          <label>Phone
+            <input name="phone" value={form.phone} onChange={change} required />
+          </label>
+          <label>Business type
+            <select name="businessType" value={form.businessType} onChange={change}>
+              <option value="Individual">Individual</option>
+              <option value="Company">Company</option>
+              <option value="Partnership">Partnership</option>
+            </select>
+          </label>
+        </div>
+        <label>Business address
+          <textarea name="businessAddress" rows={3} value={form.businessAddress} onChange={change} required />
+        </label>
+        <label className={s.readOnlyField}>Login email (fixed)
+          <input value={data.email} disabled />
+        </label>
+
+        {message && <p className={message.type === "err" ? s.errorText : s.okText}>{message.text}</p>}
+        <button type="submit" className={s.primaryBtn} disabled={saving}>
+          {saving ? "Saving…" : "Save profile"}
+        </button>
+      </form>
+
+      <p className={s.footnote}>
+        Store logo, description, banner and public link live on your{" "}
+        <Link to="/vendor/storefront" className={s.inlineLink}>Storefront page</Link>.
+      </p>
+    </div>
+  );
+};
+
+const SecurityTab = () => {
+  const [form, setForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const save = async (e) => {
+    e.preventDefault();
+    setMessage(null);
+    if (form.newPassword !== form.confirmPassword) {
+      setMessage({ type: "err", text: "New passwords do not match." });
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/vendor/settings/password`, {
+        method: "PUT", headers: authHeaders(),
+        body: JSON.stringify({ currentPassword: form.currentPassword, newPassword: form.newPassword }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Could not update password");
+      setMessage({ type: "ok", text: "Password updated. Use it next time you log in." });
+      setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      setMessage({ type: "err", text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={s.card}>
+      <h3 className={s.cardTitle}>Change password</h3>
+      <form onSubmit={save} className={s.form}>
+        <label>Current password
+          <input type="password" name="currentPassword" value={form.currentPassword} onChange={change} required />
+        </label>
+        <div className={s.formRow}>
+          <label>New password
+            <input type="password" name="newPassword" value={form.newPassword} onChange={change} minLength={8} required />
+          </label>
+          <label>Confirm new password
+            <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={change} minLength={8} required />
+          </label>
+        </div>
+        <p className={s.hint}>At least 8 characters.</p>
+        {message && <p className={message.type === "err" ? s.errorText : s.okText}>{message.text}</p>}
+        <button type="submit" className={s.primaryBtn} disabled={saving}>
+          {saving ? "Updating…" : "Update password"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const PaymentsTab = () => {
+  const [form, setForm] = useState({ holderName: "", bankName: "", accountNumber: "", ifsc: "", upi: "" });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const load = useCallback(async () => {
+    const res = await fetch(`${API_BASE}/api/vendor/settings/payments`, { headers: authHeaders() });
+    const body = await res.json();
+    if (res.ok) setForm((f) => ({ ...f, ...body }));
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const save = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/vendor/settings/payments`, {
+        method: "PUT", headers: authHeaders(), body: JSON.stringify(form),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Could not save payout details");
+      setMessage({ type: "ok", text: "Payout details saved." });
+    } catch (err) {
+      setMessage({ type: "err", text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={s.card}>
+      <h3 className={s.cardTitle}>Payout bank details</h3>
+      <p className={s.hint}>
+        Used by Citimart's finance team to send your payouts. See <Link to="/vendor/payouts" className={s.inlineLink}>Payouts</Link> for your earnings history.
+      </p>
+      <form onSubmit={save} className={s.form}>
+        <div className={s.formRow}>
+          <label>Account holder name
+            <input name="holderName" value={form.holderName} onChange={change} />
+          </label>
+          <label>Bank name
+            <input name="bankName" value={form.bankName} onChange={change} />
+          </label>
+        </div>
+        <div className={s.formRow}>
+          <label>Account number
+            <input name="accountNumber" value={form.accountNumber} onChange={change} />
+          </label>
+          <label>IFSC code
+            <input name="ifsc" value={form.ifsc} onChange={change} />
+          </label>
+        </div>
+        <label>UPI ID (optional)
+          <input name="upi" value={form.upi} onChange={change} placeholder="yourname@bank" />
+        </label>
+        {message && <p className={message.type === "err" ? s.errorText : s.okText}>{message.text}</p>}
+        <button type="submit" className={s.primaryBtn} disabled={saving}>
+          {saving ? "Saving…" : "Save payout details"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const VendorSettings = () => {
+  const [activeTab, setActiveTab] = useState("profile");
+
+  return (
+    <div className={s.page}>
+      <div className={s.header}>
+        <h1>Settings</h1>
+        <p>Manage your business profile, login security, and payout details.</p>
+      </div>
+
+      <div className={s.layout}>
+        <nav className={s.tabRail}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              className={`${s.tabBtn} ${activeTab === tab.key ? s.tabBtnActive : ""}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              <span>{tab.icon}</span> {tab.label}
+            </button>
+          ))}
+        </nav>
+        <main className={s.content}>
+          {activeTab === "profile" && <ProfileTab />}
+          {activeTab === "security" && <SecurityTab />}
+          {activeTab === "payments" && <PaymentsTab />}
+        </main>
+      </div>
     </div>
   );
 };

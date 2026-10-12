@@ -32,6 +32,7 @@ const VendorLayout = () => {
   const navItems = [
     { path: '/vendor', icon: <FaHome />, label: 'Dashboard' },
     { path: '/vendor/products', icon: <FaBox />, label: 'My Products' },
+    { path: '/vendor/storefront', icon: <FaShoppingBag />, label: 'My Storefront' },
     { path: '/vendor/orders', icon: <FaShoppingBag />, label: 'Orders' },
     { path: '/vendor/analytics', icon: <FaChartLine />, label: 'Analytics' },
     { path: '/vendor/pricing', icon: <FaTags />, label: 'Pricing Advisor' },

@@ -352,23 +352,29 @@
   margin-bottom: 4px;
 }
 
-/*  Links for sub-subcategories */
+/*  Links for sub-subcategories (rendered as <div>, not <a> — the
+    selector below must target the actual element or these get no
+    padding/sizing, leaving a hit target too small to tap reliably
+    on touch screens). */
 .subLinks {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
 }
 
-.subLinks a {
+.subLinks > div {
+  display: inline-flex;
+  align-items: center;
   color: #444;
   text-decoration: none;
   font-size: 14px;
-  padding: 2px 6px;
+  padding: 6px 10px;
+  min-height: 32px;
   border-radius: 4px;
   transition: color 0.2s, background 0.2s;
 }
 
-.subLinks a:hover {
+.subLinks > div:hover {
   background: #f7f7f7;
   color: #e91e63;
 }
