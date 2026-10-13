@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Layouts
 import MainLayout from './layouts/MainLayout';
+import VendorAuthLayout from './layouts/VendorAuthLayout';
 import AdminLayout from './layouts/AdminLayout';
 import VendorLayout from './layouts/VendorLayout';
 
@@ -160,11 +161,9 @@ function App() {
             <Route path="collections" element={<CollectionsListPage />} />  
             <Route path="collections/:collectionSlug" element={<CollectionPage />} />
             <Route path="/login" element={<CustomerLogin />} />
-            <Route path="/vendor/login" element={<VendorLogin />} />
-            
+
             <Route path="register" element={<Register />} />
            <Route path="/forgot-password" element={<ForgotPassword />} />       {/* Customer */}
-            <Route path="/vendor/forgot-password" element={<ForgotPassword />} /> {/* Vendor */}
 
             <Route path="offers" element={<Offers />} />
             <Route path="/offers/:offerId" element={<OfferProducts />} />
@@ -183,7 +182,12 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/set-password/:token" element={<SetPassword />} />
           <Route path="register-vendor" element={<RegisterVendor />} />
-         
+
+          <Route element={<VendorAuthLayout />}>
+            <Route path="/vendor/login" element={<VendorLogin />} />
+            <Route path="/vendor/forgot-password" element={<ForgotPassword />} />
+          </Route>
+
 
 
           {/* Admin Routes */}

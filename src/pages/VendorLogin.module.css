@@ -1,0 +1,210 @@
+.container {
+  width: 100%;
+  max-width: 1040px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 460px;
+  align-items: center;
+  gap: 88px;
+}
+
+.intro { color: #fff; }
+.eyebrow { display: inline-block; color: #f5c518; font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 16px; }
+.intro h2 { max-width: 520px; margin: 0; color: #fff; font-size: clamp(34px, 4vw, 50px); line-height: 1.08; letter-spacing: -.035em; }
+.intro > p { max-width: 520px; margin: 20px 0 32px; color: #c9dbe7; font-size: 16px; line-height: 1.7; }
+.benefits { display: grid; gap: 20px; }
+.benefits > div { display: flex; align-items: center; gap: 14px; }
+.benefits svg { flex: 0 0 42px; width: 42px; height: 42px; padding: 10px; color: #f5c518; background: rgba(245, 197, 24, .1); border: 1px solid rgba(245, 197, 24, .22); border-radius: 12px; }
+.benefits span { display: grid; gap: 3px; }
+.benefits strong { font-size: 14px; }
+.benefits small { color: #a9c1d1; font-size: 12px; }
+
+.formCard {
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 20px;
+  padding: 42px 40px 36px;
+  box-shadow: 0 28px 70px rgba(0, 22, 38, .35);
+  position: relative;
+  overflow: hidden;
+}
+
+.formCard::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: #f5c518;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff8d7;
+  color: #725b00;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.formCard h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #003153;
+}
+
+.subtitle {
+  margin: 0 0 28px;
+  font-size: 13.5px;
+  color: #5e7180;
+}
+
+.formGroup {
+  margin-bottom: 18px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #153e59;
+}
+
+/* Chrome will not let page CSS reliably force a dark background on
+   type="password" fields — it keeps them light-themed regardless of
+   `background-color`/`color-scheme`/`:-webkit-autofill` overrides (this
+   appears to be deliberate, likely so its password-manager affordances
+   stay legible/recognizable). Rather than fight that and risk pale text
+   on a white field, both inputs are styled as light pills on purpose —
+   reliably readable in every browser instead of a dark theme that breaks
+   specifically on passwords. */
+.formGroup input {
+  color-scheme: light;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #c9d5dc;
+  background: #f8fafc;
+  color: #092b42;
+  font-size: 14px;
+}
+.formGroup input:focus {
+  outline: none;
+  border-color: #003153;
+  box-shadow: 0 0 0 3px rgba(0, 49, 83, .12);
+}
+.formGroup input::placeholder { color: #94a3b8; }
+
+.formGroup input:-webkit-autofill,
+.formGroup input:-webkit-autofill:hover,
+.formGroup input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a;
+  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset;
+  box-shadow: 0 0 0 1000px #f8fafc inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.passwordField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.passwordField input {
+  padding-right: 52px;
+}
+.passwordField .eyeBtn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 1;
+}
+.passwordField .eyeBtn svg { width: 16px; height: 16px; display: block; }
+.passwordField .eyeBtn:hover {
+  color: #003153;
+  background: #edf3f6;
+  transform: translateY(-50%);
+}
+
+.formCard .submitBtn {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #00233c;
+  cursor: pointer;
+  background: #f5c518;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.formCard .submitBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(179, 139, 0, .24);
+  background: #ffcf22;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8ec;
+  font-size: 13px;
+}
+.links a {
+  color: #005b96;
+  text-decoration: none;
+  font-weight: 600;
+}
+.links a:hover { text-decoration: underline; }
+
+.footnote {
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: #64748b;
+  text-align: center;
+}
+.footnote a { color: #003f6b; font-weight: 700; text-decoration: none; }
+.footnote a:hover { text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .container { max-width: 520px; grid-template-columns: 1fr; gap: 34px; }
+  .intro { text-align: center; }
+  .intro h2, .intro > p { margin-left: auto; margin-right: auto; }
+  .benefits { display: none; }
+  .intro > p { margin-bottom: 0; }
+}
+
+@media (max-width: 520px) {
+  .intro h2 { font-size: 30px; }
+  .intro > p { font-size: 14px; }
+  .formCard { padding: 34px 24px 28px; border-radius: 18px; }
+  .formCard h1 { font-size: 22px; }
+  .links { font-size: 12px; }
+}
