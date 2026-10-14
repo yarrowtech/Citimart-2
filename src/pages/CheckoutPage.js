@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import styles from './CheckoutPage.module.css';
+import OrderIssuesModal from '../components/OrderIssuesModal/OrderIssuesModal';
 
 import { API_BASE } from "../config";
 const CheckoutPage = () => {
@@ -23,6 +24,8 @@ const CheckoutPage = () => {
   });
 
   const [address, setAddress] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [orderIssues, setOrderIssues] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [customerInfo, setCustomerInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -175,6 +178,7 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async () => {
     if (placingOrder) return;
     if (!address.trim()) return alert("Please enter delivery address");
+    if (!/^\d{6}$/.test(pincode.trim())) return alert("Please enter a valid 6-digit delivery pincode");
     if (!phone.trim()) return alert("Please enter your phone number");
     if (!cartItems.length) return alert("Your cart is empty");
     if (!customerInfo) return alert("Customer info not loaded yet");
@@ -190,6 +194,7 @@ const CheckoutPage = () => {
           body: JSON.stringify({
             customer_id: customerId,
             address,
+            pincode,
             phone,
             payment_method: paymentMethod,
             items: cartItems.map(item => ({
@@ -229,6 +234,8 @@ navigate('/order-success', {
     giftMessage: data.order_gift?.giftMessage || ""
   },
 });
+      } else if (data.issues?.length) {
+        setOrderIssues(data.issues);
       } else {
         alert(data.error || data.message || "Checkout failed");
       }
@@ -250,13 +257,16 @@ navigate('/order-success', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          customer_id: customerId, checkout_mode: checkoutMode,
+          customer_id: customerId, checkout_mode: checkoutMode, pincode,
           items: normalizedItems(cartItems), coupon_code: couponCode.trim(), isGift
         })
       });
 
       const orderData = await orderRes.json();
-      if (!orderRes.ok || !orderData.id) return alert(orderData.message || "Order creation failed");
+      if (!orderRes.ok || !orderData.id) {
+        if (orderData.issues?.length) { setOrderIssues(orderData.issues); return; }
+        return alert(orderData.message || "Order creation failed");
+      }
 
       const options = {
         key: orderData.key,
@@ -351,7 +361,7 @@ navigate('/order-success', {
               <p><strong>Name:</strong> {customerInfo.fullName}</p>
               <p><strong>Email:</strong> {customerInfo.email}</p>
               <div className={styles.formGroup}>
-                <label><strong><h3>Phone Number:</h3></strong></label>
+                <label>Phone number</label>
                 <input
                   type="text"
                   value={phone}
@@ -370,6 +380,15 @@ navigate('/order-success', {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             rows={4}
+          />
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            className={styles.pincodeInput}
+            placeholder="Delivery pincode (6 digits)"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
           />
 
           <h3>Payment Method</h3>
@@ -480,6 +499,7 @@ navigate('/order-success', {
           )}
         </div>
       </div>
+      <OrderIssuesModal issues={orderIssues} onClose={() => setOrderIssues(null)} />
     </div>
   );
 };

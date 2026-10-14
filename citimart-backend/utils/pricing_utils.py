@@ -2,6 +2,82 @@ from datetime import datetime
 from bson import ObjectId
 
 
+def _variant_stock(variant):
+    """Variant stock is sometimes a plain int, sometimes legacy Mongo extended
+    JSON ({"$numberInt": "5"}) left over from an old import — normalize both."""
+    raw = variant.get("stock", 0)
+    try:
+        return int(raw.get("$numberInt", 0)) if isinstance(raw, dict) else int(raw)
+    except (TypeError, ValueError):
+        return 0
+
+
+def validate_order_feasibility(*, raw_items, products_collection, pincode=None):
+    """Real pre-order checks, run right before an order is created (and again
+    right before a Razorpay payment is finalized, in case stock changed in
+    between): can every line item actually be fulfilled, and is the delivery
+    pincode one we serve? Returns a list of human-readable issue dicts —
+    empty means the order can proceed. Never raises; a lookup failure here
+    must not be the reason an order silently goes through unchecked, so
+    callers should treat a thrown error as "block the order", not ignore it.
+    """
+    issues = []
+
+    for raw in raw_items or []:
+        try:
+            product = products_collection.find_one({"_id": ObjectId(raw.get("product_id"))})
+        except Exception:
+            product = None
+        if not product:
+            issues.append({"type": "unavailable", "message": "One of the items in your cart is no longer available."})
+            continue
+
+        variants = product.get("variants") or []
+        if not variants:
+            continue  # Stock isn't tracked per-unit for this product — nothing to check.
+
+        requested_size = (raw.get("size") or "N/A").upper()
+        requested_color = raw.get("color") or "N/A"
+        requested_qty = int(raw.get("quantity") or 1)
+
+        matched = None
+        for variant in variants:
+            v_size = (variant.get("size") or "").upper()
+            v_color = variant.get("color", "")
+            size_ok = v_size == requested_size or requested_size in ("", "N/A")
+            color_ok = v_color == requested_color or requested_color in ("", "N/A")
+            if size_ok and color_ok:
+                matched = variant
+                break
+
+        if matched is None:
+            continue  # No matching variant row — same as the existing stock-reduction logic, silently skip.
+
+        available = _variant_stock(matched)
+        if available < requested_qty:
+            label = product.get("name", "This item")
+            detail_bits = [b for b in [requested_size if requested_size != "N/A" else None,
+                                       requested_color if requested_color != "N/A" else None] if b]
+            detail = f" ({', '.join(detail_bits)})" if detail_bits else ""
+            issues.append({
+                "type": "out_of_stock",
+                "product_id": str(product["_id"]),
+                "message": (
+                    f"{label}{detail} is out of stock." if available == 0
+                    else f"Only {available} left of {label}{detail} — you asked for {requested_qty}."
+                ),
+            })
+
+    from routes.delivery_routes import SERVICEABLE_PREFIXES
+    clean = str(pincode or "").strip()
+    if not (clean.isdigit() and len(clean) == 6 and clean[0] != "0"):
+        issues.append({"type": "bad_pincode", "message": "Enter a valid 6-digit delivery pincode."})
+    elif clean[:3] not in SERVICEABLE_PREFIXES:
+        issues.append({"type": "not_deliverable", "message": f"Sorry, we don't deliver to {clean} yet."})
+
+    return issues
+
+
 def _number(value, default=0):
     try:
         return float(value if value not in (None, "") else default)

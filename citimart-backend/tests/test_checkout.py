@@ -41,7 +41,7 @@ class TestCheckout:
         }, headers=_auth_headers(token))
 
         res = client.post("/customer/checkout", json={
-            "customer_id": customer_id, "phone": "9999999999", "address": "Test address",
+            "customer_id": customer_id, "phone": "9999999999", "address": "Test address", "pincode": "110001",
         }, headers=_auth_headers(token))
 
         data = res.get_json()
@@ -62,7 +62,7 @@ class TestCheckout:
             "size": "M", "color": "Red", "quantity": 1,
         }, headers=_auth_headers(token))
 
-        res = client.post("/customer/checkout", json={"customer_id": customer_id}, headers=_auth_headers(token))
+        res = client.post("/customer/checkout", json={"customer_id": customer_id, "pincode": "110001"}, headers=_auth_headers(token))
         data = res.get_json()
         assert data["total"] == 200
         assert data["delivery_fee"] == 50
@@ -75,7 +75,7 @@ class TestCheckout:
             "customer_id": customer_id, "product_id": product_id,
             "size": "M", "color": "Red", "quantity": 1,
         }, headers=_auth_headers(token))
-        client.post("/customer/checkout", json={"customer_id": customer_id}, headers=_auth_headers(token))
+        client.post("/customer/checkout", json={"customer_id": customer_id, "pincode": "110001"}, headers=_auth_headers(token))
 
         order = orders_collection.find_one({"customer_id": customer_id})
         assert order is not None
@@ -89,7 +89,7 @@ class TestCheckout:
             "customer_id": customer_id, "product_id": product_id,
             "size": "M", "color": "Red", "quantity": 1,
         }, headers=_auth_headers(token))
-        client.post("/customer/checkout", json={"customer_id": customer_id}, headers=_auth_headers(token))
+        client.post("/customer/checkout", json={"customer_id": customer_id, "pincode": "110001"}, headers=_auth_headers(token))
 
         cart_res = client.get(f"/customer/cart/{customer_id}", headers=_auth_headers(token))
         assert cart_res.get_json()["items"] == []
@@ -103,7 +103,7 @@ class TestCheckout:
             "customer_id": customer_id, "product_id": product_id,
             "size": "M", "color": "Red", "quantity": 3,
         }, headers=_auth_headers(token))
-        client.post("/customer/checkout", json={"customer_id": customer_id}, headers=_auth_headers(token))
+        client.post("/customer/checkout", json={"customer_id": customer_id, "pincode": "110001"}, headers=_auth_headers(token))
 
         from bson import ObjectId
         product = products_collection.find_one({"_id": ObjectId(product_id)})
@@ -119,7 +119,7 @@ class TestCheckout:
         }, headers=_auth_headers(token))
 
         res = client.post("/customer/checkout", json={
-            "customer_id": customer_id, "isGift": True,
+            "customer_id": customer_id, "isGift": True, "pincode": "110001",
         }, headers=_auth_headers(token))
         data = res.get_json()
         assert data["gift_wrap_fee"] == 50
@@ -132,6 +132,7 @@ class TestCheckout:
         res = client.post("/customer/checkout", json={
             "customer_id": customer_id,
             "checkout_mode": "buyNow",
+            "pincode": "110001",
             "items": [{"product_id": product_id, "size": "M", "color": "Red", "quantity": 1}],
         }, headers=_auth_headers(token))
         assert res.status_code == 200
@@ -140,3 +141,137 @@ class TestCheckout:
         # buyNow mode should NOT touch/clear the (empty) cart collection state
         cart_res = client.get(f"/customer/cart/{customer_id}", headers=_auth_headers(token))
         assert cart_res.get_json()["items"] == []
+
+
+class TestOrderFeasibilityChecks:
+    def test_checkout_blocked_when_out_of_stock(self, client, registered_customer):
+        # Simulates the real scenario this guards against: the item was in
+        # stock when added to the cart, but sold out (e.g. to another
+        # customer) by the time this one checks out — so the cart add
+        # endpoint's own stock gate can't catch it; only the checkout-time
+        # recheck can.
+        customer_id, token = registered_customer
+        product_id = _insert_product(variants=[
+            {"size": "M", "color": "Red", "stock": {"$numberInt": "1"}},
+        ])
+        from database import cart_collection
+        cart_collection.insert_one({
+            "customer_id": customer_id,
+            "items": [{"product_id": product_id, "size": "M", "color": "Red", "quantity": 5}],
+        })
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "110001",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        data = res.get_json()
+        assert data["issues"][0]["type"] == "out_of_stock"
+        assert "Only 1 left" in data["issues"][0]["message"]
+
+    def test_checkout_blocked_when_fully_sold_out(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product(variants=[
+            {"size": "M", "color": "Red", "stock": {"$numberInt": "0"}},
+        ])
+        from database import cart_collection
+        cart_collection.insert_one({
+            "customer_id": customer_id,
+            "items": [{"product_id": product_id, "size": "M", "color": "Red", "quantity": 1}],
+        })
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "110001",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        assert "out of stock" in res.get_json()["issues"][0]["message"]
+
+    def test_checkout_blocked_for_undeliverable_pincode(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product()
+        client.post("/customer/cart/add", json={
+            "customer_id": customer_id, "product_id": product_id,
+            "size": "M", "color": "Red", "quantity": 1,
+        }, headers=_auth_headers(token))
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "999999",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        data = res.get_json()
+        assert data["issues"][0]["type"] == "not_deliverable"
+        assert "999999" in data["issues"][0]["message"]
+
+    def test_checkout_blocked_for_missing_pincode(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product()
+        client.post("/customer/cart/add", json={
+            "customer_id": customer_id, "product_id": product_id,
+            "size": "M", "color": "Red", "quantity": 1,
+        }, headers=_auth_headers(token))
+
+        res = client.post("/customer/checkout", json={"customer_id": customer_id}, headers=_auth_headers(token))
+        assert res.status_code == 409
+        assert res.get_json()["issues"][0]["type"] == "bad_pincode"
+
+    def test_checkout_blocked_for_malformed_pincode(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product()
+        client.post("/customer/cart/add", json={
+            "customer_id": customer_id, "product_id": product_id,
+            "size": "M", "color": "Red", "quantity": 1,
+        }, headers=_auth_headers(token))
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "12AB",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        assert res.get_json()["issues"][0]["type"] == "bad_pincode"
+
+    def test_product_without_variants_skips_stock_check(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product(variants=[])
+        client.post("/customer/cart/add", json={
+            "customer_id": customer_id, "product_id": product_id, "quantity": 1,
+        }, headers=_auth_headers(token))
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "110001",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 200
+
+    def test_stock_ok_checkout_still_succeeds(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product(variants=[
+            {"size": "M", "color": "Red", "stock": {"$numberInt": "10"}},
+        ])
+        client.post("/customer/cart/add", json={
+            "customer_id": customer_id, "product_id": product_id,
+            "size": "M", "color": "Red", "quantity": 2,
+        }, headers=_auth_headers(token))
+
+        res = client.post("/customer/checkout", json={
+            "customer_id": customer_id, "pincode": "400001",
+        }, headers=_auth_headers(token))
+        assert res.status_code == 200
+
+    def test_create_order_blocked_when_out_of_stock(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product(variants=[
+            {"size": "M", "color": "Red", "stock": {"$numberInt": "1"}},
+        ], price="600")
+        res = client.post("/customer/create-order", json={
+            "customer_id": customer_id, "checkout_mode": "buyNow", "pincode": "110001",
+            "items": [{"product_id": product_id, "size": "M", "color": "Red", "quantity": 5}],
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        assert res.get_json()["issues"][0]["type"] == "out_of_stock"
+
+    def test_create_order_blocked_for_undeliverable_pincode(self, client, registered_customer):
+        customer_id, token = registered_customer
+        product_id = _insert_product(price="600")
+        res = client.post("/customer/create-order", json={
+            "customer_id": customer_id, "checkout_mode": "buyNow", "pincode": "999999",
+            "items": [{"product_id": product_id, "size": "M", "color": "Red", "quantity": 1}],
+        }, headers=_auth_headers(token))
+        assert res.status_code == 409
+        assert res.get_json()["issues"][0]["type"] == "not_deliverable"

@@ -6,7 +6,7 @@ from bson import ObjectId
 from datetime import datetime  
 import logging
 from utils.auth_utils import token_required
-from utils.pricing_utils import calculate_quote
+from utils.pricing_utils import calculate_quote, validate_order_feasibility
 from database import (
     users_collection,
     cart_collection,
@@ -664,6 +664,7 @@ def checkout(current_user):
     coupon_code = data.get("coupon_code")
     phone = data.get("phone", "")
     address = data.get("address", "")
+    pincode = data.get("pincode", "")
     payment_method = data.get("payment_method", "cod")
     checkout_mode = data.get("checkout_mode", "cart")
     direct_items = data.get("items", [])
@@ -683,6 +684,12 @@ def checkout(current_user):
 
     if not source_items:
         return jsonify({"message": "No items to checkout"}), 400
+
+    issues = validate_order_feasibility(
+        raw_items=source_items, products_collection=products_collection, pincode=pincode
+    )
+    if issues:
+        return jsonify({"message": "This order can't be placed as-is", "issues": issues}), 409
 
     total = 0
     enriched_items = []
@@ -1729,6 +1736,12 @@ def create_order(current_user):
             source_items = cart.get("items", []) if cart else []
         if not source_items:
             return jsonify({"success": False, "message": "No items to checkout"}), 400
+
+        issues = validate_order_feasibility(
+            raw_items=source_items, products_collection=products_collection, pincode=data.get("pincode")
+        )
+        if issues:
+            return jsonify({"success": False, "message": "This order can't be placed as-is", "issues": issues}), 409
 
         quote = calculate_quote(
             raw_items=source_items,
