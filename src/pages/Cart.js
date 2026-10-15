@@ -748,17 +748,19 @@ const groupedOffers = groupOffersById(offers);
             <Link to={`/products/${productId}`}>
               <img src={item.image || item.images?.[0] || '/images/logo.png'} alt={item.name} />
             </Link>
-            <Link to={`/products/${productId}`}><h4>{item.name}</h4></Link>
-            <p>
-              {item.original_price ? (
-                <>
-                  <del>₹{item.original_price}</del> <strong>₹{item.discounted_price}</strong>
-                </>
-              ) : (
-                <>₹{item.price}</>
-              )}
-            </p>
-            <p className={styles.brand}>{item.brand}</p>
+            <div className={styles.cardContent}>
+              <Link to={`/products/${productId}`}><h4>{item.name}</h4></Link>
+              <p>
+                {item.original_price ? (
+                  <>
+                    <del>₹{item.original_price}</del> <strong>₹{item.discounted_price}</strong>
+                  </>
+                ) : (
+                  <>₹{item.price}</>
+                )}
+              </p>
+              <p className={styles.brand}>{item.brand}</p>
+            </div>
             <div className={styles.similarActions}>
               <button onClick={() => openVariantModal(productId)}>Add to Cart</button>
               <button
